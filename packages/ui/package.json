@@ -1,0 +1,13 @@
+{
+  "name": "@vibe/ui",
+  "version": "0.1.0",
+  "private": true,
+  "main": "./index.ts",
+  "types": "./index.ts",
+  "scripts": {
+    "lint": "echo 'no lint configured'"
+  },
+  "dependencies": {
+    "react": "^19.0.0"
+  }
+}

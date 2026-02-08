@@ -1,0 +1,224 @@
+'use client';
+
+import { useState } from 'react';
+import {
+  BarChart3,
+  TrendingUp,
+  Clock,
+  MousePointerClick,
+} from 'lucide-react';
+import AnalyticsCharts from './analytics-charts';
+import TopPages from './top-pages';
+import ReferralSources from './referral-sources';
+import DeviceBreakdown from './device-breakdown';
+
+// ---------------------------------------------------------------------------
+// Demo data
+// ---------------------------------------------------------------------------
+
+const DEMO_METRICS = {
+  pageviews: 12847,
+  uniqueVisitors: 3241,
+  avgSessionDuration: '2m 34s',
+  bounceRate: '42%',
+};
+
+const DEMO_CHART = Array.from({ length: 90 }, (_, i) => ({
+  date: new Date(Date.now() - (89 - i) * 86400000).toISOString().split('T')[0],
+  views: Math.floor(Math.random() * 200) + 300 + Math.floor(i * 5),
+  unique: Math.floor(Math.random() * 80) + 80 + Math.floor(i * 2),
+}));
+
+const DEMO_TOP_PAGES = [
+  { url: '/', views: 4521, unique: 2103, avgTime: '1m 45s', bounceRate: '35%' },
+  { url: '/features', views: 2847, unique: 1456, avgTime: '3m 12s', bounceRate: '28%' },
+  { url: '/pricing', views: 2103, unique: 987, avgTime: '2m 08s', bounceRate: '45%' },
+  { url: '/contact', views: 1823, unique: 1102, avgTime: '1m 55s', bounceRate: '52%' },
+  { url: '/about', views: 1553, unique: 893, avgTime: '2m 30s', bounceRate: '38%' },
+];
+
+const DEMO_REFERRALS = [
+  { source: 'Direct', visitors: 1245, percentage: 38 },
+  { source: 'Google', visitors: 987, percentage: 30 },
+  { source: 'Twitter/X', visitors: 456, percentage: 14 },
+  { source: 'LinkedIn', visitors: 321, percentage: 10 },
+  { source: 'Overig', visitors: 232, percentage: 8 },
+];
+
+const DEMO_DEVICES = [
+  { device: 'Desktop', count: 1945, percentage: 60 },
+  { device: 'Mobile', count: 1102, percentage: 34 },
+  { device: 'Tablet', count: 194, percentage: 6 },
+];
+
+// ---------------------------------------------------------------------------
+// Metric card accent styles
+// ---------------------------------------------------------------------------
+
+const accentStyles = {
+  blue: {
+    iconBg: 'bg-blue-100 dark:bg-blue-900/40',
+    iconColor: 'text-blue-600 dark:text-blue-400',
+    border: 'border-blue-100 dark:border-blue-900/40',
+    bg: 'bg-blue-50/50 dark:bg-blue-950/20',
+  },
+  emerald: {
+    iconBg: 'bg-emerald-100 dark:bg-emerald-900/40',
+    iconColor: 'text-emerald-600 dark:text-emerald-400',
+    border: 'border-emerald-100 dark:border-emerald-900/40',
+    bg: 'bg-emerald-50/50 dark:bg-emerald-950/20',
+  },
+  purple: {
+    iconBg: 'bg-purple-100 dark:bg-purple-900/40',
+    iconColor: 'text-purple-600 dark:text-purple-400',
+    border: 'border-purple-100 dark:border-purple-900/40',
+    bg: 'bg-purple-50/50 dark:bg-purple-950/20',
+  },
+  amber: {
+    iconBg: 'bg-amber-100 dark:bg-amber-900/40',
+    iconColor: 'text-amber-600 dark:text-amber-400',
+    border: 'border-amber-100 dark:border-amber-900/40',
+    bg: 'bg-amber-50/50 dark:bg-amber-950/20',
+  },
+} as const;
+
+type AccentColor = keyof typeof accentStyles;
+
+// ---------------------------------------------------------------------------
+// Date range options
+// ---------------------------------------------------------------------------
+
+const DATE_RANGES = [
+  { label: 'Laatste 7 dagen', value: 7 },
+  { label: 'Laatste 30 dagen', value: 30 },
+  { label: 'Laatste 90 dagen', value: 90 },
+] as const;
+
+// ---------------------------------------------------------------------------
+// Component
+// ---------------------------------------------------------------------------
+
+export default function AnalyticsPage() {
+  const [range, setRange] = useState<number>(30);
+
+  const metricCards: {
+    icon: React.ReactNode;
+    label: string;
+    value: string | number;
+    accent: AccentColor;
+    trend: string;
+  }[] = [
+    {
+      icon: <BarChart3 className="h-5 w-5" />,
+      label: 'Pageviews',
+      value: DEMO_METRICS.pageviews.toLocaleString('nl-NL'),
+      accent: 'blue',
+      trend: '+12.5%',
+    },
+    {
+      icon: <TrendingUp className="h-5 w-5" />,
+      label: 'Unieke bezoekers',
+      value: DEMO_METRICS.uniqueVisitors.toLocaleString('nl-NL'),
+      accent: 'emerald',
+      trend: '+8.2%',
+    },
+    {
+      icon: <Clock className="h-5 w-5" />,
+      label: 'Gem. sessieduur',
+      value: DEMO_METRICS.avgSessionDuration,
+      accent: 'purple',
+      trend: '+5.1%',
+    },
+    {
+      icon: <MousePointerClick className="h-5 w-5" />,
+      label: 'Bounce rate',
+      value: DEMO_METRICS.bounceRate,
+      accent: 'amber',
+      trend: '-3.4%',
+    },
+  ];
+
+  return (
+    <div className="mx-auto max-w-7xl space-y-6">
+      {/* Header */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-50">
+            Analytics
+          </h1>
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+            Overzicht van je websiteverkeer en gebruikersgedrag.
+          </p>
+        </div>
+
+        {/* Date range picker */}
+        <div className="flex rounded-lg border border-slate-200 bg-white p-1 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+          {DATE_RANGES.map((dr) => (
+            <button
+              key={dr.value}
+              onClick={() => setRange(dr.value)}
+              className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
+                range === dr.value
+                  ? 'bg-slate-900 text-white shadow-sm dark:bg-slate-100 dark:text-slate-900'
+                  : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100'
+              }`}
+            >
+              {dr.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Metric cards */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {metricCards.map((card) => {
+          const styles = accentStyles[card.accent];
+          const isPositive = card.trend.startsWith('+');
+          return (
+            <div
+              key={card.label}
+              className={`rounded-xl border ${styles.border} ${styles.bg} p-5 shadow-sm transition-shadow hover:shadow-md`}
+            >
+              <div className="flex items-center justify-between">
+                <div
+                  className={`flex h-10 w-10 items-center justify-center rounded-lg ${styles.iconBg}`}
+                >
+                  <span className={styles.iconColor}>{card.icon}</span>
+                </div>
+                <span
+                  className={`text-xs font-semibold ${
+                    isPositive
+                      ? 'text-emerald-600 dark:text-emerald-400'
+                      : 'text-red-500 dark:text-red-400'
+                  }`}
+                >
+                  {card.trend}
+                </span>
+              </div>
+              <p className="mt-3 text-sm font-medium text-slate-500 dark:text-slate-400">
+                {card.label}
+              </p>
+              <p className="mt-1 text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-50">
+                {card.value}
+              </p>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Pageviews chart */}
+      <AnalyticsCharts data={DEMO_CHART} range={range} />
+
+      {/* Bottom section: tables + device breakdown */}
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <div className="lg:col-span-2">
+          <TopPages pages={DEMO_TOP_PAGES} />
+        </div>
+        <div className="space-y-6">
+          <ReferralSources sources={DEMO_REFERRALS} />
+          <DeviceBreakdown devices={DEMO_DEVICES} />
+        </div>
+      </div>
+    </div>
+  );
+}

@@ -1,0 +1,32 @@
+{
+  "name": "Vibe Control Panel",
+  "version": "1.0.0",
+  "description": "Component and feature management dashboard",
+  "components": [
+    {
+      "name": "HealthScore",
+      "path": "src/app/(dashboard)/health/health-score.tsx",
+      "category": "health"
+    },
+    {
+      "name": "CheckResults",
+      "path": "src/app/(dashboard)/health/check-results.tsx",
+      "category": "health"
+    },
+    {
+      "name": "HealthHistory",
+      "path": "src/app/(dashboard)/health/health-history.tsx",
+      "category": "health"
+    },
+    {
+      "name": "SettingsPanel",
+      "path": "src/app/(dashboard)/health/settings-panel.tsx",
+      "category": "health"
+    },
+    {
+      "name": "NotificationsPanel",
+      "path": "src/app/(dashboard)/health/notifications-panel.tsx",
+      "category": "health"
+    }
+  ]
+}
