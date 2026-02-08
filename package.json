@@ -1,0 +1,19 @@
+{
+  "name": "vibe-control-panel",
+  "private": true,
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "lint": "turbo lint",
+    "clean": "turbo clean"
+  },
+  "devDependencies": {
+    "turbo": "latest",
+    "typescript": "^5.7.0"
+  },
+  "packageManager": "pnpm@9.15.0",
+  "dependencies": {
+    "date-fns": "^4.1.0",
+    "reactflow": "^11.11.4"
+  }
+}
