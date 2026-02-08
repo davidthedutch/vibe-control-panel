@@ -1,4 +1,3 @@
 {
-  "buildCommand": "cd ../.. && pnpm install && pnpm turbo run build --filter=@vibe/web",
-  "installCommand": "pnpm install"
+  "buildCommand": "cd ../.. && pnpm install && pnpm turbo run build --filter=@vibe/web"
 }
