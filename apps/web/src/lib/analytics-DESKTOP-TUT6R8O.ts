@@ -258,7 +258,7 @@ export async function fetchTopPages(
       : 0;
     const timePerPage = pages.length > 0 ? sessionDuration / pages.length : 0;
 
-    pages.forEach((page, index) => {
+    pages.forEach((page: string, index: number) => {
       if (!pageData[page]) {
         pageData[page] = {
           views: 0,
