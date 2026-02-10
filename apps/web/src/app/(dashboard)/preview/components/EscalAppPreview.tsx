@@ -1,14 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-import { Home, Calendar, Radio, User } from 'lucide-react';
+import { Calendar, Radio, User } from 'lucide-react';
 import HomeScreen from './escal-screens/HomeScreen';
-import EventsScreen from './escal-screens/EventsScreen';
 import EventDetailScreen from './escal-screens/EventDetailScreen';
 import LiveScreen from './escal-screens/LiveScreen';
 import ProfileScreen from './escal-screens/ProfileScreen';
 
-type Tab = 'home' | 'events' | 'live' | 'profile';
+type Tab = 'home' | 'live' | 'profile';
 type DeviceMode = 'iphone' | 'ipad';
 
 interface EscalAppPreviewProps {
@@ -39,23 +38,20 @@ export default function EscalAppPreview({ device }: EscalAppPreviewProps) {
     setSelectedEventId(null);
   };
 
-  const tabs: { id: Tab; label: string; icon: typeof Home }[] = [
-    { id: 'home', label: 'Home', icon: Home },
-    { id: 'events', label: 'Events', icon: Calendar },
+  const tabs: { id: Tab; label: string; icon: typeof Calendar }[] = [
+    { id: 'home', label: 'Events', icon: Calendar },
     { id: 'live', label: 'Live', icon: Radio },
     { id: 'profile', label: 'Profiel', icon: User },
   ];
 
   const renderScreen = () => {
-    if (activeTab === 'events' && selectedEventId) {
+    if (activeTab === 'home' && selectedEventId) {
       return <EventDetailScreen eventId={selectedEventId} onBack={handleBackFromEvent} />;
     }
 
     switch (activeTab) {
       case 'home':
-        return <HomeScreen />;
-      case 'events':
-        return <EventsScreen onSelectEvent={handleSelectEvent} />;
+        return <HomeScreen onSelectEvent={handleSelectEvent} />;
       case 'live':
         return <LiveScreen />;
       case 'profile':
