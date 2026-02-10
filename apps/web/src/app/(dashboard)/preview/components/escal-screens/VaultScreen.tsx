@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { User, Star, Trophy, Calendar, Users, Settings, ChevronRight, ChevronDown, LogOut, Award, Flame, MapPin, Music, Zap, Heart, Shield, Share2, Copy, Check, X, Bell, Moon, Globe } from 'lucide-react';
+import { usePersistedState } from './use-persisted-state';
 
 const DEMO_FAVORITE_EVENTS = [
   { name: 'Awakenings NYE 2026', date: '31 dec 2026', venue: 'Gashouder' },
@@ -58,9 +59,9 @@ interface VaultScreenProps {
 export default function VaultScreen({ user }: VaultScreenProps) {
   const [codeCopied, setCodeCopied] = useState(false);
   const [expandedMenu, setExpandedMenu] = useState<string | null>(null);
-  const [notificaties, setNotificaties] = useState(true);
-  const [darkMode, setDarkMode] = useState(true);
-  const [taalNL, setTaalNL] = useState(true);
+  const [notificaties, setNotificaties] = usePersistedState('escal-vault-notif', true);
+  const [darkMode, setDarkMode] = usePersistedState('escal-vault-dark', true);
+  const [taalNL, setTaalNL] = usePersistedState('escal-vault-taal', true);
 
   const profile = {
     username: user.username,

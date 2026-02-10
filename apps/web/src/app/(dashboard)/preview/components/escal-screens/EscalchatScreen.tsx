@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { Search, Send, Hash, Users, ChevronDown, ChevronUp, UserCheck } from 'lucide-react';
+import { usePersistedState } from './use-persisted-state';
 import type { PreviewUser } from '../../page';
 
 const DEMO_ROOMS = [
@@ -45,40 +46,16 @@ interface EscalchatScreenProps {
   user: PreviewUser;
 }
 
-const STORAGE_KEY = 'escal-chat-messages';
-
-function loadMessages() {
-  if (typeof window === 'undefined') return INITIAL_MESSAGES;
-  try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) {
-      const parsed = JSON.parse(stored);
-      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-    }
-  } catch { /* ignore */ }
-  return INITIAL_MESSAGES;
-}
-
 export default function EscalchatScreen({ user }: EscalchatScreenProps) {
   const [activeRoom, setActiveRoom] = useState('public');
   const [messageText, setMessageText] = useState('');
-  const [messages, setMessages] = useState(INITIAL_MESSAGES);
+  const [messages, setMessages] = usePersistedState('escal-chat-messages', INITIAL_MESSAGES);
   const [showSearch, setShowSearch] = useState(false);
   const [searchCode, setSearchCode] = useState('');
   const [searchResult, setSearchResult] = useState<typeof DEMO_PEOPLE[0] | null | 'not_found'>(null);
   const [usersExpanded, setUsersExpanded] = useState(false);
   const [userFilter, setUserFilter] = useState<'all' | 'friends'>('all');
   const chatEndRef = useRef<HTMLDivElement>(null);
-
-  // Load persisted messages on mount
-  useEffect(() => {
-    setMessages(loadMessages());
-  }, []);
-
-  // Persist messages to localStorage on change
-  useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(messages));
-  }, [messages]);
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });

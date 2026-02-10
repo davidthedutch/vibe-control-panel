@@ -1,20 +1,61 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Shield, Phone, Volume2, Coffee, Droplets, MapPin, Timer, Activity, AlertTriangle, Cigarette, Check, X } from 'lucide-react';
 import { useBuddyPairs } from '@/lib/hooks/use-escal-data';
+import { usePersistedState } from './use-persisted-state';
 
 export default function ArsenalScreen() {
   const { pairs, loading: pairsLoading } = useBuddyPairs();
   const [bpmTaps, setBpmTaps] = useState<number[]>([]);
   const [bpmValue, setBpmValue] = useState<number | null>(null);
-  const [timerActive, setTimerActive] = useState(false);
-  const [timerMinutes, setTimerMinutes] = useState(5);
+  const [timerSeconds, setTimerSeconds] = useState(0);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const timerActive = timerSeconds > 0;
   const [sosPressed, setSosPressed] = useState(false);
-  const [safeHome, setSafeHome] = useState(false);
+  const [safeHome, setSafeHome] = usePersistedState('escal-arsenal-safehome', false);
   const [activeQuickAction, setActiveQuickAction] = useState<string | null>(null);
-  const [dbLevel, setDbLevel] = useState(92);
+  const [dbLevel, setDbLevel] = usePersistedState('escal-arsenal-db', 92);
   const [dbMeasuring, setDbMeasuring] = useState(false);
+
+  const startTimer = useCallback((minutes: number) => {
+    setTimerSeconds(minutes * 60);
+  }, []);
+
+  const stopTimer = useCallback(() => {
+    setTimerSeconds(0);
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
+  }, []);
+
+  useEffect(() => {
+    if (timerSeconds <= 0) {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+      return;
+    }
+    timerRef.current = setInterval(() => {
+      setTimerSeconds((prev) => {
+        if (prev <= 1) return 0;
+        return prev - 1;
+      });
+    }, 1000);
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, [timerSeconds > 0]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const formatTimer = (secs: number) => {
+    const m = Math.floor(secs / 60);
+    const s = secs % 60;
+    return `${m}:${String(s).padStart(2, '0')}`;
+  };
+
+  const timerProgress = timerSeconds > 0 ? ((timerSeconds % 60) / 60) * 100 : 0;
 
   const activePairs = pairs.filter((p) => p.status === 'active');
   const alertPairs = pairs.filter((p) => p.status === 'alert');
@@ -87,19 +128,27 @@ export default function ArsenalScreen() {
       <div className="rounded-[20px] bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] shadow-lg shadow-black/20 p-3">
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
-            <Timer className="h-4 w-4 text-blue-400" />
+            <Timer className={`h-4 w-4 ${timerActive ? 'text-blue-400 animate-pulse' : 'text-blue-400'}`} />
             <span className="text-xs font-semibold text-white">Timer</span>
           </div>
           {timerActive && (
-            <span className="text-xs font-bold text-blue-400">{timerMinutes}:00</span>
+            <span className="text-lg font-bold tabular-nums text-blue-400">{formatTimer(timerSeconds)}</span>
           )}
         </div>
+        {timerActive && (
+          <div className="mb-2 h-1.5 overflow-hidden rounded-full bg-white/[0.06]">
+            <div
+              className="h-full rounded-full bg-blue-400 transition-all duration-1000"
+              style={{ width: `${timerProgress}%` }}
+            />
+          </div>
+        )}
         {!timerActive ? (
           <div className="flex gap-1.5">
             {[5, 10, 15, 30].map((m) => (
               <button
                 key={m}
-                onClick={() => { setTimerMinutes(m); setTimerActive(true); }}
+                onClick={() => startTimer(m)}
                 className="flex-1 rounded-full py-1.5 text-[10px] font-medium bg-white/[0.06] text-slate-400 active:bg-blue-500 active:text-white transition-colors"
               >
                 {m} min
@@ -108,7 +157,7 @@ export default function ArsenalScreen() {
           </div>
         ) : (
           <button
-            onClick={() => setTimerActive(false)}
+            onClick={stopTimer}
             className="w-full rounded-full bg-red-500/20 py-1.5 text-[10px] font-medium text-red-400 active:bg-red-500/30"
           >
             Stop timer

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { MapPin, Radio, Navigation, Footprints, CheckCircle, Send, Droplets, Timer, Check } from 'lucide-react';
 import { useLiveLocations } from '@/lib/hooks/use-escal-data';
+import { usePersistedState } from './use-persisted-state';
 import type { PreviewUser } from '../../page';
 
 interface ArenaScreenProps {
@@ -11,12 +12,12 @@ interface ArenaScreenProps {
 
 export default function ArenaScreen({ user }: ArenaScreenProps) {
   const { locations, loading: locsLoading } = useLiveLocations();
-  const [checkedIn, setCheckedIn] = useState(false);
-  const [sharingLocation, setSharingLocation] = useState(false);
-  const [stagePosition, setStagePosition] = useState('Main Stage');
+  const [checkedIn, setCheckedIn] = usePersistedState('escal-arena-checkedin', false);
+  const [sharingLocation, setSharingLocation] = usePersistedState('escal-arena-sharing', false);
+  const [stagePosition, setStagePosition] = usePersistedState('escal-arena-stage', 'Main Stage');
   const [statusText, setStatusText] = useState('');
-  const [postedStatuses, setPostedStatuses] = useState<{ text: string; time: string }[]>([]);
-  const [waterTimer, setWaterTimer] = useState(false);
+  const [postedStatuses, setPostedStatuses] = usePersistedState<{ text: string; time: string }[]>('escal-arena-statuses', []);
+  const [waterTimer, setWaterTimer] = usePersistedState('escal-arena-water', false);
 
   const handleSendStatus = () => {
     if (!statusText.trim()) return;

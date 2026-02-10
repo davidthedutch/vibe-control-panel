@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { ArrowLeft, MapPin, Calendar, Users, Clock, Share2, Heart, Music, Ticket, MessageSquare, AlertTriangle, Send, Check } from 'lucide-react';
 import { useEscalEvent } from '@/lib/hooks/use-escal-data';
+import { usePersistedState } from './use-persisted-state';
 import type { PreviewUser } from '../../page';
 
 interface EventDetailScreenProps {
@@ -34,13 +35,13 @@ const DEMO_REACTIES = [
 
 export default function EventDetailScreen({ eventId, onBack, user }: EventDetailScreenProps) {
   const { event, loading } = useEscalEvent(eventId);
-  const [isFavorite, setIsFavorite] = useState(false);
-  const [isGoing, setIsGoing] = useState(false);
-  const [isInterested, setIsInterested] = useState(false);
+  const [isFavorite, setIsFavorite] = usePersistedState(`escal-event-fav-${eventId}`, false);
+  const [isGoing, setIsGoing] = usePersistedState(`escal-event-going-${eventId}`, false);
+  const [isInterested, setIsInterested] = usePersistedState(`escal-event-interest-${eventId}`, false);
   const [shared, setShared] = useState(false);
   const [showReactieInput, setShowReactieInput] = useState(false);
   const [reactieText, setReactieText] = useState('');
-  const [reacties, setReacties] = useState(DEMO_REACTIES);
+  const [reacties, setReacties] = usePersistedState(`escal-event-reacties-${eventId}`, DEMO_REACTIES);
 
   const formatDate = (dateStr: string) => {
     return new Date(dateStr).toLocaleDateString('nl-NL', {
