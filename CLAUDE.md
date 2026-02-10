@@ -75,7 +75,7 @@ Kleur mapping voor Escal components (ALLE platforms):
 - **Success**: `green-*` (online, check-in, veilig thuis)
 - **Error/SOS**: `red-*` (alerts, noodknop)
 - **Backgrounds**: `slate-*` (surfaces, borders, secondary text)
-- **VERBODEN**: `purple-*` mag NIET worden gebruikt als Escal primary/accent kleur
+- **VERBODEN**: `purple-*` en `indigo-*` mogen NIET worden gebruikt als Escal primary/accent kleur
 
 ## Key Files
 - `src/lib/escal-api-client.ts` - Escal API client
