@@ -1,13 +1,15 @@
 'use client';
 
 import { useState } from 'react';
-import { Calendar, Radio, User } from 'lucide-react';
+import { Zap, Calendar, Shield, MessageCircle, Lock } from 'lucide-react';
 import HomeScreen from './escal-screens/HomeScreen';
 import EventDetailScreen from './escal-screens/EventDetailScreen';
-import LiveScreen from './escal-screens/LiveScreen';
-import ProfileScreen from './escal-screens/ProfileScreen';
+import ArenaScreen from './escal-screens/ArenaScreen';
+import ArsenalScreen from './escal-screens/ArsenalScreen';
+import EscalchatScreen from './escal-screens/EscalchatScreen';
+import VaultScreen from './escal-screens/VaultScreen';
 
-type Tab = 'home' | 'live' | 'profile';
+type Tab = 'arena' | 'events' | 'arsenal' | 'escalchat' | 'vault';
 type DeviceMode = 'iphone' | 'ipad';
 
 interface EscalAppPreviewProps {
@@ -20,7 +22,7 @@ const DEVICE_DIMENSIONS = {
 };
 
 export default function EscalAppPreview({ device }: EscalAppPreviewProps) {
-  const [activeTab, setActiveTab] = useState<Tab>('home');
+  const [activeTab, setActiveTab] = useState<Tab>('arena');
   const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
 
   const dims = DEVICE_DIMENSIONS[device];
@@ -39,23 +41,29 @@ export default function EscalAppPreview({ device }: EscalAppPreviewProps) {
   };
 
   const tabs: { id: Tab; label: string; icon: typeof Calendar }[] = [
-    { id: 'home', label: 'Events', icon: Calendar },
-    { id: 'live', label: 'Live', icon: Radio },
-    { id: 'profile', label: 'Profiel', icon: User },
+    { id: 'arena', label: 'Arena', icon: Zap },
+    { id: 'events', label: 'Events', icon: Calendar },
+    { id: 'arsenal', label: 'Arsenal', icon: Shield },
+    { id: 'escalchat', label: 'Escal', icon: MessageCircle },
+    { id: 'vault', label: 'Vault', icon: Lock },
   ];
 
   const renderScreen = () => {
-    if (activeTab === 'home' && selectedEventId) {
+    if (activeTab === 'events' && selectedEventId) {
       return <EventDetailScreen eventId={selectedEventId} onBack={handleBackFromEvent} />;
     }
 
     switch (activeTab) {
-      case 'home':
+      case 'arena':
+        return <ArenaScreen />;
+      case 'events':
         return <HomeScreen onSelectEvent={handleSelectEvent} />;
-      case 'live':
-        return <LiveScreen />;
-      case 'profile':
-        return <ProfileScreen />;
+      case 'arsenal':
+        return <ArsenalScreen />;
+      case 'escalchat':
+        return <EscalchatScreen />;
+      case 'vault':
+        return <VaultScreen />;
     }
   };
 
@@ -108,10 +116,10 @@ export default function EscalAppPreview({ device }: EscalAppPreviewProps) {
                   className="flex flex-col items-center gap-0.5 px-3 py-1"
                 >
                   <tab.icon
-                    className={`h-5 w-5 ${isActive ? 'text-orange-400' : 'text-slate-500'}`}
+                    className={`h-4 w-4 ${isActive ? 'text-orange-400' : 'text-slate-500'}`}
                   />
                   <span
-                    className={`text-[10px] font-medium ${
+                    className={`text-[9px] font-medium ${
                       isActive ? 'text-orange-400' : 'text-slate-500'
                     }`}
                   >

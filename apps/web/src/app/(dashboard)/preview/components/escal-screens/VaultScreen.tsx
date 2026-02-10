@@ -1,6 +1,7 @@
 'use client';
 
-import { User, Star, Trophy, Calendar, Users, Settings, ChevronRight, LogOut, Award, Flame, MapPin, Music, Zap, Heart, Shield, Share2 } from 'lucide-react';
+import { useState } from 'react';
+import { User, Star, Trophy, Calendar, Users, Settings, ChevronRight, LogOut, Award, Flame, MapPin, Music, Zap, Heart, Shield, Share2, Copy, Check } from 'lucide-react';
 
 const DEMO_BADGES = [
   { name: 'First Timer', icon: Star, color: 'text-yellow-400', bg: 'bg-yellow-500/20', earned: true },
@@ -28,9 +29,12 @@ const DEMO_EVENT_HISTORY = [
   { name: 'Verknipt', date: '8 mrt 2025', venue: 'Jaarbeurs' },
 ];
 
-export default function ProfileScreen() {
+export default function VaultScreen() {
+  const [codeCopied, setCodeCopied] = useState(false);
+
   const profile = {
     username: 'DemoUser',
+    userCode: '482910',
     level: 12,
     xp: 2450,
     xpNext: 3000,
@@ -45,6 +49,11 @@ export default function ProfileScreen() {
   const xpProgress = (profile.xp / profile.xpNext) * 100;
   const earnedBadges = DEMO_BADGES.filter(b => b.earned).length;
 
+  const handleCopyCode = () => {
+    setCodeCopied(true);
+    setTimeout(() => setCodeCopied(false), 2000);
+  };
+
   return (
     <div className="flex flex-col gap-5 p-5">
       {/* Profile header */}
@@ -58,7 +67,24 @@ export default function ProfileScreen() {
           </div>
         </div>
         <h1 className="text-lg font-bold text-white">{profile.username}</h1>
-        <p className="text-xs text-slate-400">Level {profile.level} &bull; {profile.topGenre} liefhebber</p>
+
+        {/* 6-digit user code */}
+        <div className="mt-1 flex items-center gap-2">
+          <span className="text-sm font-mono font-bold text-orange-400">#{profile.userCode}</span>
+          <button
+            onClick={handleCopyCode}
+            className="flex h-6 w-6 items-center justify-center rounded-full bg-white/[0.06] border border-white/[0.08]"
+          >
+            {codeCopied ? (
+              <Check className="h-3 w-3 text-green-400" />
+            ) : (
+              <Copy className="h-3 w-3 text-slate-400" />
+            )}
+          </button>
+        </div>
+        <p className="mt-0.5 text-[10px] text-slate-500">Deel je code zodat vrienden je kunnen vinden</p>
+
+        <p className="mt-1 text-xs text-slate-400">Level {profile.level} &bull; {profile.topGenre} liefhebber</p>
         <div className="mt-2 flex gap-2">
           <button className="rounded-full bg-orange-500 px-4 py-1.5 text-[11px] font-semibold text-white">
             Profiel Bewerken

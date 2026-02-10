@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { ArrowLeft, MapPin, Calendar, Users, Clock, Star, Share2, Heart, Music, Ticket, MessageSquare, AlertTriangle, ChevronRight } from 'lucide-react';
+import { ArrowLeft, MapPin, Calendar, Users, Clock, Share2, Heart, Music, Ticket, MessageSquare, AlertTriangle } from 'lucide-react';
 import { useEscalEvent } from '@/lib/hooks/use-escal-data';
 
 interface EventDetailScreenProps {
@@ -24,9 +24,10 @@ const DEMO_FRIENDS_GOING = [
   { name: 'BassDrop', initials: 'BD' },
 ];
 
-const DEMO_REVIEWS = [
-  { user: 'NightOwl', rating: 5, text: 'Beste event van het jaar!', date: '2 weken geleden' },
-  { user: 'ClubKid', rating: 4, text: 'Geweldige line-up, geluid was top.', date: '1 maand geleden' },
+const DEMO_REACTIES = [
+  { user: 'NightOwl', text: 'Beste event van het jaar!', date: '2 weken geleden' },
+  { user: 'ClubKid', text: 'Geweldige line-up, geluid was top.', date: '1 maand geleden' },
+  { user: 'DJFan123', text: 'Charlotte de Witte was insane 🔥', date: '3 dagen geleden' },
 ];
 
 export default function EventDetailScreen({ eventId, onBack }: EventDetailScreenProps) {
@@ -210,50 +211,32 @@ export default function EventDetailScreen({ eventId, onBack }: EventDetailScreen
           </div>
         )}
 
-        {/* Reviews */}
+        {/* Reacties */}
         <div>
           <div className="mb-2 flex items-center justify-between">
             <h3 className="flex items-center gap-1.5 text-xs font-semibold uppercase text-slate-500">
-              <MessageSquare className="h-3.5 w-3.5" /> Reviews
+              <MessageSquare className="h-3.5 w-3.5" /> Reacties
             </h3>
-            <div className="flex items-center gap-1">
-              {[1, 2, 3, 4, 5].map((s) => (
-                <Star key={s} className={`h-3 w-3 ${s <= 4 ? 'text-yellow-400' : 'text-slate-600'}`} fill={s <= 4 ? 'currentColor' : 'none'} />
-              ))}
-              <span className="ml-1 text-[10px] text-slate-400">4.2</span>
-            </div>
+            <span className="text-[10px] text-slate-400">{DEMO_REACTIES.length} reacties</span>
           </div>
           <div className="flex flex-col gap-2">
-            {DEMO_REVIEWS.map((review, i) => (
+            {DEMO_REACTIES.map((reactie, i) => (
               <div key={i} className="rounded-[16px] bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] px-3 py-2">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-xs font-medium text-orange-300">{review.user}</span>
-                    <div className="flex">
-                      {[1, 2, 3, 4, 5].map((s) => (
-                        <Star key={s} className={`h-2.5 w-2.5 ${s <= review.rating ? 'text-yellow-400' : 'text-slate-600'}`} fill={s <= review.rating ? 'currentColor' : 'none'} />
-                      ))}
-                    </div>
-                  </div>
-                  <span className="text-[10px] text-slate-500">{review.date}</span>
+                  <span className="text-xs font-medium text-orange-300">{reactie.user}</span>
+                  <span className="text-[10px] text-slate-500">{reactie.date}</span>
                 </div>
-                <p className="mt-1 text-[11px] text-slate-300">{review.text}</p>
+                <p className="mt-1 text-[11px] text-slate-300">{reactie.text}</p>
               </div>
             ))}
           </div>
           <button className="mt-2 w-full rounded-[16px] bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] py-2 text-xs text-orange-400">
-            Schrijf een review
+            Schrijf een reactie
           </button>
         </div>
 
-        {/* Source + age */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="text-[11px] text-slate-500">Bron:</span>
-            <span className="rounded bg-white/[0.06] px-2 py-0.5 text-[11px] font-medium uppercase text-slate-300">
-              {event.source}
-            </span>
-          </div>
+        {/* Age indicator */}
+        <div className="flex items-center justify-end">
           <div className="flex items-center gap-1 text-[11px] text-orange-400">
             <AlertTriangle className="h-3 w-3" />
             18+
