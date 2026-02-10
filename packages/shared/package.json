@@ -4,6 +4,12 @@
   "private": true,
   "main": "./index.ts",
   "types": "./index.ts",
+  "exports": {
+    ".": "./index.ts",
+    "./lib/*": "./lib/*.ts",
+    "./types": "./types/index.ts",
+    "./constants/*": "./constants/*.ts"
+  },
   "scripts": {
     "lint": "echo 'no lint configured'"
   },
