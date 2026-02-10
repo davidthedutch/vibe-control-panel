@@ -1,32 +1,41 @@
 'use client';
 
-import { useState } from 'react';
-import { MessageCircle, Search, Send, Hash, Users, ChevronRight, UserCheck } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
+import { Search, Send, Hash, Users, ChevronDown, ChevronUp, UserCheck } from 'lucide-react';
+import type { PreviewUser } from '../../page';
 
 const DEMO_ROOMS = [
-  { id: 'public', label: 'Public', active: true },
-  { id: 'awakenings', label: 'Awakenings NYE', active: false },
-  { id: 'verknipt', label: 'Verknipt', active: false },
-  { id: 'dgtl', label: 'DGTL', active: false },
+  { id: 'public', label: 'Public' },
+  { id: 'awakenings', label: 'Awakenings NYE' },
+  { id: 'verknipt', label: 'Verknipt' },
+  { id: 'dgtl', label: 'DGTL' },
 ];
 
 const DEMO_PEOPLE = [
-  { name: 'DJFan123', initials: 'DJ', online: true, code: '482910' },
-  { name: 'TechnoLover', initials: 'TL', online: true, code: '731458' },
-  { name: 'RaveQueen', initials: 'RQ', online: true, code: '204867' },
-  { name: 'BassDrop', initials: 'BD', online: false, code: '965312' },
-  { name: 'NightOwl', initials: 'NO', online: true, code: '148293' },
+  { name: 'DJFan', initials: 'DJ', online: true, code: '482910', friend: true },
+  { name: 'Techno', initials: 'TL', online: true, code: '731458', friend: false },
+  { name: 'Rave', initials: 'RQ', online: true, code: '204867', friend: true },
+  { name: 'Bass', initials: 'BD', online: false, code: '965312', friend: true },
+  { name: 'Night', initials: 'NO', online: true, code: '148293', friend: false },
+  { name: 'Flux', initials: 'FX', online: true, code: '557201', friend: false },
+  { name: 'Echo', initials: 'EC', online: false, code: '883412', friend: true },
+  { name: 'Venom', initials: 'VN', online: true, code: '224690', friend: false },
+  { name: 'Pulse', initials: 'PL', online: false, code: '669823', friend: true },
+  { name: 'Storm', initials: 'ST', online: true, code: '771034', friend: false },
 ];
 
 const INITIAL_MESSAGES = [
-  { id: '1', user: 'DJFan123', text: 'Wie staat er bij Main Stage?', time: '23:42' },
-  { id: '2', user: 'TechnoLover', text: 'Charlotte de Witte is insane 🔥', time: '23:44' },
-  { id: '3', user: 'RaveQueen', text: 'Bar 2 is het minst druk btw', time: '23:45' },
-  { id: '4', user: 'NightOwl', text: 'Iemand oordopjes over? Ben de mijne kwijt', time: '23:47' },
-  { id: '5', user: 'DJFan123', text: 'Bij de merch stand verkopen ze ze!', time: '23:48' },
+  { id: '1', user: 'DJFan', text: 'Wie staat er bij Main Stage?', time: '23:42' },
+  { id: '2', user: 'Techno', text: 'Charlotte de Witte is insane', time: '23:44' },
+  { id: '3', user: 'Rave', text: 'Bar 2 is het minst druk btw', time: '23:45' },
+  { id: '4', user: 'Night', text: 'Iemand oordopjes over?', time: '23:47' },
+  { id: '5', user: 'DJFan', text: 'Bij de merch stand verkopen ze ze!', time: '23:48' },
+  { id: '6', user: 'Flux', text: 'Ben Klock gaat zo beginnen', time: '23:50' },
+  { id: '7', user: 'Venom', text: 'Stage 2 is leeg, kom hierheen', time: '23:51' },
+  { id: '8', user: 'Storm', text: 'Geluid is hier echt top', time: '23:52' },
+  { id: '9', user: 'Rave', text: 'Wie wil water delen?', time: '23:53' },
+  { id: '10', user: 'DJFan', text: 'Ik sta bij de speakers links', time: '23:55' },
 ];
-
-import type { PreviewUser } from '../../page';
 
 interface EscalchatScreenProps {
   user: PreviewUser;
@@ -39,6 +48,13 @@ export default function EscalchatScreen({ user }: EscalchatScreenProps) {
   const [showSearch, setShowSearch] = useState(false);
   const [searchCode, setSearchCode] = useState('');
   const [searchResult, setSearchResult] = useState<typeof DEMO_PEOPLE[0] | null | 'not_found'>(null);
+  const [usersExpanded, setUsersExpanded] = useState(false);
+  const [userFilter, setUserFilter] = useState<'all' | 'friends'>('all');
+  const chatEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
 
   const handleSendMessage = () => {
     if (!messageText.trim()) return;
@@ -46,7 +62,7 @@ export default function EscalchatScreen({ user }: EscalchatScreenProps) {
     const time = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
     setMessages((prev) => [
       ...prev,
-      { id: String(Date.now()), user: user.username, text: messageText.trim(), time },
+      { id: String(Date.now()), user: user.username.slice(0, 7), text: messageText.trim(), time },
     ]);
     setMessageText('');
   };
@@ -57,8 +73,15 @@ export default function EscalchatScreen({ user }: EscalchatScreenProps) {
     setSearchResult(found ?? 'not_found');
   };
 
+  const truncName = (name: string) => name.slice(0, 7);
+
+  const filteredPeople = userFilter === 'friends'
+    ? DEMO_PEOPLE.filter((p) => p.friend)
+    : DEMO_PEOPLE;
+
   return (
-    <div className="flex flex-col gap-4 p-5">
+    <div className="flex flex-col gap-3 p-5">
+      {/* Header */}
       <div className="flex items-center justify-between">
         <h1 className="text-lg font-bold text-white">Escalchat</h1>
         <button
@@ -95,7 +118,6 @@ export default function EscalchatScreen({ user }: EscalchatScreenProps) {
               Zoek
             </button>
           </div>
-          {/* Search result */}
           {searchResult === 'not_found' && (
             <p className="mt-2 text-[11px] text-red-400">Geen persoon gevonden met code #{searchCode}</p>
           )}
@@ -132,78 +154,114 @@ export default function EscalchatScreen({ user }: EscalchatScreenProps) {
         ))}
       </div>
 
-      {/* People list */}
-      <div className="rounded-[20px] bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] shadow-lg shadow-black/20 p-3">
-        <div className="mb-2 flex items-center justify-between">
+      {/* Chat block - one big container */}
+      <div className="rounded-[20px] bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] shadow-lg shadow-black/20 flex flex-col overflow-hidden" style={{ minHeight: 200 }}>
+        <div className="flex-1 overflow-y-auto px-3 py-3 scrollbar-hide" style={{ maxHeight: 280 }}>
+          {messages.map((msg) => {
+            const isOwn = msg.user === user.username.slice(0, 7);
+            return (
+              <div key={msg.id} className="py-0.5">
+                <p className="text-xs leading-relaxed">
+                  <span className={`font-semibold ${isOwn ? 'text-orange-400' : 'text-orange-300'}`}>
+                    {isOwn ? 'Jij' : truncName(msg.user)}
+                  </span>
+                  <span className="text-slate-500 mx-1">·</span>
+                  <span className="text-slate-300">{msg.text}</span>
+                  <span className="ml-1.5 text-[10px] text-slate-600">{msg.time}</span>
+                </p>
+              </div>
+            );
+          })}
+          <div ref={chatEndRef} />
+        </div>
+
+        {/* Chat input inside the block */}
+        <div className="border-t border-white/[0.08] px-3 py-2 flex items-center gap-2">
+          <input
+            type="text"
+            placeholder="Bericht..."
+            className="flex-1 bg-transparent text-xs text-white placeholder-slate-500 outline-none"
+            value={messageText}
+            onChange={(e) => setMessageText(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
+          />
+          <button onClick={handleSendMessage} className="active:scale-90 transition-transform">
+            <Send className={`h-4 w-4 ${messageText.trim() ? 'text-orange-400' : 'text-slate-600'}`} />
+          </button>
+        </div>
+      </div>
+
+      {/* Online users block - collapsed by default, shows ~2 lines */}
+      <div className="rounded-[20px] bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] shadow-lg shadow-black/20 overflow-hidden">
+        {/* Header with expand toggle */}
+        <button
+          onClick={() => setUsersExpanded(!usersExpanded)}
+          className="w-full flex items-center justify-between px-3 py-2"
+        >
           <h3 className="flex items-center gap-1.5 text-[11px] font-semibold text-slate-400">
             <Users className="h-3 w-3" />
             Online ({DEMO_PEOPLE.filter(p => p.online).length + 1})
           </h3>
-        </div>
-        <div className="flex gap-2 overflow-x-auto scrollbar-hide">
-          {/* Current user first */}
-          <div className="flex flex-col items-center gap-1 shrink-0">
-            <div className="relative">
-              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-orange-500/50 text-[10px] font-bold text-white ring-2 ring-orange-400">
-                {user.username.slice(0, 2).toUpperCase()}
-              </div>
-              <div className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-[#1A1D23] bg-green-400" />
-            </div>
-            <span className="text-[9px] text-orange-400 max-w-[48px] truncate font-medium">Jij</span>
-          </div>
-          {DEMO_PEOPLE.filter(p => p.online).map((person) => (
-            <div key={person.name} className="flex flex-col items-center gap-1 shrink-0">
-              <div className="relative">
-                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-orange-500/30 text-[10px] font-bold text-orange-300">
-                  {person.initials}
-                </div>
-                <div className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-[#1A1D23] bg-green-400" />
-              </div>
-              <span className="text-[9px] text-slate-400 max-w-[48px] truncate">{person.name}</span>
-            </div>
-          ))}
-        </div>
-      </div>
+          {usersExpanded ? (
+            <ChevronUp className="h-3.5 w-3.5 text-slate-500" />
+          ) : (
+            <ChevronDown className="h-3.5 w-3.5 text-slate-500" />
+          )}
+        </button>
 
-      {/* Chat messages */}
-      <div className="flex flex-col gap-1.5">
-        {messages.map((msg) => {
-          const isOwn = msg.user === user.username;
-          return (
-            <div
-              key={msg.id}
-              className={`rounded-[16px] backdrop-blur-xl border px-3 py-2 ${
-                isOwn
-                  ? 'bg-orange-500/10 border-orange-500/20 ml-6'
-                  : 'bg-white/[0.06] border-white/[0.08]'
+        {/* Filter tabs */}
+        <div className="flex gap-1 px-3 pb-2">
+          {(['all', 'friends'] as const).map((filter) => (
+            <button
+              key={filter}
+              onClick={() => setUserFilter(filter)}
+              className={`rounded-full px-2.5 py-0.5 text-[10px] font-medium ${
+                userFilter === filter
+                  ? 'bg-orange-500 text-white'
+                  : 'bg-white/[0.06] text-slate-500'
               }`}
             >
-              <div className="flex items-center justify-between">
-                <span className={`text-xs font-medium ${isOwn ? 'text-orange-400' : 'text-orange-300'}`}>
-                  {isOwn ? 'Jij' : msg.user}
-                </span>
-                <span className="text-[10px] text-slate-500">{msg.time}</span>
-              </div>
-              <p className="mt-0.5 text-xs text-slate-300">{msg.text}</p>
-            </div>
-          );
-        })}
-      </div>
+              {filter === 'all' ? 'All' : 'Friends'}
+            </button>
+          ))}
+        </div>
 
-      {/* Chat input */}
-      <div className="flex items-center gap-2 rounded-[20px] bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] px-3 py-2">
-        <span className="text-[10px] font-medium text-orange-400 shrink-0">{user.username}</span>
-        <input
-          type="text"
-          placeholder="Bericht versturen..."
-          className="flex-1 bg-transparent text-xs text-white placeholder-slate-500 outline-none"
-          value={messageText}
-          onChange={(e) => setMessageText(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
-        />
-        <button onClick={handleSendMessage} className="active:scale-90 transition-transform">
-          <Send className={`h-4 w-4 ${messageText.trim() ? 'text-orange-400' : 'text-slate-600'}`} />
-        </button>
+        {/* Users grid - collapsed shows 2 rows (~8 users), expanded shows all */}
+        <div
+          className="px-3 pb-3 overflow-hidden transition-all duration-200"
+          style={{ maxHeight: usersExpanded ? 500 : 72 }}
+        >
+          <div className="flex flex-wrap gap-2">
+            {/* Current user always first */}
+            <div className="flex items-center gap-1.5 rounded-full bg-orange-500/15 border border-orange-500/20 px-2 py-1">
+              <div className="relative">
+                <div className="flex h-5 w-5 items-center justify-center rounded-full bg-orange-500/50 text-[8px] font-bold text-white">
+                  {user.username.slice(0, 2).toUpperCase()}
+                </div>
+                <div className="absolute -bottom-px -right-px h-1.5 w-1.5 rounded-full bg-green-400" />
+              </div>
+              <span className="text-[10px] text-orange-400 font-medium">Jij</span>
+            </div>
+            {filteredPeople.map((person) => (
+              <div
+                key={person.name}
+                className="flex items-center gap-1.5 rounded-full bg-white/[0.04] border border-white/[0.06] px-2 py-1"
+              >
+                <div className="relative">
+                  <div className="flex h-5 w-5 items-center justify-center rounded-full bg-orange-500/20 text-[8px] font-bold text-orange-300">
+                    {person.initials}
+                  </div>
+                  {person.online && (
+                    <div className="absolute -bottom-px -right-px h-1.5 w-1.5 rounded-full bg-green-400" />
+                  )}
+                </div>
+                <span className={`text-[10px] ${person.online ? 'text-slate-300' : 'text-slate-600'}`}>
+                  {person.name}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );
