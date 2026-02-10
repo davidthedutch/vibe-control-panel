@@ -1,22 +1,16 @@
 import { NextResponse } from 'next/server';
-import * as fs from 'fs';
-import * as path from 'path';
+import eventsData from '@/data/events.json';
 
 // ====================================================================
 // Clubguide Metrics API
-// Provides real metrics from scraped event data
+// Provides real metrics from bundled event data
 // ====================================================================
 
-export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
-
-const ENRICHED_DATA_PATH = path.join('H:', 'Onedrive', 'PC-Rogier', 'Oud', 'Feesten', 'data', 'enriched_events_2026-02-08.json');
 
 export async function GET() {
   try {
-    const fileContent = fs.readFileSync(ENRICHED_DATA_PATH, 'utf-8');
-    const data = JSON.parse(fileContent);
-    const events = data.events || [];
+    const events = eventsData.events || [];
 
     const now = new Date();
     const activeEvents = events.filter((e: any) => new Date(e.date) >= now);

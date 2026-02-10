@@ -50,8 +50,13 @@ export default function PreviewPage() {
         setLoading(true);
         const response = await getProject(PROJECT_ID);
 
-        if (response.error) {
-          setError(response.error);
+        if (response.error || !response.data) {
+          // Fallback: use current origin or configured URL
+          const fallbackUrl =
+            typeof window !== 'undefined'
+              ? window.location.origin
+              : 'http://localhost:3000';
+          setProjectUrl(fallbackUrl);
           setLoading(false);
           return;
         }
@@ -63,7 +68,11 @@ export default function PreviewPage() {
           response.data?.urls.production;
 
         if (!url) {
-          setError('No preview URL configured for this project');
+          const fallbackUrl =
+            typeof window !== 'undefined'
+              ? window.location.origin
+              : 'http://localhost:3000';
+          setProjectUrl(fallbackUrl);
           setLoading(false);
           return;
         }
@@ -71,7 +80,12 @@ export default function PreviewPage() {
         setProjectUrl(url);
         setLoading(false);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to load project');
+        // Fallback on any error
+        const fallbackUrl =
+          typeof window !== 'undefined'
+            ? window.location.origin
+            : 'http://localhost:3000';
+        setProjectUrl(fallbackUrl);
         setLoading(false);
       }
     }

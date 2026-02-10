@@ -1,13 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import * as fs from 'fs';
-import * as path from 'path';
+import eventsData from '@/data/events.json';
 
 // ====================================================================
 // Real Event Data API
-// Serves enriched events from the event scraping project
+// Serves enriched events from bundled event data
 // ====================================================================
 
-export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 interface EnrichedEvent {
@@ -26,35 +24,8 @@ interface EnrichedEvent {
   enrichedMatchScore?: number;
 }
 
-// Path to enriched events data
-const ENRICHED_DATA_PATH = path.join('H:', 'Onedrive', 'PC-Rogier', 'Oud', 'Feesten', 'data', 'enriched_events_2026-02-08.json');
-
-// Cache for events data
-let eventsCache: EnrichedEvent[] | null = null;
-let cacheTimestamp = 0;
-const CACHE_TTL = 60000; // 1 minute
-
 function loadEvents(): EnrichedEvent[] {
-  const now = Date.now();
-
-  // Return cached data if still valid
-  if (eventsCache && (now - cacheTimestamp) < CACHE_TTL) {
-    return eventsCache;
-  }
-
-  try {
-    const fileContent = fs.readFileSync(ENRICHED_DATA_PATH, 'utf-8');
-    const data = JSON.parse(fileContent);
-    const loadedEvents: EnrichedEvent[] = data.events || [];
-    eventsCache = loadedEvents;
-    cacheTimestamp = now;
-
-    console.log(`[Clubguide API] Loaded ${loadedEvents.length} events from enriched data`);
-    return loadedEvents;
-  } catch (error) {
-    console.error('[Clubguide API] Error loading enriched events:', error);
-    return [];
-  }
+  return (eventsData.events || []) as EnrichedEvent[];
 }
 
 function convertToClubguideFormat(event: EnrichedEvent, index: number) {
@@ -74,7 +45,7 @@ function convertToClubguideFormat(event: EnrichedEvent, index: number) {
     genres: event.genres || [],
     going_count: event.artists?.length ? event.artists.length * 50 : 0, // Estimate based on artists
     interested_count: event.artists?.length ? event.artists.length * 30 : 0,
-    source: event.source as 'ra' | 'partyflock' | 'djguide' | 'manual',
+    source: (event.source === 'residentadvisor' ? 'ra' : event.source) as 'ra' | 'partyflock' | 'djguide' | 'manual',
     status: isActive ? 'active' as const : 'past' as const,
     created_at: new Date().toISOString(),
     artists: event.artists || [],
@@ -110,9 +81,11 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    // Source filter
+    // Source filter (map 'ra' to 'residentadvisor' for matching)
     if (source !== 'all') {
-      filteredEvents = filteredEvents.filter(e => e.source === source);
+      const sourceMap: Record<string, string> = { ra: 'residentadvisor' };
+      const mappedSource = sourceMap[source] || source;
+      filteredEvents = filteredEvents.filter(e => e.source === mappedSource || e.source === source);
     }
 
     // Search filter

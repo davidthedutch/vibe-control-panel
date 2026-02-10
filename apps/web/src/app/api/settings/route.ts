@@ -1,7 +1,31 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 
-export const runtime = 'edge';
+export const dynamic = 'force-dynamic';
+
+const DEFAULT_SETTINGS = {
+  project: {
+    name: 'Vibe Control Panel',
+    description: 'Een dashboard voor het beheren van vibe-coded websites. Biedt inzicht in componenten, features, design tokens, SEO en meer.',
+    status: 'in_development',
+    urls: {
+      production: 'https://vibe-control-panel-web.vercel.app',
+      staging: '',
+      development: 'http://localhost:3000',
+    },
+    techStack: {
+      framework: 'Next.js 15',
+      styling: 'Tailwind CSS 4',
+      database: 'Supabase',
+      auth: 'Clerk',
+      deployment: 'Vercel',
+    },
+  },
+  tokens: {},
+  policies: [],
+  integrations: {},
+  secrets: [],
+};
 
 // GET /api/settings - Fetch all project settings
 export async function GET(request: NextRequest) {
@@ -14,45 +38,14 @@ export async function GET(request: NextRequest) {
       .eq('project_id', projectId)
       .single();
 
-    if (error && error.code !== 'PGRST116') {
-      // PGRST116 = no rows returned
-      throw error;
-    }
-
-    // Return default settings if none exist
-    if (!data) {
-      return NextResponse.json({
-        project: {
-          name: 'Vibe Control Panel',
-          description: 'Een dashboard voor het beheren van vibe-coded websites.',
-          status: 'in_development',
-          urls: {
-            production: '',
-            staging: '',
-            development: 'http://localhost:3000',
-          },
-          techStack: {
-            framework: 'Next.js 15',
-            styling: 'Tailwind CSS 4',
-            database: 'Supabase',
-            auth: 'Clerk',
-            deployment: 'Vercel',
-          },
-        },
-        tokens: {},
-        policies: [],
-        integrations: {},
-        secrets: [],
-      });
+    if (error || !data) {
+      return NextResponse.json(DEFAULT_SETTINGS);
     }
 
     return NextResponse.json(data.settings);
   } catch (error) {
     console.error('Error fetching settings:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch settings' },
-      { status: 500 }
-    );
+    return NextResponse.json(DEFAULT_SETTINGS);
   }
 }
 
