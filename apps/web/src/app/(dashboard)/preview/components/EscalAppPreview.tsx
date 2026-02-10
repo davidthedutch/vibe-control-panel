@@ -8,12 +8,14 @@ import ArenaScreen from './escal-screens/ArenaScreen';
 import ArsenalScreen from './escal-screens/ArsenalScreen';
 import EscalchatScreen from './escal-screens/EscalchatScreen';
 import VaultScreen from './escal-screens/VaultScreen';
+import type { PreviewUser } from '../page';
 
 type Tab = 'arena' | 'events' | 'arsenal' | 'escalchat' | 'vault';
 type DeviceMode = 'iphone' | 'ipad';
 
 interface EscalAppPreviewProps {
   device: DeviceMode;
+  user: PreviewUser;
 }
 
 const DEVICE_DIMENSIONS = {
@@ -21,7 +23,7 @@ const DEVICE_DIMENSIONS = {
   ipad: { width: 768, height: 1024 },
 };
 
-export default function EscalAppPreview({ device }: EscalAppPreviewProps) {
+export default function EscalAppPreview({ device, user }: EscalAppPreviewProps) {
   const [activeTab, setActiveTab] = useState<Tab>('arena');
   const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
 
@@ -55,15 +57,15 @@ export default function EscalAppPreview({ device }: EscalAppPreviewProps) {
 
     switch (activeTab) {
       case 'arena':
-        return <ArenaScreen />;
+        return <ArenaScreen user={user} />;
       case 'events':
         return <HomeScreen onSelectEvent={handleSelectEvent} />;
       case 'arsenal':
         return <ArsenalScreen />;
       case 'escalchat':
-        return <EscalchatScreen />;
+        return <EscalchatScreen user={user} />;
       case 'vault':
-        return <VaultScreen />;
+        return <VaultScreen user={user} />;
     }
   };
 

@@ -3,8 +3,13 @@
 import { useState } from 'react';
 import { MapPin, Radio, Navigation, Footprints, CheckCircle, Send, Droplets, Timer } from 'lucide-react';
 import { useLiveLocations } from '@/lib/hooks/use-escal-data';
+import type { PreviewUser } from '../../page';
 
-export default function ArenaScreen() {
+interface ArenaScreenProps {
+  user: PreviewUser;
+}
+
+export default function ArenaScreen({ user }: ArenaScreenProps) {
   const { locations, loading: locsLoading } = useLiveLocations();
   const [checkedIn, setCheckedIn] = useState(false);
   const [stagePosition, setStagePosition] = useState('Main Stage');
@@ -13,7 +18,10 @@ export default function ArenaScreen() {
 
   return (
     <div className="flex flex-col gap-5 p-5">
-      <h1 className="text-lg font-bold text-white">Arena</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-lg font-bold text-white">Arena</h1>
+        <span className="text-xs text-slate-400">Hoi, <span className="text-orange-400 font-medium">{user.username}</span></span>
+      </div>
 
       {/* Live stats bar */}
       <div className="flex gap-2">

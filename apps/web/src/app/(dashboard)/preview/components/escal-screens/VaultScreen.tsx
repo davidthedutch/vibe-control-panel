@@ -29,21 +29,27 @@ const DEMO_EVENT_HISTORY = [
   { name: 'Verknipt', date: '8 mrt 2025', venue: 'Jaarbeurs' },
 ];
 
-export default function VaultScreen() {
+import type { PreviewUser } from '../../page';
+
+interface VaultScreenProps {
+  user: PreviewUser;
+}
+
+export default function VaultScreen({ user }: VaultScreenProps) {
   const [codeCopied, setCodeCopied] = useState(false);
 
   const profile = {
-    username: 'DemoUser',
-    userCode: '482910',
-    level: 12,
-    xp: 2450,
-    xpNext: 3000,
-    eventsAttended: 34,
-    friends: 67,
+    username: user.username,
+    userCode: user.userCode,
+    level: user.level,
+    xp: user.xp,
+    xpNext: user.xpNext,
+    eventsAttended: user.eventsAttended,
+    friends: user.friends,
     badges: 8,
-    streak: 5,
-    topGenre: 'Techno',
-    venuesVisited: 15,
+    streak: user.streak,
+    topGenre: user.topGenre,
+    venuesVisited: user.venuesVisited,
   };
 
   const xpProgress = (profile.xp / profile.xpNext) * 100;

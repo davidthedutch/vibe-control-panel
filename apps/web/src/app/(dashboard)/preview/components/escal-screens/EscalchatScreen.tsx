@@ -26,7 +26,13 @@ const DEMO_MESSAGES = [
   { id: '5', user: 'DJFan123', text: 'Bij de merch stand verkopen ze ze!', time: '23:48' },
 ];
 
-export default function EscalchatScreen() {
+import type { PreviewUser } from '../../page';
+
+interface EscalchatScreenProps {
+  user: PreviewUser;
+}
+
+export default function EscalchatScreen({ user }: EscalchatScreenProps) {
   const [activeRoom, setActiveRoom] = useState('public');
   const [messageText, setMessageText] = useState('');
   const [showSearch, setShowSearch] = useState(false);
@@ -123,6 +129,7 @@ export default function EscalchatScreen() {
 
       {/* Chat input */}
       <div className="flex items-center gap-2 rounded-[20px] bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] px-3 py-2">
+        <span className="text-[10px] font-medium text-orange-400 shrink-0">{user.username}</span>
         <input
           type="text"
           placeholder="Bericht versturen..."
