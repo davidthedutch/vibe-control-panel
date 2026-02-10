@@ -49,7 +49,7 @@ function SubNav({ current }: { current: string }) {
             href={item.href}
             className={`inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
               isActive
-                ? 'bg-indigo-600 text-white'
+                ? 'bg-orange-600 text-white'
                 : 'bg-white text-slate-600 hover:bg-slate-100 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700'
             }`}
           >
@@ -171,7 +171,7 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
           <p className="mt-4 text-lg font-medium text-slate-900 dark:text-slate-100">Event not found</p>
           <Link
             href="/escal/events"
-            className="mt-4 text-sm font-medium text-indigo-600 hover:text-indigo-700 dark:text-indigo-400"
+            className="mt-4 text-sm font-medium text-orange-600 hover:text-orange-700 dark:text-orange-400"
           >
             Back to events
           </Link>
@@ -239,7 +239,7 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
               {event.genres.map((genre) => (
                 <span
                   key={genre}
-                  className="inline-flex items-center rounded-full bg-indigo-100 px-3 py-1 text-sm font-medium text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-400"
+                  className="inline-flex items-center rounded-full bg-orange-100 px-3 py-1 text-sm font-medium text-orange-700 dark:bg-orange-900/40 dark:text-orange-400"
                 >
                   {genre}
                 </span>
@@ -253,7 +253,7 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
             <Star className="h-4 w-4" />
             Feature
           </button>
-          <button className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700">
+          <button className="inline-flex items-center gap-2 rounded-lg bg-orange-600 px-4 py-2 text-sm font-medium text-white hover:bg-orange-700">
             <ExternalLink className="h-4 w-4" />
             View Public
           </button>

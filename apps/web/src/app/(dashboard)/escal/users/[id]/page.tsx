@@ -52,7 +52,7 @@ function SubNav({ current }: { current: string }) {
             href={item.href}
             className={`inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
               isActive
-                ? 'bg-indigo-600 text-white'
+                ? 'bg-orange-600 text-white'
                 : 'bg-white text-slate-600 hover:bg-slate-100 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700'
             }`}
           >
@@ -96,7 +96,7 @@ function StatCard({
   icon: React.ReactNode;
   label: string;
   value: string | number;
-  color: 'emerald' | 'amber' | 'orange' | 'blue' | 'indigo';
+  color: 'emerald' | 'amber' | 'orange' | 'blue';
 }) {
   const colorStyles = {
     emerald: {
@@ -114,10 +114,6 @@ function StatCard({
     blue: {
       bg: 'bg-blue-100 dark:bg-blue-900/40',
       text: 'text-blue-600 dark:text-blue-400',
-    },
-    indigo: {
-      bg: 'bg-indigo-100 dark:bg-indigo-900/40',
-      text: 'text-indigo-600 dark:text-indigo-400',
     },
   };
 
@@ -153,7 +149,7 @@ function XpProgressBar({ xp, level }: { xp: number; level: number }) {
       </div>
       <div className="h-2 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700">
         <div
-          className="h-full rounded-full bg-indigo-600 transition-all duration-500"
+          className="h-full rounded-full bg-orange-600 transition-all duration-500"
           style={{ width: `${Math.min(100, progress)}%` }}
         />
       </div>
@@ -199,7 +195,7 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
           <p className="mt-4 text-lg font-medium text-slate-900 dark:text-slate-100">User not found</p>
           <Link
             href="/escal/users"
-            className="mt-4 text-sm font-medium text-indigo-600 hover:text-indigo-700 dark:text-indigo-400"
+            className="mt-4 text-sm font-medium text-orange-600 hover:text-orange-700 dark:text-orange-400"
           >
             Back to users
           </Link>
@@ -300,7 +296,7 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
           icon={<Star className="h-5 w-5" />}
           label="Level"
           value={user.level}
-          color="indigo"
+          color="orange"
         />
         <StatCard
           icon={<Calendar className="h-5 w-5" />}

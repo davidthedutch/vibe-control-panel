@@ -51,7 +51,7 @@ function SubNav({ current }: { current: string }) {
             href={item.href}
             className={`inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
               isActive
-                ? 'bg-indigo-600 text-white'
+                ? 'bg-orange-600 text-white'
                 : 'bg-white text-slate-600 hover:bg-slate-100 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700'
             }`}
           >
@@ -89,7 +89,7 @@ function StatusBadge({ status }: { status: EscalUser['status'] }) {
 function LevelBadge({ level, xp }: { level: number; xp: number }) {
   const getColor = (lvl: number) => {
     if (lvl >= 15) return 'bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-400';
-    if (lvl >= 10) return 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-400';
+    if (lvl >= 10) return 'bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-400';
     if (lvl >= 5) return 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-400';
     return 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400';
   };
@@ -138,7 +138,7 @@ function UserRow({ user, selected, onSelect }: { user: EscalUser; selected: bool
           type="checkbox"
           checked={selected}
           onChange={onSelect}
-          className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+          className="h-4 w-4 rounded border-slate-300 text-orange-600 focus:ring-orange-500"
         />
       </td>
       <td className="py-3 pr-4">
@@ -150,7 +150,7 @@ function UserRow({ user, selected, onSelect }: { user: EscalUser; selected: bool
             )}
           </div>
           <div>
-            <p className="font-medium text-slate-900 group-hover:text-indigo-600 dark:text-slate-100 dark:group-hover:text-indigo-400">
+            <p className="font-medium text-slate-900 group-hover:text-orange-600 dark:text-slate-100 dark:group-hover:text-orange-400">
               {user.username}
             </p>
             <p className="text-sm text-slate-500 dark:text-slate-400">{user.email}</p>
@@ -282,7 +282,7 @@ export default function UsersPage() {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="flex items-center gap-3 text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-50">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-600 text-white">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-orange-600 text-white">
               <Music className="h-5 w-5" />
             </div>
             Users Management
@@ -310,7 +310,7 @@ export default function UsersPage() {
                 setSearch(e.target.value);
                 setPage(1);
               }}
-              className="h-10 rounded-lg border border-slate-200 bg-white pl-10 pr-4 text-sm text-slate-900 placeholder-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+              className="h-10 rounded-lg border border-slate-200 bg-white pl-10 pr-4 text-sm text-slate-900 placeholder-slate-400 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
             />
           </div>
 
@@ -321,7 +321,7 @@ export default function UsersPage() {
               setStatusFilter(e.target.value);
               setPage(1);
             }}
-            className="h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+            className="h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
           >
             <option value="all">All Statuses</option>
             <option value="active">Active</option>
@@ -379,7 +379,7 @@ export default function UsersPage() {
                       type="checkbox"
                       checked={selectedUsers.size === users.length && users.length > 0}
                       onChange={handleSelectAll}
-                      className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                      className="h-4 w-4 rounded border-slate-300 text-orange-600 focus:ring-orange-500"
                     />
                   </th>
                   <th className="py-3 pr-4 text-left text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-slate-400">

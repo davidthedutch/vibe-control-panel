@@ -46,7 +46,7 @@ function SubNav({ current }: { current: string }) {
             href={item.href}
             className={`inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
               isActive
-                ? 'bg-indigo-600 text-white'
+                ? 'bg-orange-600 text-white'
                 : 'bg-white text-slate-600 hover:bg-slate-100 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700'
             }`}
           >
@@ -66,7 +66,7 @@ function SubNav({ current }: { current: string }) {
 function SimpleBarChart({
   data,
   dataKey,
-  color = 'indigo',
+  color = 'orange',
   height = 200,
 }: {
   data: { label: string; value: number }[];
@@ -76,10 +76,9 @@ function SimpleBarChart({
 }) {
   const maxValue = Math.max(...data.map((d) => d.value));
   const colorClasses: Record<string, string> = {
-    indigo: 'bg-indigo-500',
+    orange: 'bg-orange-500',
     emerald: 'bg-emerald-500',
     amber: 'bg-amber-500',
-    orange: 'bg-orange-500',
     blue: 'bg-blue-500',
   };
 
@@ -243,10 +242,10 @@ function CheckinHeatmap({ data }: { data: { day: number; hour: number; count: nu
   const getColor = (count: number) => {
     const intensity = count / maxCount;
     if (intensity < 0.2) return 'bg-slate-100 dark:bg-slate-800';
-    if (intensity < 0.4) return 'bg-indigo-100 dark:bg-indigo-900/40';
-    if (intensity < 0.6) return 'bg-indigo-200 dark:bg-indigo-800/60';
-    if (intensity < 0.8) return 'bg-indigo-400 dark:bg-indigo-600';
-    return 'bg-indigo-600 dark:bg-indigo-500';
+    if (intensity < 0.4) return 'bg-orange-100 dark:bg-orange-900/40';
+    if (intensity < 0.6) return 'bg-orange-200 dark:bg-orange-800/60';
+    if (intensity < 0.8) return 'bg-orange-400 dark:bg-orange-600';
+    return 'bg-orange-600 dark:bg-orange-500';
   };
 
   return (
@@ -355,7 +354,7 @@ export default function AnalyticsPage() {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="flex items-center gap-3 text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-50">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-600 text-white">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-orange-600 text-white">
               <Music className="h-5 w-5" />
             </div>
             Analytics
@@ -390,8 +389,8 @@ export default function AnalyticsPage() {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <div className="rounded-xl border border-slate-200 bg-white p-5 dark:border-slate-700 dark:bg-slate-900">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-100 dark:bg-indigo-900/40">
-              <Users className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-orange-100 dark:bg-orange-900/40">
+              <Users className="h-5 w-5 text-orange-600 dark:text-orange-400" />
             </div>
             <div>
               <p className="text-sm text-slate-500 dark:text-slate-400">Total Users</p>
@@ -450,7 +449,7 @@ export default function AnalyticsPage() {
         {/* User Growth */}
         <div className="rounded-xl border border-slate-200 bg-white p-6 dark:border-slate-700 dark:bg-slate-900">
           <div className="mb-4 flex items-center gap-2">
-            <LineChart className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
+            <LineChart className="h-5 w-5 text-orange-600 dark:text-orange-400" />
             <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50">User Growth</h2>
           </div>
           <SimpleLineChart
@@ -505,7 +504,7 @@ export default function AnalyticsPage() {
       {/* Check-ins Heatmap */}
       <div className="rounded-xl border border-slate-200 bg-white p-6 dark:border-slate-700 dark:bg-slate-900">
         <div className="mb-4 flex items-center gap-2">
-          <CheckCircle className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
+          <CheckCircle className="h-5 w-5 text-orange-600 dark:text-orange-400" />
           <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50">Check-ins Heatmap</h2>
           <span className="text-sm text-slate-500 dark:text-slate-400">(by day/hour)</span>
         </div>

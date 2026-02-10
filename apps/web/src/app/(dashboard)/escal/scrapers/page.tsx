@@ -53,7 +53,7 @@ function SubNav({ current }: { current: string }) {
             href={item.href}
             className={`inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
               isActive
-                ? 'bg-indigo-600 text-white'
+                ? 'bg-orange-600 text-white'
                 : 'bg-white text-slate-600 hover:bg-slate-100 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700'
             }`}
           >
@@ -194,7 +194,7 @@ function ScraperCard({
         <button
           onClick={onTrigger}
           disabled={scraper.status === 'running'}
-          className="flex-1 inline-flex items-center justify-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex-1 inline-flex items-center justify-center gap-2 rounded-lg bg-orange-600 px-4 py-2 text-sm font-medium text-white hover:bg-orange-700 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {scraper.status === 'running' ? (
             <>
@@ -321,7 +321,7 @@ export default function ScrapersPage() {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="flex items-center gap-3 text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-50">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-600 text-white">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-orange-600 text-white">
               <Music className="h-5 w-5" />
             </div>
             Scrapers Dashboard
@@ -370,7 +370,7 @@ export default function ScrapersPage() {
             <select
               value={sourceFilter}
               onChange={(e) => setSourceFilter(e.target.value)}
-              className="h-9 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+              className="h-9 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
             >
               <option value="all">All Sources</option>
               <option value="ra">Resident Advisor</option>

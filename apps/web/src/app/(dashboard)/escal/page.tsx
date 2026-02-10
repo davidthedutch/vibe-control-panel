@@ -27,23 +27,17 @@ import {
 // ---------------------------------------------------------------------------
 
 const accentStyles = {
-  indigo: {
-    iconBg: 'bg-indigo-100 dark:bg-indigo-900/40',
-    iconColor: 'text-indigo-600 dark:text-indigo-400',
-    border: 'border-indigo-100 dark:border-indigo-900/40',
-    bg: 'bg-indigo-50/50 dark:bg-indigo-950/20',
+  orange: {
+    iconBg: 'bg-orange-100 dark:bg-orange-900/40',
+    iconColor: 'text-orange-600 dark:text-orange-400',
+    border: 'border-orange-100 dark:border-orange-900/40',
+    bg: 'bg-orange-50/50 dark:bg-orange-950/20',
   },
   emerald: {
     iconBg: 'bg-emerald-100 dark:bg-emerald-900/40',
     iconColor: 'text-emerald-600 dark:text-emerald-400',
     border: 'border-emerald-100 dark:border-emerald-900/40',
     bg: 'bg-emerald-50/50 dark:bg-emerald-950/20',
-  },
-  orange: {
-    iconBg: 'bg-orange-100 dark:bg-orange-900/40',
-    iconColor: 'text-orange-600 dark:text-orange-400',
-    border: 'border-orange-100 dark:border-orange-900/40',
-    bg: 'bg-orange-50/50 dark:bg-orange-950/20',
   },
   amber: {
     iconBg: 'bg-amber-100 dark:bg-amber-900/40',
@@ -80,7 +74,7 @@ function SubNav({ current }: { current: string }) {
             href={item.href}
             className={`inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
               isActive
-                ? 'bg-indigo-600 text-white'
+                ? 'bg-orange-600 text-white'
                 : 'bg-white text-slate-600 hover:bg-slate-100 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700'
             }`}
           >
@@ -115,7 +109,7 @@ function ActivityFeedItem({
     scraper_run: Bot,
   };
   const colorMap = {
-    event_created: 'bg-indigo-100 text-indigo-600 dark:bg-indigo-900/40 dark:text-indigo-400',
+    event_created: 'bg-orange-100 text-orange-600 dark:bg-orange-900/40 dark:text-orange-400',
     user_registered: 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/40 dark:text-emerald-400',
     checkin: 'bg-orange-100 text-orange-600 dark:bg-orange-900/40 dark:text-orange-400',
     scraper_run: 'bg-amber-100 text-amber-600 dark:bg-amber-900/40 dark:text-amber-400',
@@ -174,7 +168,7 @@ export default function EscalDashboard() {
       icon: <Calendar className="h-5 w-5" />,
       label: 'Total Events',
       value: metricsLoading ? '-' : metrics.totalEvents.toLocaleString('nl-NL'),
-      accent: 'indigo',
+      accent: 'orange',
       trend: metrics.trends.totalEvents,
       href: '/escal/events',
     },
@@ -210,7 +204,7 @@ export default function EscalDashboard() {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="flex items-center gap-3 text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-50">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-600 text-white">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-orange-600 text-white">
               <Music className="h-5 w-5" />
             </div>
             Escal
@@ -306,7 +300,7 @@ export default function EscalDashboard() {
             </h2>
             <Link
               href="/escal/live"
-              className="text-sm font-medium text-indigo-600 hover:text-indigo-700 dark:text-indigo-400"
+              className="text-sm font-medium text-orange-600 hover:text-orange-700 dark:text-orange-400"
             >
               View all
             </Link>
@@ -359,7 +353,7 @@ export default function EscalDashboard() {
           </h2>
           <Link
             href="/escal/events"
-            className="text-sm font-medium text-indigo-600 hover:text-indigo-700 dark:text-indigo-400"
+            className="text-sm font-medium text-orange-600 hover:text-orange-700 dark:text-orange-400"
           >
             View all events
           </Link>
@@ -395,7 +389,7 @@ export default function EscalDashboard() {
                         <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-100 text-sm font-semibold text-slate-600 dark:bg-slate-800 dark:text-slate-400">
                           {index + 1}
                         </span>
-                        <span className="font-medium text-slate-900 group-hover:text-indigo-600 dark:text-slate-100 dark:group-hover:text-indigo-400">
+                        <span className="font-medium text-slate-900 group-hover:text-orange-600 dark:text-slate-100 dark:group-hover:text-orange-400">
                           {event.title}
                         </span>
                       </Link>

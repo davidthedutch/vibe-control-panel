@@ -55,7 +55,7 @@ function SubNav({ current }: { current: string }) {
             href={item.href}
             className={`inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
               isActive
-                ? 'bg-indigo-600 text-white'
+                ? 'bg-orange-600 text-white'
                 : 'bg-white text-slate-600 hover:bg-slate-100 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700'
             }`}
           >
@@ -154,8 +154,8 @@ function BuddyCard({ pair }: { pair: BuddyPair }) {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <div className="flex -space-x-2">
-            <div className="h-8 w-8 rounded-full bg-indigo-100 dark:bg-indigo-900/40 flex items-center justify-center border-2 border-white dark:border-slate-800">
-              <Users className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
+            <div className="h-8 w-8 rounded-full bg-orange-100 dark:bg-orange-900/40 flex items-center justify-center border-2 border-white dark:border-slate-800">
+              <Users className="h-4 w-4 text-orange-600 dark:text-orange-400" />
             </div>
             <div className="h-8 w-8 rounded-full bg-orange-100 dark:bg-orange-900/40 flex items-center justify-center border-2 border-white dark:border-slate-800">
               <Users className="h-4 w-4 text-orange-600 dark:text-orange-400" />
@@ -264,7 +264,7 @@ export default function LiveMonitoringPage() {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="flex items-center gap-3 text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-50">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-600 text-white">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-orange-600 text-white">
               <Music className="h-5 w-5" />
             </div>
             Live Monitoring

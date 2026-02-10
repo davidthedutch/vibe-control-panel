@@ -49,7 +49,7 @@ function SubNav({ current }: { current: string }) {
             href={item.href}
             className={`inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
               isActive
-                ? 'bg-indigo-600 text-white'
+                ? 'bg-orange-600 text-white'
                 : 'bg-white text-slate-600 hover:bg-slate-100 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700'
             }`}
           >
@@ -60,7 +60,7 @@ function SubNav({ current }: { current: string }) {
       })}
       <Link
         href="/escal/settings"
-        className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition-colors"
+        className="inline-flex items-center gap-2 rounded-lg bg-orange-600 px-4 py-2 text-sm font-medium text-white transition-colors"
       >
         <Settings className="h-4 w-4" />
         Settings
@@ -94,8 +94,8 @@ function Toggle({
       </div>
       <button
         onClick={() => onChange(!enabled)}
-        className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 ${
-          enabled ? 'bg-indigo-600' : 'bg-slate-200 dark:bg-slate-700'
+        className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 ${
+          enabled ? 'bg-orange-600' : 'bg-slate-200 dark:bg-slate-700'
         }`}
       >
         <span
@@ -139,7 +139,7 @@ function InputField({
             type={type}
             value={value}
             onChange={(e) => onChange(e.target.value)}
-            className="block w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+            className="block w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
           />
           {suffix && (
             <span className="text-sm text-slate-500 dark:text-slate-400 whitespace-nowrap">{suffix}</span>
@@ -203,11 +203,11 @@ function KeywordsEditor({
           onChange={(e) => setNewKeyword(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && addKeyword()}
           placeholder="Add keyword..."
-          className="block w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+          className="block w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
         />
         <button
           onClick={addKeyword}
-          className="inline-flex items-center gap-1 rounded-lg bg-indigo-600 px-3 py-2 text-sm font-medium text-white hover:bg-indigo-700"
+          className="inline-flex items-center gap-1 rounded-lg bg-orange-600 px-3 py-2 text-sm font-medium text-white hover:bg-orange-700"
         >
           <Plus className="h-4 w-4" />
           Add
@@ -253,7 +253,7 @@ function BuddyIntervalsEditor({
               onClick={() => toggleInterval(interval)}
               className={`inline-flex items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
                 isEnabled
-                  ? 'bg-indigo-600 text-white'
+                  ? 'bg-orange-600 text-white'
                   : 'bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700'
               }`}
             >
@@ -332,7 +332,7 @@ export default function SettingsPage() {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="flex items-center gap-3 text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-50">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-600 text-white">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-orange-600 text-white">
               <Music className="h-5 w-5" />
             </div>
             Settings
@@ -345,7 +345,7 @@ export default function SettingsPage() {
         <button
           onClick={handleSave}
           disabled={!hasChanges || saving}
-          className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="inline-flex items-center gap-2 rounded-lg bg-orange-600 px-4 py-2 text-sm font-medium text-white hover:bg-orange-700 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {saving ? (
             <>
@@ -368,7 +368,7 @@ export default function SettingsPage() {
         {/* Scraper Settings */}
         <div className="rounded-xl border border-slate-200 bg-white p-6 dark:border-slate-700 dark:bg-slate-900">
           <h2 className="flex items-center gap-2 text-lg font-semibold text-slate-900 dark:text-slate-50">
-            <Bot className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
+            <Bot className="h-5 w-5 text-orange-600 dark:text-orange-400" />
             Scraper Intervals
           </h2>
           <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">

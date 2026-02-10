@@ -50,7 +50,7 @@ function SubNav({ current }: { current: string }) {
             href={item.href}
             className={`inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
               isActive
-                ? 'bg-indigo-600 text-white'
+                ? 'bg-orange-600 text-white'
                 : 'bg-white text-slate-600 hover:bg-slate-100 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700'
             }`}
           >
@@ -127,7 +127,7 @@ function EventRow({ event, selected, onSelect }: { event: EscalEvent; selected: 
           type="checkbox"
           checked={selected}
           onChange={onSelect}
-          className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+          className="h-4 w-4 rounded border-slate-300 text-orange-600 focus:ring-orange-500"
         />
       </td>
       <td className="py-3 pr-4">
@@ -136,7 +136,7 @@ function EventRow({ event, selected, onSelect }: { event: EscalEvent; selected: 
             <Music className="h-5 w-5 text-slate-400" />
           </div>
           <div>
-            <p className="font-medium text-slate-900 group-hover:text-indigo-600 dark:text-slate-100 dark:group-hover:text-indigo-400">
+            <p className="font-medium text-slate-900 group-hover:text-orange-600 dark:text-slate-100 dark:group-hover:text-orange-400">
               {event.title}
             </p>
             <p className="text-sm text-slate-500 dark:text-slate-400">
@@ -271,7 +271,7 @@ export default function EventsPage() {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="flex items-center gap-3 text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-50">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-600 text-white">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-orange-600 text-white">
               <Music className="h-5 w-5" />
             </div>
             Events Management
@@ -299,7 +299,7 @@ export default function EventsPage() {
                 setSearch(e.target.value);
                 setPage(1);
               }}
-              className="h-10 rounded-lg border border-slate-200 bg-white pl-10 pr-4 text-sm text-slate-900 placeholder-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+              className="h-10 rounded-lg border border-slate-200 bg-white pl-10 pr-4 text-sm text-slate-900 placeholder-slate-400 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
             />
           </div>
 
@@ -310,7 +310,7 @@ export default function EventsPage() {
               setStatusFilter(e.target.value);
               setPage(1);
             }}
-            className="h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+            className="h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
           >
             <option value="all">All Statuses</option>
             <option value="active">Active</option>
@@ -326,7 +326,7 @@ export default function EventsPage() {
               setSourceFilter(e.target.value);
               setPage(1);
             }}
-            className="h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+            className="h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
           >
             <option value="all">All Sources</option>
             <option value="ra">Resident Advisor</option>
@@ -379,7 +379,7 @@ export default function EventsPage() {
                       type="checkbox"
                       checked={selectedEvents.size === events.length && events.length > 0}
                       onChange={handleSelectAll}
-                      className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                      className="h-4 w-4 rounded border-slate-300 text-orange-600 focus:ring-orange-500"
                     />
                   </th>
                   <th className="py-3 pr-4 text-left text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-slate-400">
