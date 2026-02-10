@@ -12,6 +12,8 @@ export default function ArsenalScreen() {
   const [timerSeconds, setTimerSeconds] = useState(0);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const timerActive = timerSeconds > 0;
+  const timerStartMinRef = useRef(0);
+  const [timerHistory, setTimerHistory] = usePersistedState<{ minutes: number; time: string; date: string }[]>('escal-arsenal-timer-history', []);
   const [sosPressed, setSosPressed] = useState(false);
   const [safeHome, setSafeHome] = usePersistedState('escal-arsenal-safehome', false);
   const [activeQuickAction, setActiveQuickAction] = useState<string | null>(null);
@@ -19,6 +21,7 @@ export default function ArsenalScreen() {
   const [dbMeasuring, setDbMeasuring] = useState(false);
 
   const startTimer = useCallback((minutes: number) => {
+    timerStartMinRef.current = minutes;
     setTimerSeconds(minutes * 60);
   }, []);
 
@@ -35,6 +38,17 @@ export default function ArsenalScreen() {
       if (timerRef.current) {
         clearInterval(timerRef.current);
         timerRef.current = null;
+      }
+      // Timer completed — add to history if it was started (not just init)
+      if (timerStartMinRef.current > 0) {
+        const now = new Date();
+        const time = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+        const date = now.toLocaleDateString('nl-NL', { day: 'numeric', month: 'short' });
+        setTimerHistory((prev) => [
+          { minutes: timerStartMinRef.current, time, date },
+          ...prev.slice(0, 9),
+        ]);
+        timerStartMinRef.current = 0;
       }
       return;
     }
@@ -162,6 +176,28 @@ export default function ArsenalScreen() {
           >
             Stop timer
           </button>
+        )}
+        {/* Timer historie */}
+        {timerHistory.length > 0 && (
+          <div className="mt-2 border-t border-white/[0.06] pt-2">
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-[10px] text-slate-500">Historie</span>
+              <button
+                onClick={() => setTimerHistory([])}
+                className="text-[9px] text-slate-600 active:text-red-400"
+              >
+                Wis
+              </button>
+            </div>
+            <div className="flex flex-col gap-0.5">
+              {timerHistory.map((entry, i) => (
+                <div key={i} className="flex items-center justify-between">
+                  <span className="text-[10px] text-slate-400">{entry.minutes} min</span>
+                  <span className="text-[10px] text-slate-600">{entry.time} &bull; {entry.date}</span>
+                </div>
+              ))}
+            </div>
+          </div>
         )}
       </div>
 
