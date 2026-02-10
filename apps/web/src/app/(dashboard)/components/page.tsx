@@ -6,6 +6,9 @@ import { ComponentTable } from './component-table';
 import { ComponentDetail } from './component-detail';
 import { DependencyGraph } from './dependency-graph';
 import { NewComponentDialog } from './new-component-dialog';
+import { EscalSectionTab } from './escal-section-tab';
+import { tabKeys, tabMeta } from './escal-components-data';
+import type { EscalTabKey } from './escal-components-data';
 import { getComponents, getComponentDependencies } from '@vibe/shared/lib/api';
 import type { Component } from '@vibe/shared/types';
 
@@ -65,6 +68,7 @@ export default function ComponentsPage() {
   const [viewMode, setViewMode] = useState<ViewMode>('list');
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [showNewDialog, setShowNewDialog] = useState(false);
+  const [escalTab, setEscalTab] = useState<EscalTabKey>('all');
 
   // Fetch components on mount
   useEffect(() => {
@@ -252,6 +256,34 @@ export default function ComponentsPage() {
         </div>
       )}
 
+      {/* Escal Tab Navigation */}
+      <div className="flex items-center gap-0.5 overflow-x-auto rounded-lg border border-slate-200 bg-slate-50 p-0.5 dark:border-slate-700 dark:bg-slate-800">
+        {tabKeys.map((key) => {
+          const meta = tabMeta[key];
+          const Icon = meta.icon;
+          return (
+            <button
+              key={key}
+              onClick={() => setEscalTab(key)}
+              className={`flex shrink-0 items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors duration-150 ${
+                escalTab === key
+                  ? 'bg-white text-slate-800 shadow-sm dark:bg-slate-700 dark:text-slate-100'
+                  : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300'
+              }`}
+            >
+              <Icon className="h-3.5 w-3.5" />
+              {meta.label}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Escal Section Content (when a specific tab is selected) */}
+      {escalTab !== 'all' ? (
+        <EscalSectionTab tabKey={escalTab} />
+      ) : (
+        <>
+
       {/* Loading State */}
       {isLoading ? (
         <div className="flex flex-col items-center justify-center rounded-xl border border-slate-200 bg-white py-16 dark:border-slate-800 dark:bg-slate-900">
@@ -380,6 +412,9 @@ export default function ComponentsPage() {
             />
           )}
         </>
+      )}
+
+      </>
       )}
 
       {/* Detail Slide-over */}

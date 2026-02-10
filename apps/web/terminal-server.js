@@ -143,16 +143,25 @@ server.listen(PORT, () => {
   console.log(`[Terminal Server] Using ${useNodePty ? 'node-pty' : 'child_process'} for terminal emulation`);
 });
 
+server.on('error', (err) => {
+  if (err.code === 'EADDRINUSE') {
+    console.error(`[Terminal Server] Port ${PORT} is already in use. Kill the existing process or use a different port via TERMINAL_PORT env var.`);
+  } else {
+    console.error('[Terminal Server] Server error:', err);
+  }
+  process.exit(1);
+});
+
 // Handle server shutdown
-process.on('SIGTERM', () => {
+function shutdown() {
   console.log('[Terminal Server] Shutting down...');
   terminals.forEach((term) => {
-    if (useNodePty) {
-      term.kill();
-    } else {
-      term.kill();
-    }
+    try { term.kill(); } catch (_) { /* ignore */ }
   });
+  terminals.clear();
   server.close();
   process.exit(0);
-});
+}
+
+process.on('SIGTERM', shutdown);
+process.on('SIGINT', shutdown);

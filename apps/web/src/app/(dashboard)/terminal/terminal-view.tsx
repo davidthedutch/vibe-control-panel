@@ -1,20 +1,35 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useImperativeHandle } from 'react';
+import type { Ref } from 'react';
 import type { Terminal as XTermTerminal } from '@xterm/xterm';
 import '@xterm/xterm/css/xterm.css';
 
-interface TerminalViewProps {
-  wsUrl?: string;
+export interface TerminalViewHandle {
+  sendCommand: (cmd: string) => void;
 }
 
-export default function TerminalView({ wsUrl = 'ws://localhost:3001' }: TerminalViewProps) {
+interface TerminalViewProps {
+  wsUrl?: string;
+  ref?: Ref<TerminalViewHandle>;
+}
+
+export default function TerminalView({ wsUrl = 'ws://localhost:3001', ref }: TerminalViewProps) {
   const terminalRef = useRef<HTMLDivElement>(null);
   const xtermRef = useRef<XTermTerminal | null>(null);
   const wsRef = useRef<WebSocket | null>(null);
   const fitAddonRef = useRef<any>(null);
   const [connectionStatus, setConnectionStatus] = useState<'connecting' | 'connected' | 'disconnected'>('disconnected');
   const [error, setError] = useState<string | null>(null);
+
+  // Expose sendCommand to parent via ref
+  useImperativeHandle(ref, () => ({
+    sendCommand(cmd: string) {
+      if (wsRef.current?.readyState === WebSocket.OPEN) {
+        wsRef.current.send(JSON.stringify({ type: 'input', data: cmd + '\r' }));
+      }
+    },
+  }));
 
   useEffect(() => {
     let mounted = true;
@@ -129,12 +144,11 @@ export default function TerminalView({ wsUrl = 'ws://localhost:3001' }: Terminal
           setConnectionStatus('connected');
           setError(null);
 
-          // Create terminal session
+          // Create terminal session (no cwd — not available in browser)
           ws.send(JSON.stringify({
             type: 'create',
             cols: term.cols,
             rows: term.rows,
-            cwd: process.cwd(),
           }));
 
           // Send input from terminal to server

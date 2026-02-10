@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useRef } from 'react';
 import { Terminal, GripVertical } from 'lucide-react';
-import TerminalView from './terminal-view';
+import TerminalView, { type TerminalViewHandle } from './terminal-view';
 import PromptInput from './prompt-input';
 import PromptHistory from './prompt-history';
 import { parseTerminalOutput } from './output-parser';
@@ -58,7 +58,7 @@ export default function TerminalPage() {
 
   const dragging = useRef(false);
   const containerRef = useRef<HTMLDivElement>(null);
-  const wsRef = useRef<WebSocket | null>(null);
+  const terminalViewRef = useRef<TerminalViewHandle>(null);
 
   function getCurrentTimestamp(): string {
     const now = new Date();
@@ -97,13 +97,8 @@ export default function TerminalPage() {
       setPromptHistory((prev) => [newEntry, ...prev].slice(0, 20)); // Keep last 20
     }
 
-    // Send command through WebSocket if available
-    if (wsRef.current?.readyState === WebSocket.OPEN) {
-      wsRef.current.send(JSON.stringify({
-        type: 'input',
-        data: command + '\r'
-      }));
-    }
+    // Send command through terminal view ref
+    terminalViewRef.current?.sendCommand(command);
   }
 
   function handleRepeatPrompt(prompt: string) {
@@ -197,7 +192,7 @@ export default function TerminalPage() {
           <PromptInput onExecuteCommand={handleExecuteCommand} />
 
           {/* Terminal view */}
-          <TerminalView />
+          <TerminalView ref={terminalViewRef} />
         </div>
 
         {/* Resize handle */}

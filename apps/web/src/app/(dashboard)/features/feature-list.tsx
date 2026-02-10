@@ -178,7 +178,7 @@ function SortableFeatureItem({
         <button
           type="button"
           onClick={onTestFeature}
-          className="shrink-0 rounded-lg p-2 text-indigo-600 transition-colors duration-150 hover:bg-indigo-50 dark:text-indigo-400 dark:hover:bg-indigo-950/50"
+          className="shrink-0 rounded-lg p-2 text-orange-600 transition-colors duration-150 hover:bg-orange-50 dark:text-orange-400 dark:hover:bg-orange-950/50"
           title="Test feature"
         >
           <PlayCircle className="h-4 w-4" />
@@ -321,7 +321,7 @@ function SortableFeatureItem({
                     <button
                       key={componentId}
                       onClick={() => onNavigateToComponent(componentId)}
-                      className="inline-flex cursor-pointer items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700 transition-colors duration-150 hover:border-indigo-300 hover:text-indigo-600 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:border-indigo-600 dark:hover:text-indigo-400"
+                      className="inline-flex cursor-pointer items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700 transition-colors duration-150 hover:border-orange-300 hover:text-orange-600 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:border-orange-600 dark:hover:text-orange-400"
                     >
                       <LinkIcon className="h-3 w-3" />
                       {componentId}
@@ -395,20 +395,37 @@ export default function FeatureList({ features, onReorder, onUpdate, projectId }
   };
 
   const handleTestFeature = (feature: Feature) => {
-    // Try to determine which page to open based on feature name
     const featureName = feature.name.toLowerCase();
-    let testUrl = '/';
 
-    if (featureName.includes('contact')) {
-      testUrl = '/contact';
-    } else if (featureName.includes('pricing') || featureName.includes('prijs')) {
-      testUrl = '/pricing';
-    } else if (featureName.includes('about') || featureName.includes('over')) {
-      testUrl = '/about';
+    // Known feature → page mapping
+    const featureRoutes: Record<string, string> = {
+      'live preview': '/preview',
+      'crm dashboard': '/crm',
+      'escal events': '/escal/events',
+      'seo analyzer': '/seo',
+      'health monitoring': '/health',
+      'ai terminal': '/terminal',
+      'live safety buddies': '/escal/live',
+    };
+
+    // Check exact match first
+    const exactMatch = featureRoutes[featureName];
+    if (exactMatch) {
+      router.push(exactMatch);
+      return;
     }
 
-    // Open in new tab
-    window.open(testUrl, '_blank');
+    // Keyword fallback
+    if (featureName.includes('preview')) router.push('/preview');
+    else if (featureName.includes('crm')) router.push('/crm');
+    else if (featureName.includes('event')) router.push('/escal/events');
+    else if (featureName.includes('seo')) router.push('/seo');
+    else if (featureName.includes('health')) router.push('/health');
+    else if (featureName.includes('terminal')) router.push('/terminal');
+    else if (featureName.includes('live') || featureName.includes('buddy') || featureName.includes('safety')) router.push('/escal/live');
+    else if (featureName.includes('component')) router.push('/components');
+    else if (featureName.includes('feature')) router.push('/features');
+    else router.push('/');
   };
 
   const handleNavigateToComponent = (componentId: string) => {
