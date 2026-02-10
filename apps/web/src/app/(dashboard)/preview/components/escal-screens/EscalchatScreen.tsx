@@ -25,16 +25,20 @@ const DEMO_PEOPLE = [
 ];
 
 const INITIAL_MESSAGES = [
-  { id: '1', user: 'DJFan', text: 'Wie staat er bij Main Stage?', time: '23:42' },
-  { id: '2', user: 'Techno', text: 'Charlotte de Witte is insane', time: '23:44' },
-  { id: '3', user: 'Rave', text: 'Bar 2 is het minst druk btw', time: '23:45' },
-  { id: '4', user: 'Night', text: 'Iemand oordopjes over?', time: '23:47' },
-  { id: '5', user: 'DJFan', text: 'Bij de merch stand verkopen ze ze!', time: '23:48' },
-  { id: '6', user: 'Flux', text: 'Ben Klock gaat zo beginnen', time: '23:50' },
-  { id: '7', user: 'Venom', text: 'Stage 2 is leeg, kom hierheen', time: '23:51' },
-  { id: '8', user: 'Storm', text: 'Geluid is hier echt top', time: '23:52' },
-  { id: '9', user: 'Rave', text: 'Wie wil water delen?', time: '23:53' },
-  { id: '10', user: 'DJFan', text: 'Ik sta bij de speakers links', time: '23:55' },
+  { id: '1', user: 'DJFan', text: 'Wie staat er bij Main Stage?', time: '23:42', room: 'public' },
+  { id: '2', user: 'Techno', text: 'Charlotte de Witte is insane', time: '23:44', room: 'public' },
+  { id: '3', user: 'Rave', text: 'Bar 2 is het minst druk btw', time: '23:45', room: 'public' },
+  { id: '4', user: 'Night', text: 'Iemand oordopjes over?', time: '23:47', room: 'public' },
+  { id: '5', user: 'DJFan', text: 'Bij de merch stand verkopen ze ze!', time: '23:48', room: 'public' },
+  { id: '6', user: 'Flux', text: 'Ben Klock gaat zo beginnen', time: '23:50', room: 'awakenings' },
+  { id: '7', user: 'Venom', text: 'Stage 2 is leeg, kom hierheen', time: '23:51', room: 'awakenings' },
+  { id: '8', user: 'Storm', text: 'Geluid is hier echt top', time: '23:52', room: 'verknipt' },
+  { id: '9', user: 'Rave', text: 'Wie wil water delen?', time: '23:53', room: 'public' },
+  { id: '10', user: 'DJFan', text: 'Ik sta bij de speakers links', time: '23:55', room: 'dgtl' },
+  { id: '11', user: 'Storm', text: 'Wat een set!', time: '23:56', room: 'verknipt' },
+  { id: '12', user: 'Venom', text: 'Area V is beter dan verwacht', time: '23:57', room: 'awakenings' },
+  { id: '13', user: 'Flux', text: 'DGTL line-up is sterk dit jaar', time: '23:58', room: 'dgtl' },
+  { id: '14', user: 'Night', text: 'Iemand bij de waterbar?', time: '23:59', room: 'dgtl' },
 ];
 
 interface EscalchatScreenProps {
@@ -54,7 +58,7 @@ export default function EscalchatScreen({ user }: EscalchatScreenProps) {
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+  }, [messages, activeRoom]);
 
   const handleSendMessage = () => {
     if (!messageText.trim()) return;
@@ -62,7 +66,7 @@ export default function EscalchatScreen({ user }: EscalchatScreenProps) {
     const time = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
     setMessages((prev) => [
       ...prev,
-      { id: String(Date.now()), user: user.username.slice(0, 7), text: messageText.trim(), time },
+      { id: String(Date.now()), user: user.username.slice(0, 7), text: messageText.trim(), time, room: activeRoom },
     ]);
     setMessageText('');
   };
@@ -74,6 +78,8 @@ export default function EscalchatScreen({ user }: EscalchatScreenProps) {
   };
 
   const truncName = (name: string) => name.slice(0, 7);
+
+  const filteredMessages = messages.filter((msg) => msg.room === activeRoom);
 
   const filteredPeople = userFilter === 'friends'
     ? DEMO_PEOPLE.filter((p) => p.friend)
@@ -157,7 +163,7 @@ export default function EscalchatScreen({ user }: EscalchatScreenProps) {
       {/* Chat block - one big container */}
       <div className="rounded-[20px] bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] shadow-lg shadow-black/20 flex flex-col overflow-hidden" style={{ minHeight: 200 }}>
         <div className="flex-1 overflow-y-auto px-3 py-3 scrollbar-hide" style={{ maxHeight: 280 }}>
-          {messages.map((msg) => {
+          {filteredMessages.map((msg) => {
             const isOwn = msg.user === user.username.slice(0, 7);
             return (
               <div key={msg.id} className="py-0.5">

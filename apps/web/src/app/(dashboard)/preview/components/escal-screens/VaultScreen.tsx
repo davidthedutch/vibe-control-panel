@@ -1,7 +1,27 @@
 'use client';
 
 import { useState } from 'react';
-import { User, Star, Trophy, Calendar, Users, Settings, ChevronRight, LogOut, Award, Flame, MapPin, Music, Zap, Heart, Shield, Share2, Copy, Check } from 'lucide-react';
+import { User, Star, Trophy, Calendar, Users, Settings, ChevronRight, ChevronDown, LogOut, Award, Flame, MapPin, Music, Zap, Heart, Shield, Share2, Copy, Check, X, Bell, Moon, Globe } from 'lucide-react';
+
+const DEMO_FAVORITE_EVENTS = [
+  { name: 'Awakenings NYE 2026', date: '31 dec 2026', venue: 'Gashouder' },
+  { name: 'DGTL Festival', date: '11 apr 2026', venue: 'NDSM-werf' },
+  { name: 'Verknipt Indoor', date: '15 mrt 2026', venue: 'Jaarbeurs' },
+  { name: 'Soenda Festival', date: '6 jun 2026', venue: 'Ruigenhoek' },
+];
+
+const DEMO_FOLLOWED_DJS = [
+  { name: 'Charlotte de Witte', genre: 'Techno', events: 3 },
+  { name: 'Ben Klock', genre: 'Techno', events: 2 },
+  { name: 'Amelie Lens', genre: 'Techno', events: 4 },
+  { name: 'Jeff Mills', genre: 'Techno', events: 1 },
+  { name: 'Nina Kraviz', genre: 'Techno / Electro', events: 2 },
+];
+
+const DEMO_NOODCONTACTEN = [
+  { name: 'Sophie', relation: 'Zus', phone: '06-12345678' },
+  { name: 'Mark', relation: 'Vriend', phone: '06-87654321' },
+];
 
 const DEMO_BADGES = [
   { name: 'First Timer', icon: Star, color: 'text-yellow-400', bg: 'bg-yellow-500/20', earned: true },
@@ -37,6 +57,10 @@ interface VaultScreenProps {
 
 export default function VaultScreen({ user }: VaultScreenProps) {
   const [codeCopied, setCodeCopied] = useState(false);
+  const [expandedMenu, setExpandedMenu] = useState<string | null>(null);
+  const [notificaties, setNotificaties] = useState(true);
+  const [darkMode, setDarkMode] = useState(true);
+  const [taalNL, setTaalNL] = useState(true);
 
   const profile = {
     username: user.username,
@@ -221,24 +245,131 @@ export default function VaultScreen({ user }: VaultScreenProps) {
 
       {/* Menu items */}
       <div className="flex flex-col gap-1.5">
-        {[
-          { icon: Heart, label: 'Favorieten', count: 12 },
-          { icon: Music, label: 'Gevolgde DJ\'s', count: 8 },
-          { icon: Shield, label: 'Noodcontacten', count: 2 },
-          { icon: Settings, label: 'Instellingen', count: null },
-        ].map((item) => (
+        {/* Favorieten */}
+        <div>
           <button
-            key={item.label}
-            className="flex items-center gap-3 rounded-[20px] bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] px-4 py-3 text-left active:bg-white/[0.1]"
+            onClick={() => setExpandedMenu(expandedMenu === 'favorieten' ? null : 'favorieten')}
+            className="flex w-full items-center gap-3 rounded-[20px] bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] px-4 py-3 text-left active:bg-white/[0.1]"
           >
-            <item.icon className="h-5 w-5 text-slate-400" />
-            <span className="flex-1 text-sm font-medium text-slate-200">{item.label}</span>
-            {item.count !== null && (
-              <span className="text-xs text-slate-500">{item.count}</span>
-            )}
-            <ChevronRight className="h-4 w-4 text-slate-600" />
+            <Heart className="h-5 w-5 text-red-400" />
+            <span className="flex-1 text-sm font-medium text-slate-200">Favorieten</span>
+            <span className="text-xs text-slate-500">{DEMO_FAVORITE_EVENTS.length}</span>
+            {expandedMenu === 'favorieten' ? <ChevronDown className="h-4 w-4 text-slate-600" /> : <ChevronRight className="h-4 w-4 text-slate-600" />}
           </button>
-        ))}
+          {expandedMenu === 'favorieten' && (
+            <div className="mt-1 flex flex-col gap-1 pl-2">
+              {DEMO_FAVORITE_EVENTS.map((ev) => (
+                <div key={ev.name} className="flex items-center gap-2 rounded-[16px] bg-white/[0.04] border border-white/[0.06] px-3 py-2">
+                  <Heart className="h-3 w-3 text-red-400 shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-medium text-slate-200 truncate">{ev.name}</p>
+                    <p className="text-[10px] text-slate-500">{ev.venue} &bull; {ev.date}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Gevolgde DJ's */}
+        <div>
+          <button
+            onClick={() => setExpandedMenu(expandedMenu === 'djs' ? null : 'djs')}
+            className="flex w-full items-center gap-3 rounded-[20px] bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] px-4 py-3 text-left active:bg-white/[0.1]"
+          >
+            <Music className="h-5 w-5 text-purple-400" />
+            <span className="flex-1 text-sm font-medium text-slate-200">Gevolgde DJ&apos;s</span>
+            <span className="text-xs text-slate-500">{DEMO_FOLLOWED_DJS.length}</span>
+            {expandedMenu === 'djs' ? <ChevronDown className="h-4 w-4 text-slate-600" /> : <ChevronRight className="h-4 w-4 text-slate-600" />}
+          </button>
+          {expandedMenu === 'djs' && (
+            <div className="mt-1 flex flex-col gap-1 pl-2">
+              {DEMO_FOLLOWED_DJS.map((dj) => (
+                <div key={dj.name} className="flex items-center gap-2 rounded-[16px] bg-white/[0.04] border border-white/[0.06] px-3 py-2">
+                  <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-purple-500/20 text-[9px] font-bold text-purple-300">
+                    {dj.name.split(' ').map(n => n[0]).join('')}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-medium text-slate-200 truncate">{dj.name}</p>
+                    <p className="text-[10px] text-slate-500">{dj.genre} &bull; {dj.events} events</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Noodcontacten */}
+        <div>
+          <button
+            onClick={() => setExpandedMenu(expandedMenu === 'nood' ? null : 'nood')}
+            className="flex w-full items-center gap-3 rounded-[20px] bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] px-4 py-3 text-left active:bg-white/[0.1]"
+          >
+            <Shield className="h-5 w-5 text-red-400" />
+            <span className="flex-1 text-sm font-medium text-slate-200">Noodcontacten</span>
+            <span className="text-xs text-slate-500">{DEMO_NOODCONTACTEN.length}</span>
+            {expandedMenu === 'nood' ? <ChevronDown className="h-4 w-4 text-slate-600" /> : <ChevronRight className="h-4 w-4 text-slate-600" />}
+          </button>
+          {expandedMenu === 'nood' && (
+            <div className="mt-1 flex flex-col gap-1 pl-2">
+              {DEMO_NOODCONTACTEN.map((contact) => (
+                <div key={contact.name} className="flex items-center gap-2 rounded-[16px] bg-white/[0.04] border border-white/[0.06] px-3 py-2">
+                  <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-red-500/20 text-[9px] font-bold text-red-300">
+                    {contact.name.slice(0, 2).toUpperCase()}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-medium text-slate-200">{contact.name}</p>
+                    <p className="text-[10px] text-slate-500">{contact.relation} &bull; {contact.phone}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Instellingen */}
+        <div>
+          <button
+            onClick={() => setExpandedMenu(expandedMenu === 'settings' ? null : 'settings')}
+            className="flex w-full items-center gap-3 rounded-[20px] bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] px-4 py-3 text-left active:bg-white/[0.1]"
+          >
+            <Settings className="h-5 w-5 text-slate-400" />
+            <span className="flex-1 text-sm font-medium text-slate-200">Instellingen</span>
+            {expandedMenu === 'settings' ? <ChevronDown className="h-4 w-4 text-slate-600" /> : <ChevronRight className="h-4 w-4 text-slate-600" />}
+          </button>
+          {expandedMenu === 'settings' && (
+            <div className="mt-1 flex flex-col gap-1 pl-2">
+              <button
+                onClick={() => setNotificaties(!notificaties)}
+                className="flex items-center gap-3 rounded-[16px] bg-white/[0.04] border border-white/[0.06] px-3 py-2.5"
+              >
+                <Bell className="h-4 w-4 text-slate-400" />
+                <span className="flex-1 text-xs text-slate-200 text-left">Notificaties</span>
+                <div className={`h-5 w-9 rounded-full transition-colors ${notificaties ? 'bg-orange-500' : 'bg-slate-600'}`}>
+                  <div className={`h-5 w-5 rounded-full bg-white shadow transition-transform ${notificaties ? 'translate-x-4' : 'translate-x-0'}`} />
+                </div>
+              </button>
+              <button
+                onClick={() => setDarkMode(!darkMode)}
+                className="flex items-center gap-3 rounded-[16px] bg-white/[0.04] border border-white/[0.06] px-3 py-2.5"
+              >
+                <Moon className="h-4 w-4 text-slate-400" />
+                <span className="flex-1 text-xs text-slate-200 text-left">Dark Mode</span>
+                <div className={`h-5 w-9 rounded-full transition-colors ${darkMode ? 'bg-orange-500' : 'bg-slate-600'}`}>
+                  <div className={`h-5 w-5 rounded-full bg-white shadow transition-transform ${darkMode ? 'translate-x-4' : 'translate-x-0'}`} />
+                </div>
+              </button>
+              <button
+                onClick={() => setTaalNL(!taalNL)}
+                className="flex items-center gap-3 rounded-[16px] bg-white/[0.04] border border-white/[0.06] px-3 py-2.5"
+              >
+                <Globe className="h-4 w-4 text-slate-400" />
+                <span className="flex-1 text-xs text-slate-200 text-left">Taal</span>
+                <span className="text-[10px] text-orange-400 font-medium">{taalNL ? 'Nederlands' : 'English'}</span>
+              </button>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Logout */}

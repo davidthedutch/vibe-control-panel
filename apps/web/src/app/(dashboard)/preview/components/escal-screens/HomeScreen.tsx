@@ -96,12 +96,51 @@ export default function HomeScreen({ onSelectEvent }: HomeScreenProps) {
     search: searchQuery || undefined,
   });
 
-  // Enrich events and group by date
+  // Enrich events, apply filters, and group by date
   const groupedEvents = useMemo(() => {
     const enriched = allEvents.map(enrichEvent);
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+    const filtered = enriched.filter((event) => {
+      // Date filter
+      if (activeDate !== 'all') {
+        const eventDate = new Date(event.start_date);
+        if (activeDate === 'today') {
+          const tomorrow = new Date(today);
+          tomorrow.setDate(tomorrow.getDate() + 1);
+          if (eventDate < today || eventDate >= tomorrow) return false;
+        } else if (activeDate === 'weekend') {
+          const dayOfWeek = today.getDay();
+          const saturday = new Date(today);
+          saturday.setDate(today.getDate() + (6 - dayOfWeek));
+          const monday = new Date(saturday);
+          monday.setDate(saturday.getDate() + 2);
+          if (eventDate < saturday || eventDate >= monday) return false;
+        } else if (activeDate === 'week') {
+          const endOfWeek = new Date(today);
+          endOfWeek.setDate(today.getDate() + (7 - today.getDay()));
+          if (eventDate < today || eventDate >= endOfWeek) return false;
+        } else if (activeDate === 'month') {
+          const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 1);
+          if (eventDate < today || eventDate >= endOfMonth) return false;
+        }
+      }
+
+      // Genre filter
+      if (activeGenre !== 'all') {
+        const hasGenre = event.genres.some(
+          (g) => g.toLowerCase().includes(activeGenre.toLowerCase())
+        );
+        if (!hasGenre) return false;
+      }
+
+      return true;
+    });
+
     const groups = new Map<string, { label: string; events: HomeEvent[] }>();
 
-    enriched.forEach((event) => {
+    filtered.forEach((event) => {
       const key = getDateKey(event.start_date);
       if (!groups.has(key)) {
         groups.set(key, { label: formatDateHeader(event.start_date), events: [] });
@@ -112,7 +151,7 @@ export default function HomeScreen({ onSelectEvent }: HomeScreenProps) {
     return Array.from(groups.entries())
       .sort(([a], [b]) => a.localeCompare(b))
       .map(([key, group]) => ({ key, ...group }));
-  }, [allEvents]);
+  }, [allEvents, activeDate, activeGenre]);
 
   return (
     <div className="flex flex-col gap-5 p-5">
