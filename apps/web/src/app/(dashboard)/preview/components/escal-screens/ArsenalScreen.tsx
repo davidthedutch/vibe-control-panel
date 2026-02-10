@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Shield, Phone, Volume2, Coffee, Droplets, MapPin, Timer, Activity, AlertTriangle, Cigarette, ChevronRight } from 'lucide-react';
+import { Shield, Phone, Volume2, Coffee, Droplets, MapPin, Timer, Activity, AlertTriangle, Cigarette, Check, X } from 'lucide-react';
 import { useBuddyPairs } from '@/lib/hooks/use-escal-data';
 
 export default function ArsenalScreen() {
@@ -10,6 +10,11 @@ export default function ArsenalScreen() {
   const [bpmValue, setBpmValue] = useState<number | null>(null);
   const [timerActive, setTimerActive] = useState(false);
   const [timerMinutes, setTimerMinutes] = useState(5);
+  const [sosPressed, setSosPressed] = useState(false);
+  const [safeHome, setSafeHome] = useState(false);
+  const [activeQuickAction, setActiveQuickAction] = useState<string | null>(null);
+  const [dbLevel, setDbLevel] = useState(92);
+  const [dbMeasuring, setDbMeasuring] = useState(false);
 
   const activePairs = pairs.filter((p) => p.status === 'active');
   const alertPairs = pairs.filter((p) => p.status === 'alert');
@@ -25,22 +30,58 @@ export default function ArsenalScreen() {
     }
   };
 
+  const handleBpmReset = () => {
+    setBpmTaps([]);
+    setBpmValue(null);
+  };
+
+  const handleMeasureDb = () => {
+    setDbMeasuring(true);
+    // Simulate measuring with random fluctuation
+    const interval = setInterval(() => {
+      setDbLevel(Math.floor(75 + Math.random() * 30));
+    }, 200);
+    setTimeout(() => {
+      clearInterval(interval);
+      setDbMeasuring(false);
+      setDbLevel(Math.floor(80 + Math.random() * 25));
+    }, 2000);
+  };
+
+  const handleQuickAction = (label: string) => {
+    setActiveQuickAction(label);
+    setTimeout(() => setActiveQuickAction(null), 2000);
+  };
+
+  const dbPercent = Math.min(100, Math.max(0, ((dbLevel - 50) / 70) * 100));
+  const dbColor = dbLevel >= 100 ? 'text-red-400' : dbLevel >= 85 ? 'text-orange-400' : 'text-green-400';
+
   return (
     <div className="flex flex-col gap-5 p-5">
       <h1 className="text-lg font-bold text-white">Arsenal</h1>
 
       {/* BPM Meter */}
-      <button
-        onClick={handleBpmTap}
-        className="rounded-[20px] bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] shadow-lg shadow-black/20 p-4 text-center active:bg-white/[0.1] transition-colors"
-      >
-        <Activity className="mx-auto mb-2 h-6 w-6 text-orange-400" />
-        <p className="text-2xl font-bold text-white">{bpmValue ?? '—'}</p>
-        <p className="text-[10px] text-slate-400">BPM — Tik om te meten</p>
-        {bpmTaps.length > 0 && bpmTaps.length < 3 && (
-          <p className="mt-1 text-[10px] text-orange-400">Blijf tikken... ({bpmTaps.length}/3)</p>
+      <div className="rounded-[20px] bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] shadow-lg shadow-black/20 p-4 text-center">
+        <button
+          onClick={handleBpmTap}
+          className="w-full active:scale-95 transition-transform"
+        >
+          <Activity className={`mx-auto mb-2 h-6 w-6 ${bpmValue ? 'text-orange-400' : 'text-slate-400'}`} />
+          <p className="text-2xl font-bold text-white">{bpmValue ?? '—'}</p>
+          <p className="text-[10px] text-slate-400">BPM — Tik om te meten</p>
+          {bpmTaps.length > 0 && bpmTaps.length < 3 && (
+            <p className="mt-1 text-[10px] text-orange-400">Blijf tikken... ({bpmTaps.length}/3)</p>
+          )}
+        </button>
+        {bpmValue && (
+          <button
+            onClick={handleBpmReset}
+            className="mt-2 text-[10px] text-slate-500 underline"
+          >
+            Reset
+          </button>
         )}
-      </button>
+      </div>
 
       {/* Timer */}
       <div className="rounded-[20px] bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] shadow-lg shadow-black/20 p-3">
@@ -59,9 +100,7 @@ export default function ArsenalScreen() {
               <button
                 key={m}
                 onClick={() => { setTimerMinutes(m); setTimerActive(true); }}
-                className={`flex-1 rounded-full py-1.5 text-[10px] font-medium ${
-                  timerMinutes === m ? 'bg-blue-500 text-white' : 'bg-white/[0.06] text-slate-400'
-                }`}
+                className="flex-1 rounded-full py-1.5 text-[10px] font-medium bg-white/[0.06] text-slate-400 active:bg-blue-500 active:text-white transition-colors"
               >
                 {m} min
               </button>
@@ -70,7 +109,7 @@ export default function ArsenalScreen() {
         ) : (
           <button
             onClick={() => setTimerActive(false)}
-            className="w-full rounded-full bg-red-500/20 py-1.5 text-[10px] font-medium text-red-400"
+            className="w-full rounded-full bg-red-500/20 py-1.5 text-[10px] font-medium text-red-400 active:bg-red-500/30"
           >
             Stop timer
           </button>
@@ -89,10 +128,35 @@ export default function ArsenalScreen() {
       </div>
 
       {/* SOS Noodknop */}
-      <button className="flex items-center justify-center gap-2 rounded-[20px] border border-red-500/30 bg-red-500/10 py-3 text-sm font-bold text-red-400 active:bg-red-500/20">
-        <Phone className="h-4 w-4" />
-        SOS Noodknop
-      </button>
+      {!sosPressed ? (
+        <button
+          onClick={() => setSosPressed(true)}
+          className="flex items-center justify-center gap-2 rounded-[20px] border border-red-500/30 bg-red-500/10 py-3 text-sm font-bold text-red-400 active:bg-red-500/20"
+        >
+          <Phone className="h-4 w-4" />
+          SOS Noodknop
+        </button>
+      ) : (
+        <div className="rounded-[20px] border border-red-500/30 bg-red-500/10 p-3">
+          <p className="text-center text-xs font-bold text-red-400 mb-2">Weet je het zeker?</p>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setSosPressed(false)}
+              className="flex flex-1 items-center justify-center gap-1 rounded-full bg-white/[0.06] py-2 text-xs text-slate-300"
+            >
+              <X className="h-3 w-3" />
+              Annuleer
+            </button>
+            <button
+              onClick={() => setSosPressed(false)}
+              className="flex flex-1 items-center justify-center gap-1 rounded-full bg-red-500 py-2 text-xs font-bold text-white"
+            >
+              <Phone className="h-3 w-3" />
+              Bel 112
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Buddy System */}
       <div>
@@ -135,39 +199,69 @@ export default function ArsenalScreen() {
       </div>
 
       {/* dB Meter */}
-      <div className="rounded-[20px] bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] shadow-lg shadow-black/20 p-3">
+      <button
+        onClick={handleMeasureDb}
+        className="rounded-[20px] bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] shadow-lg shadow-black/20 p-3 text-left active:bg-white/[0.08]"
+      >
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
-            <Volume2 className="h-4 w-4 text-orange-400" />
+            <Volume2 className={`h-4 w-4 ${dbColor} ${dbMeasuring ? 'animate-pulse' : ''}`} />
             <span className="text-xs font-semibold text-white">dB Meter</span>
           </div>
-          <span className="text-sm font-bold text-orange-400">92 dB</span>
+          <span className={`text-sm font-bold ${dbColor}`}>{dbLevel} dB</span>
         </div>
         <div className="h-2 overflow-hidden rounded-full bg-white/[0.06]">
-          <div className="h-full w-[72%] rounded-full bg-gradient-to-r from-green-400 via-yellow-400 to-orange-500" />
+          <div
+            className="h-full rounded-full bg-gradient-to-r from-green-400 via-yellow-400 to-orange-500 transition-all duration-200"
+            style={{ width: `${dbPercent}%` }}
+          />
         </div>
-        <p className="mt-1 text-[10px] text-slate-500">Bescherm je gehoor — gebruik oordopjes boven 85 dB</p>
-      </div>
+        <p className="mt-1 text-[10px] text-slate-500">
+          {dbMeasuring ? 'Meten...' : 'Tik om opnieuw te meten — oordopjes boven 85 dB'}
+        </p>
+      </button>
 
       {/* Quick Actions Grid */}
       <div className="grid grid-cols-4 gap-2">
         {[
-          { icon: Droplets, label: 'Water', color: 'text-blue-400', bg: 'bg-blue-500/10' },
-          { icon: Coffee, label: 'Bar', color: 'text-yellow-400', bg: 'bg-yellow-500/10' },
-          { icon: Shield, label: 'Garderobe', color: 'text-purple-400', bg: 'bg-purple-500/10' },
-          { icon: Cigarette, label: 'Roken', color: 'text-slate-400', bg: 'bg-slate-500/10' },
-        ].map((item) => (
-          <button key={item.label} className={`flex flex-col items-center gap-1 rounded-[20px] ${item.bg} backdrop-blur-xl border border-white/[0.08] py-2.5`}>
-            <item.icon className={`h-4 w-4 ${item.color}`} />
-            <span className="text-[9px] font-medium text-slate-300">{item.label}</span>
-          </button>
-        ))}
+          { icon: Droplets, label: 'Water', color: 'text-blue-400', bg: 'bg-blue-500/10', activeBg: 'bg-blue-500' },
+          { icon: Coffee, label: 'Bar', color: 'text-yellow-400', bg: 'bg-yellow-500/10', activeBg: 'bg-yellow-500' },
+          { icon: Shield, label: 'Garderobe', color: 'text-purple-400', bg: 'bg-purple-500/10', activeBg: 'bg-purple-500' },
+          { icon: Cigarette, label: 'Roken', color: 'text-slate-400', bg: 'bg-slate-500/10', activeBg: 'bg-slate-500' },
+        ].map((item) => {
+          const isActive = activeQuickAction === item.label;
+          return (
+            <button
+              key={item.label}
+              onClick={() => handleQuickAction(item.label)}
+              className={`flex flex-col items-center gap-1 rounded-[20px] backdrop-blur-xl border border-white/[0.08] py-2.5 transition-colors ${
+                isActive ? `${item.activeBg} text-white` : item.bg
+              }`}
+            >
+              {isActive ? (
+                <Check className="h-4 w-4 text-white" />
+              ) : (
+                <item.icon className={`h-4 w-4 ${item.color}`} />
+              )}
+              <span className={`text-[9px] font-medium ${isActive ? 'text-white' : 'text-slate-300'}`}>
+                {isActive ? 'Gevonden!' : item.label}
+              </span>
+            </button>
+          );
+        })}
       </div>
 
       {/* Veilig Thuiskomen */}
-      <button className="flex items-center justify-center gap-2 rounded-[20px] bg-green-500/10 py-3 text-sm font-semibold text-green-400 active:bg-green-500/20">
-        <Shield className="h-4 w-4" />
-        Ik ben veilig thuis
+      <button
+        onClick={() => setSafeHome(!safeHome)}
+        className={`flex items-center justify-center gap-2 rounded-[20px] py-3 text-sm font-semibold transition-colors ${
+          safeHome
+            ? 'bg-green-500 text-white'
+            : 'bg-green-500/10 text-green-400 active:bg-green-500/20'
+        }`}
+      >
+        {safeHome ? <Check className="h-4 w-4" /> : <Shield className="h-4 w-4" />}
+        {safeHome ? 'Veilig thuis gemeld!' : 'Ik ben veilig thuis'}
       </button>
     </div>
   );

@@ -52,7 +52,7 @@ export default function EscalAppPreview({ device, user }: EscalAppPreviewProps) 
 
   const renderScreen = () => {
     if (activeTab === 'events' && selectedEventId) {
-      return <EventDetailScreen eventId={selectedEventId} onBack={handleBackFromEvent} />;
+      return <EventDetailScreen eventId={selectedEventId} onBack={handleBackFromEvent} user={user} />;
     }
 
     switch (activeTab) {

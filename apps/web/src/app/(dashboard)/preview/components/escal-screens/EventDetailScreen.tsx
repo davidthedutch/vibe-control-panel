@@ -1,12 +1,14 @@
 'use client';
 
 import { useState } from 'react';
-import { ArrowLeft, MapPin, Calendar, Users, Clock, Share2, Heart, Music, Ticket, MessageSquare, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, MapPin, Calendar, Users, Clock, Share2, Heart, Music, Ticket, MessageSquare, AlertTriangle, Send, Check } from 'lucide-react';
 import { useEscalEvent } from '@/lib/hooks/use-escal-data';
+import type { PreviewUser } from '../../page';
 
 interface EventDetailScreenProps {
   eventId: string;
   onBack: () => void;
+  user: PreviewUser;
 }
 
 const DEMO_LINEUP = [
@@ -30,10 +32,15 @@ const DEMO_REACTIES = [
   { user: 'DJFan123', text: 'Charlotte de Witte was insane 🔥', date: '3 dagen geleden' },
 ];
 
-export default function EventDetailScreen({ eventId, onBack }: EventDetailScreenProps) {
+export default function EventDetailScreen({ eventId, onBack, user }: EventDetailScreenProps) {
   const { event, loading } = useEscalEvent(eventId);
   const [isFavorite, setIsFavorite] = useState(false);
   const [isGoing, setIsGoing] = useState(false);
+  const [isInterested, setIsInterested] = useState(false);
+  const [shared, setShared] = useState(false);
+  const [showReactieInput, setShowReactieInput] = useState(false);
+  const [reactieText, setReactieText] = useState('');
+  const [reacties, setReacties] = useState(DEMO_REACTIES);
 
   const formatDate = (dateStr: string) => {
     return new Date(dateStr).toLocaleDateString('nl-NL', {
@@ -87,8 +94,11 @@ export default function EventDetailScreen({ eventId, onBack }: EventDetailScreen
           >
             <Heart className={`h-4 w-4 ${isFavorite ? 'text-red-400' : 'text-white'}`} fill={isFavorite ? 'currentColor' : 'none'} />
           </button>
-          <button className="flex h-8 w-8 items-center justify-center rounded-full bg-black/40 backdrop-blur-sm">
-            <Share2 className="h-4 w-4 text-white" />
+          <button
+            onClick={() => { setShared(true); setTimeout(() => setShared(false), 2000); }}
+            className="flex h-8 w-8 items-center justify-center rounded-full bg-black/40 backdrop-blur-sm"
+          >
+            {shared ? <Check className="h-4 w-4 text-green-400" /> : <Share2 className="h-4 w-4 text-white" />}
           </button>
         </div>
         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-[#1A1D23] to-transparent p-4 pt-12">
@@ -131,8 +141,15 @@ export default function EventDetailScreen({ eventId, onBack }: EventDetailScreen
           >
             {isGoing ? '✓ Ik ga!' : `Ik ga! (${event.going_count})`}
           </button>
-          <button className="rounded-[20px] bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] px-4 py-2.5 text-sm font-medium text-slate-300">
-            Interesse
+          <button
+            onClick={() => setIsInterested(!isInterested)}
+            className={`rounded-[20px] px-4 py-2.5 text-sm font-medium transition-colors ${
+              isInterested
+                ? 'bg-blue-500 text-white'
+                : 'bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] text-slate-300'
+            }`}
+          >
+            {isInterested ? '✓ Interesse' : 'Interesse'}
           </button>
         </div>
 
@@ -143,7 +160,7 @@ export default function EventDetailScreen({ eventId, onBack }: EventDetailScreen
             <p className="text-[11px] text-slate-400">Going</p>
           </div>
           <div className="flex-1 rounded-[20px] bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] shadow-lg shadow-black/20 p-3 text-center">
-            <p className="text-lg font-bold text-blue-400">{event.interested_count}</p>
+            <p className="text-lg font-bold text-blue-400">{event.interested_count + (isInterested ? 1 : 0)}</p>
             <p className="text-[11px] text-slate-400">Interested</p>
           </div>
         </div>
@@ -217,22 +234,63 @@ export default function EventDetailScreen({ eventId, onBack }: EventDetailScreen
             <h3 className="flex items-center gap-1.5 text-xs font-semibold uppercase text-slate-500">
               <MessageSquare className="h-3.5 w-3.5" /> Reacties
             </h3>
-            <span className="text-[10px] text-slate-400">{DEMO_REACTIES.length} reacties</span>
+            <span className="text-[10px] text-slate-400">{reacties.length} reacties</span>
           </div>
           <div className="flex flex-col gap-2">
-            {DEMO_REACTIES.map((reactie, i) => (
-              <div key={i} className="rounded-[16px] bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] px-3 py-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-medium text-orange-300">{reactie.user}</span>
-                  <span className="text-[10px] text-slate-500">{reactie.date}</span>
+            {reacties.map((reactie, i) => {
+              const isOwn = reactie.user === user.username;
+              return (
+                <div key={i} className={`rounded-[16px] backdrop-blur-xl border px-3 py-2 ${
+                  isOwn ? 'bg-orange-500/10 border-orange-500/20' : 'bg-white/[0.06] border-white/[0.08]'
+                }`}>
+                  <div className="flex items-center justify-between">
+                    <span className={`text-xs font-medium ${isOwn ? 'text-orange-400' : 'text-orange-300'}`}>
+                      {isOwn ? 'Jij' : reactie.user}
+                    </span>
+                    <span className="text-[10px] text-slate-500">{reactie.date}</span>
+                  </div>
+                  <p className="mt-1 text-[11px] text-slate-300">{reactie.text}</p>
                 </div>
-                <p className="mt-1 text-[11px] text-slate-300">{reactie.text}</p>
-              </div>
-            ))}
+              );
+            })}
           </div>
-          <button className="mt-2 w-full rounded-[16px] bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] py-2 text-xs text-orange-400">
-            Schrijf een reactie
-          </button>
+          {/* Reactie input */}
+          {showReactieInput ? (
+            <div className="mt-2 flex items-center gap-2 rounded-[16px] bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] px-3 py-2">
+              <input
+                type="text"
+                placeholder="Schrijf je reactie..."
+                className="flex-1 bg-transparent text-xs text-white placeholder-slate-500 outline-none"
+                value={reactieText}
+                onChange={(e) => setReactieText(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && reactieText.trim()) {
+                    setReacties((prev) => [...prev, { user: user.username, text: reactieText.trim(), date: 'Zojuist' }]);
+                    setReactieText('');
+                    setShowReactieInput(false);
+                  }
+                }}
+                autoFocus
+              />
+              <button
+                onClick={() => {
+                  if (!reactieText.trim()) return;
+                  setReacties((prev) => [...prev, { user: user.username, text: reactieText.trim(), date: 'Zojuist' }]);
+                  setReactieText('');
+                  setShowReactieInput(false);
+                }}
+              >
+                <Send className={`h-4 w-4 ${reactieText.trim() ? 'text-orange-400' : 'text-slate-600'}`} />
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={() => setShowReactieInput(true)}
+              className="mt-2 w-full rounded-[16px] bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] py-2 text-xs text-orange-400 active:bg-white/[0.1]"
+            >
+              Schrijf een reactie
+            </button>
+          )}
         </div>
 
         {/* Age indicator */}
