@@ -1,12 +1,16 @@
 'use client';
 
-import { MapPin, MessageCircle, Shield, Users, Radio, AlertTriangle } from 'lucide-react';
+import { useState } from 'react';
+import { MapPin, MessageCircle, Shield, Radio, AlertTriangle, Footprints, Phone, Navigation, Coffee, Droplets, Volume2, CheckCircle, Send } from 'lucide-react';
 import { useLiveLocations, useRadiusMessages, useBuddyPairs } from '@/lib/hooks/use-escal-data';
 
 export default function LiveScreen() {
   const { locations, loading: locsLoading } = useLiveLocations();
   const { messages, loading: msgsLoading } = useRadiusMessages();
   const { pairs, loading: pairsLoading } = useBuddyPairs();
+  const [checkedIn, setCheckedIn] = useState(false);
+  const [stagePosition, setStagePosition] = useState('Main Stage');
+  const [statusText, setStatusText] = useState('');
 
   const activePairs = pairs.filter((p) => p.status === 'active');
   const alertPairs = pairs.filter((p) => p.status === 'alert');
@@ -24,29 +28,89 @@ export default function LiveScreen() {
           </div>
           <div>
             <p className="text-sm font-bold text-green-400">{locsLoading ? '...' : locations.length}</p>
-            <p className="text-[10px] text-slate-400">Live users</p>
+            <p className="text-[10px] text-slate-400">Live</p>
           </div>
         </div>
         <div className="flex flex-1 items-center gap-2 rounded-xl bg-blue-500/10 px-3 py-2">
           <MessageCircle className="h-4 w-4 text-blue-400" />
           <div>
             <p className="text-sm font-bold text-blue-400">{msgsLoading ? '...' : messages.length}</p>
-            <p className="text-[10px] text-slate-400">Berichten</p>
+            <p className="text-[10px] text-slate-400">Chat</p>
           </div>
         </div>
         <div className="flex flex-1 items-center gap-2 rounded-xl bg-orange-500/10 px-3 py-2">
           <Shield className="h-4 w-4 text-orange-400" />
           <div>
             <p className="text-sm font-bold text-orange-400">{pairsLoading ? '...' : activePairs.length}</p>
-            <p className="text-[10px] text-slate-400">Buddy&apos;s</p>
+            <p className="text-[10px] text-slate-400">Buddy</p>
           </div>
         </div>
       </div>
 
+      {/* Check-in + Status */}
+      <div className="flex gap-2">
+        <button
+          onClick={() => setCheckedIn(!checkedIn)}
+          className={`flex flex-1 items-center justify-center gap-1.5 rounded-xl py-2.5 text-xs font-semibold ${
+            checkedIn ? 'bg-green-500 text-white' : 'bg-purple-500 text-white'
+          }`}
+        >
+          <CheckCircle className="h-3.5 w-3.5" />
+          {checkedIn ? 'Ingecheckt!' : 'Check-in'}
+        </button>
+        <button className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-slate-700 py-2.5 text-xs font-medium text-slate-300">
+          <Navigation className="h-3.5 w-3.5" />
+          Locatie Delen
+        </button>
+      </div>
+
+      {/* Stage Position */}
+      <div className="rounded-xl bg-slate-800/80 p-3">
+        <p className="mb-2 text-[11px] font-medium text-slate-400">Waar sta je?</p>
+        <div className="flex flex-wrap gap-1.5">
+          {['Main Stage', 'Stage 2', 'Bar', 'Toilet', 'Ingang', 'Chill Zone'].map((pos) => (
+            <button
+              key={pos}
+              onClick={() => setStagePosition(pos)}
+              className={`rounded-full px-2.5 py-1 text-[10px] font-medium ${
+                stagePosition === pos
+                  ? 'bg-purple-500 text-white'
+                  : 'bg-slate-700 text-slate-400'
+              }`}
+            >
+              {pos}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Status Update */}
+      <div className="flex items-center gap-2 rounded-xl bg-slate-800 px-3 py-2">
+        <input
+          type="text"
+          placeholder="Status: 'Epic set!', 'Bij de bar'..."
+          className="flex-1 bg-transparent text-xs text-white placeholder-slate-500 outline-none"
+          value={statusText}
+          onChange={(e) => setStatusText(e.target.value)}
+        />
+        <Send className="h-4 w-4 text-purple-400" />
+      </div>
+
+      {/* Stappenteller */}
+      <div className="rounded-xl bg-slate-800/80 p-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Footprints className="h-4 w-4 text-green-400" />
+            <span className="text-xs font-medium text-white">Stappen vanavond</span>
+          </div>
+          <span className="text-sm font-bold text-green-400">6.832</span>
+        </div>
+        <div className="mt-1 text-[10px] text-slate-500">Leaderboard: #3 van je vrienden</div>
+      </div>
+
       {/* Fake map area */}
-      <div className="relative h-36 overflow-hidden rounded-xl bg-slate-800/80">
+      <div className="relative h-32 overflow-hidden rounded-xl bg-slate-800/80">
         <div className="absolute inset-0 bg-gradient-to-br from-slate-700/50 to-slate-800/50" />
-        {/* Map pins */}
         {!locsLoading && locations.slice(0, 8).map((loc, i) => (
           <div
             key={loc.id}
@@ -67,11 +131,32 @@ export default function LiveScreen() {
         </div>
       </div>
 
+      {/* Quick Actions */}
+      <div className="grid grid-cols-4 gap-2">
+        {[
+          { icon: Coffee, label: 'Bar', color: 'text-yellow-400', bg: 'bg-yellow-500/10' },
+          { icon: Droplets, label: 'Water', color: 'text-blue-400', bg: 'bg-blue-500/10' },
+          { icon: MapPin, label: 'EHBO', color: 'text-red-400', bg: 'bg-red-500/10' },
+          { icon: Volume2, label: 'dB Meter', color: 'text-purple-400', bg: 'bg-purple-500/10' },
+        ].map((item) => (
+          <button key={item.label} className={`flex flex-col items-center gap-1 rounded-xl ${item.bg} py-2.5`}>
+            <item.icon className={`h-4 w-4 ${item.color}`} />
+            <span className="text-[9px] font-medium text-slate-300">{item.label}</span>
+          </button>
+        ))}
+      </div>
+
+      {/* SOS Button */}
+      <button className="flex items-center justify-center gap-2 rounded-xl border border-red-500/30 bg-red-500/10 py-3 text-sm font-bold text-red-400 active:bg-red-500/20">
+        <Phone className="h-4 w-4" />
+        SOS Noodknop
+      </button>
+
       {/* Radius Chat */}
       <div>
         <h2 className="mb-2 flex items-center gap-2 text-sm font-semibold text-white">
           <MessageCircle className="h-4 w-4 text-blue-400" />
-          Radius Chat
+          500m Radius Chat
         </h2>
         <div className="flex flex-col gap-1.5">
           {msgsLoading ? (
@@ -89,6 +174,15 @@ export default function LiveScreen() {
               </div>
             ))
           )}
+        </div>
+        {/* Chat input */}
+        <div className="mt-2 flex items-center gap-2 rounded-lg bg-slate-800 px-3 py-2">
+          <input
+            type="text"
+            placeholder="Bericht versturen..."
+            className="flex-1 bg-transparent text-xs text-white placeholder-slate-500 outline-none"
+          />
+          <Send className="h-4 w-4 text-purple-400" />
         </div>
       </div>
 
@@ -118,7 +212,7 @@ export default function LiveScreen() {
                   <p className="truncate text-xs font-medium text-slate-200">
                     {pair.user_name} &amp; {pair.buddy_name}
                   </p>
-                  <p className="truncate text-[10px] text-slate-500">{pair.event_title}</p>
+                  <p className="truncate text-[10px] text-slate-500">{pair.event_title} &bull; Check elke {pair.check_interval_minutes}min</p>
                 </div>
                 <span className={`text-[10px] font-medium ${
                   pair.status === 'active' ? 'text-green-400' :
@@ -131,6 +225,12 @@ export default function LiveScreen() {
           )}
         </div>
       </div>
+
+      {/* Veilig Thuiskomen */}
+      <button className="flex items-center justify-center gap-2 rounded-xl bg-green-500/10 py-3 text-sm font-semibold text-green-400 active:bg-green-500/20">
+        <CheckCircle className="h-4 w-4" />
+        Ik ben veilig thuis
+      </button>
     </div>
   );
 }

@@ -1,23 +1,53 @@
 'use client';
 
-import { Calendar, Users, MapPin, TrendingUp, Activity, Zap } from 'lucide-react';
-import { useEscalMetrics, useTopEvents, useRecentActivity } from '@/lib/hooks/use-escal-data';
+import { Calendar, Users, MapPin, TrendingUp, Activity, Zap, Bell, Cloud, Sun, CloudRain, Heart, Clock, Star, Footprints } from 'lucide-react';
+import { useEscalMetrics, useTopEvents, useRecentActivity, useEscalEvents } from '@/lib/hooks/use-escal-data';
 
 export default function HomeScreen() {
   const { metrics, loading: metricsLoading } = useEscalMetrics();
   const { events: topEvents, loading: eventsLoading } = useTopEvents();
   const { activities, loading: activityLoading } = useRecentActivity();
+  const { events: upcomingEvents, loading: upcomingLoading } = useEscalEvents({ limit: 3, status: 'active' });
 
   return (
     <div className="flex flex-col gap-4 p-4">
-      {/* Header */}
+      {/* Header with notification bell */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-lg font-bold text-white">Escal</h1>
           <p className="text-xs text-slate-400">Welkom terug</p>
         </div>
-        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-purple-500/20">
-          <Zap className="h-4 w-4 text-purple-400" />
+        <div className="flex items-center gap-2">
+          <button className="relative flex h-8 w-8 items-center justify-center rounded-full bg-slate-800">
+            <Bell className="h-4 w-4 text-slate-300" />
+            <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[8px] font-bold text-white">3</span>
+          </button>
+          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-purple-500/20">
+            <Zap className="h-4 w-4 text-purple-400" />
+          </div>
+        </div>
+      </div>
+
+      {/* Weather Widget */}
+      <div className="rounded-xl bg-gradient-to-r from-blue-600/30 to-purple-600/30 p-3">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-xs font-medium text-blue-300">Weer in Amsterdam</p>
+            <div className="mt-1 flex items-center gap-2">
+              <Sun className="h-6 w-6 text-yellow-400" />
+              <span className="text-2xl font-bold text-white">14°</span>
+            </div>
+            <p className="mt-0.5 text-[10px] text-slate-300">Vanavond: 9° - Licht bewolkt</p>
+          </div>
+          <div className="flex flex-col items-end gap-1">
+            <div className="flex items-center gap-1.5 text-[10px] text-slate-300">
+              <Cloud className="h-3 w-3" /> <span>Za: 12°</span>
+            </div>
+            <div className="flex items-center gap-1.5 text-[10px] text-slate-300">
+              <CloudRain className="h-3 w-3" /> <span>Zo: 8°</span>
+            </div>
+            <p className="text-[9px] text-blue-300">Neem een jas mee!</p>
+          </div>
         </div>
       </div>
 
@@ -47,6 +77,47 @@ export default function HomeScreen() {
         ))}
       </div>
 
+      {/* My Upcoming Events */}
+      <div>
+        <div className="mb-2 flex items-center justify-between">
+          <h2 className="text-sm font-semibold text-white">Mijn Agenda</h2>
+          <span className="text-[10px] text-purple-400">Alles bekijken</span>
+        </div>
+        <div className="flex gap-2.5 overflow-x-auto pb-1">
+          {upcomingLoading ? (
+            <div className="h-20 w-40 shrink-0 animate-pulse rounded-xl bg-slate-800/80" />
+          ) : (
+            upcomingEvents.slice(0, 3).map((event) => (
+              <div key={event.id} className="w-40 shrink-0 rounded-xl bg-gradient-to-br from-purple-600/30 to-blue-600/20 p-3">
+                <p className="truncate text-xs font-semibold text-white">{event.title}</p>
+                <p className="mt-0.5 truncate text-[10px] text-slate-300">{event.venue_name || 'TBA'}</p>
+                <div className="mt-2 flex items-center justify-between">
+                  <span className="text-[10px] text-purple-300">
+                    {new Date(event.start_date).toLocaleDateString('nl-NL', { day: 'numeric', month: 'short' })}
+                  </span>
+                  <Heart className="h-3 w-3 text-red-400" fill="currentColor" />
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+
+      {/* Daily Challenge */}
+      <div className="rounded-xl border border-yellow-500/20 bg-yellow-500/5 p-3">
+        <div className="flex items-center gap-2">
+          <Star className="h-4 w-4 text-yellow-400" />
+          <span className="text-xs font-semibold text-yellow-300">Dagelijkse Challenge</span>
+        </div>
+        <p className="mt-1 text-[11px] text-slate-300">Check 3 events vandaag - <span className="text-yellow-400">+50 XP</span></p>
+        <div className="mt-2 flex items-center gap-2">
+          <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-slate-700">
+            <div className="h-full w-1/3 rounded-full bg-yellow-400" />
+          </div>
+          <span className="text-[10px] text-slate-400">1/3</span>
+        </div>
+      </div>
+
       {/* Trending Events */}
       <div>
         <h2 className="mb-2 text-sm font-semibold text-white">Trending Events</h2>
@@ -63,12 +134,28 @@ export default function HomeScreen() {
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm font-medium text-white">{event.title}</p>
-                  <p className="text-[11px] text-slate-400">{event.going} going</p>
+                  <p className="text-[11px] text-slate-400">{event.going} going &bull; {event.interested} interested</p>
                 </div>
+                <Heart className="h-3.5 w-3.5 text-slate-500" />
               </div>
             ))
           )}
         </div>
+      </div>
+
+      {/* Steps Today */}
+      <div className="rounded-xl bg-slate-800/80 p-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Footprints className="h-4 w-4 text-green-400" />
+            <span className="text-xs font-medium text-white">Stappen Vandaag</span>
+          </div>
+          <span className="text-sm font-bold text-green-400">4.231</span>
+        </div>
+        <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-slate-700">
+          <div className="h-full w-[42%] rounded-full bg-green-400" />
+        </div>
+        <p className="mt-1 text-[10px] text-slate-500">Doel: 10.000 stappen</p>
       </div>
 
       {/* Recent Activity */}
