@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Search, Send, Hash, Users, UserCheck, UserPlus, UserMinus, ArrowLeft, Circle, X, MessageSquare, Plus, Lock } from 'lucide-react';
+import { Search, Send, Hash, Users, ChevronDown, ChevronUp, UserCheck, UserPlus, UserMinus, ArrowLeft, Circle, X, MessageSquare, Lock } from 'lucide-react';
 import { usePersistedState } from './use-persisted-state';
 import type { PreviewUser } from '../../page';
 
@@ -55,7 +55,6 @@ const INITIAL_ROOM_MESSAGES: Record<string, { id: string; user: string; text: st
     { id: '13', user: 'Flux', text: 'DGTL line-up is sterk dit jaar', time: '23:58' },
     { id: '14', user: 'Night', text: 'Iemand bij de waterbar?', time: '23:59' },
   ],
-  // Group chats
   crew: [
     { id: 'g1', user: 'DJFan', text: 'Zijn we er allemaal?', time: '22:30' },
     { id: 'g2', user: 'Rave', text: 'Ja bij de ingang!', time: '22:31' },
@@ -65,7 +64,6 @@ const INITIAL_ROOM_MESSAGES: Record<string, { id: string; user: string; text: st
     { id: 'g4', user: 'Echo', text: 'Volgende keer Verknipt?', time: '20:00' },
     { id: 'g5', user: 'Pulse', text: 'Zeker weten!', time: '20:05' },
   ],
-  // DMs
   'dm:DJFan': [
     { id: 'd1', user: 'DJFan', text: 'Yo waar sta je?', time: '23:30' },
     { id: 'd2', user: '__me__', text: 'Bij Main Stage links', time: '23:31' },
@@ -81,27 +79,30 @@ const INITIAL_ROOM_MESSAGES: Record<string, { id: string; user: string; text: st
   ],
 };
 
-type ChatTarget = { type: 'room'; id: string } | { type: 'group'; id: string } | { type: 'dm'; name: string };
+type FriendsChat = { type: 'group'; id: string } | { type: 'dm'; name: string };
 
 interface EscalchatScreenProps {
   user: PreviewUser;
 }
 
 export default function EscalchatScreen({ user }: EscalchatScreenProps) {
-  const [activeChat, setActiveChat] = useState<ChatTarget | null>(null);
+  const [mode, setMode] = useState<'public' | 'friends'>('public');
+  const [activeRoom, setActiveRoom] = useState('public');
+  const [activeFriendsChat, setActiveFriendsChat] = useState<FriendsChat | null>(null);
   const [messageText, setMessageText] = useState('');
   const [allMessages, setAllMessages] = usePersistedState('escal-chat-all-messages', INITIAL_ROOM_MESSAGES);
   const [friendsList, setFriendsList] = usePersistedState<string[]>('escal-friends-list', DEFAULT_FRIENDS);
-  const [friendGroups, setFriendGroups] = usePersistedState('escal-friend-groups', DEFAULT_FRIEND_GROUPS);
+  const [friendGroups] = usePersistedState('escal-friend-groups', DEFAULT_FRIEND_GROUPS);
   const [showSearch, setShowSearch] = useState(false);
   const [searchCode, setSearchCode] = useState('');
   const [searchResult, setSearchResult] = useState<typeof DEMO_PEOPLE[0] | null | 'not_found'>(null);
   const [selectedProfile, setSelectedProfile] = useState<string | null>(null);
+  const [usersExpanded, setUsersExpanded] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [allMessages, activeChat]);
+  }, [allMessages, activeRoom, activeFriendsChat]);
 
   const isFriend = (name: string) => friendsList.includes(name);
 
@@ -111,18 +112,23 @@ export default function EscalchatScreen({ user }: EscalchatScreenProps) {
     );
   };
 
-  const getChatKey = (target: ChatTarget): string => {
-    if (target.type === 'room') return target.id;
-    if (target.type === 'group') return target.id;
-    return `dm:${target.name}`;
-  };
-
-  const handleSendMessage = () => {
-    if (!messageText.trim() || !activeChat) return;
+  const handleSendPublicMessage = () => {
+    if (!messageText.trim()) return;
     const now = new Date();
     const time = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-    const key = getChatKey(activeChat);
-    const msgUser = activeChat.type === 'dm' ? '__me__' : user.username.slice(0, 7);
+    setAllMessages((prev) => ({
+      ...prev,
+      [activeRoom]: [...(prev[activeRoom] || []), { id: String(Date.now()), user: user.username.slice(0, 7), text: messageText.trim(), time }],
+    }));
+    setMessageText('');
+  };
+
+  const handleSendFriendsMessage = () => {
+    if (!messageText.trim() || !activeFriendsChat) return;
+    const now = new Date();
+    const time = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    const key = activeFriendsChat.type === 'dm' ? `dm:${activeFriendsChat.name}` : activeFriendsChat.id;
+    const msgUser = activeFriendsChat.type === 'dm' ? '__me__' : user.username.slice(0, 7);
     setAllMessages((prev) => ({
       ...prev,
       [key]: [...(prev[key] || []), { id: String(Date.now()), user: msgUser, text: messageText.trim(), time }],
@@ -138,12 +144,14 @@ export default function EscalchatScreen({ user }: EscalchatScreenProps) {
 
   const openDM = (name: string) => {
     setSelectedProfile(null);
-    setActiveChat({ type: 'dm', name });
+    setMode('friends');
+    setActiveFriendsChat({ type: 'dm', name });
   };
 
   const truncName = (name: string) => name.slice(0, 7);
 
-  // Get DMs with unread messages (last msg not from me)
+  const filteredPublicMessages = allMessages[activeRoom] || [];
+
   const dmConversations = friendsList
     .map((name) => {
       const msgs = allMessages[`dm:${name}`] || [];
@@ -212,47 +220,41 @@ export default function EscalchatScreen({ user }: EscalchatScreenProps) {
     </div>
   ) : null;
 
-  // ====== ACTIVE CHAT VIEW ======
-  if (activeChat) {
-    const chatKey = getChatKey(activeChat);
+  // ====== FRIENDS: ACTIVE CHAT (group or DM) ======
+  if (mode === 'friends' && activeFriendsChat) {
+    const isDM = activeFriendsChat.type === 'dm';
+    const chatKey = isDM ? `dm:${activeFriendsChat.name}` : activeFriendsChat.id;
     const chatMsgs = allMessages[chatKey] || [];
-    const isDM = activeChat.type === 'dm';
-    const isGroup = activeChat.type === 'group';
 
     let chatTitle = '';
     let chatSubtitle = '';
-    if (activeChat.type === 'room') {
-      const room = DEMO_ROOMS.find((r) => r.id === activeChat.id);
-      chatTitle = room?.label || activeChat.id;
-      chatSubtitle = 'Public room';
-    } else if (activeChat.type === 'group') {
-      const group = friendGroups.find((g) => g.id === activeChat.id);
-      chatTitle = group?.name || activeChat.id;
-      chatSubtitle = `${group?.members.length || 0} leden`;
-    } else {
-      const person = DEMO_PEOPLE.find((p) => p.name === activeChat.name);
-      chatTitle = activeChat.name;
+    if (isDM) {
+      const person = DEMO_PEOPLE.find((p) => p.name === activeFriendsChat.name);
+      chatTitle = activeFriendsChat.name;
       chatSubtitle = person?.online ? 'Online' : 'Offline';
+    } else {
+      const group = friendGroups.find((g) => g.id === activeFriendsChat.id);
+      chatTitle = group?.name || activeFriendsChat.id;
+      chatSubtitle = `${group?.members.length || 0} leden`;
     }
 
     return (
       <div className="relative flex flex-col gap-3 p-5">
         {MiniProfile}
-        {/* Chat header */}
         <div className="flex items-center gap-3">
           <button
-            onClick={() => { setActiveChat(null); setMessageText(''); }}
+            onClick={() => { setActiveFriendsChat(null); setMessageText(''); }}
             className="flex h-8 w-8 items-center justify-center rounded-full bg-white/[0.06] backdrop-blur-xl border border-white/[0.08]"
           >
             <ArrowLeft className="h-4 w-4 text-slate-300" />
           </button>
           {isDM ? (
-            <button onClick={() => setSelectedProfile(activeChat.name)} className="flex items-center gap-2 flex-1">
+            <button onClick={() => setSelectedProfile(activeFriendsChat.name)} className="flex items-center gap-2 flex-1">
               <div className="relative">
                 <div className="flex h-8 w-8 items-center justify-center rounded-full bg-orange-500/30 text-[10px] font-bold text-orange-300">
-                  {DEMO_PEOPLE.find((p) => p.name === activeChat.name)?.initials || activeChat.name.slice(0, 2)}
+                  {DEMO_PEOPLE.find((p) => p.name === activeFriendsChat.name)?.initials || activeFriendsChat.name.slice(0, 2)}
                 </div>
-                {DEMO_PEOPLE.find((p) => p.name === activeChat.name)?.online && (
+                {DEMO_PEOPLE.find((p) => p.name === activeFriendsChat.name)?.online && (
                   <div className="absolute -bottom-px -right-px h-2 w-2 rounded-full bg-green-400 border border-[#1A1D23]" />
                 )}
               </div>
@@ -263,8 +265,8 @@ export default function EscalchatScreen({ user }: EscalchatScreenProps) {
             </button>
           ) : (
             <div className="flex items-center gap-2 flex-1">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white/[0.06] border border-white/[0.08]">
-                {isGroup ? <Users className="h-4 w-4 text-purple-400" /> : <Hash className="h-4 w-4 text-orange-400" />}
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-purple-500/15 border border-purple-500/20">
+                <Users className="h-4 w-4 text-purple-400" />
               </div>
               <div>
                 <p className="text-sm font-semibold text-white">{chatTitle}</p>
@@ -274,12 +276,10 @@ export default function EscalchatScreen({ user }: EscalchatScreenProps) {
           )}
         </div>
 
-        {/* Chat messages */}
         <div className="rounded-[20px] bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] shadow-lg shadow-black/20 flex flex-col overflow-hidden" style={{ minHeight: 320 }}>
           <div className="flex-1 overflow-y-auto px-3 py-3 scrollbar-hide" style={{ maxHeight: 400 }}>
             {chatMsgs.map((msg) => {
               const isOwn = isDM ? msg.user === '__me__' : msg.user === user.username.slice(0, 7);
-              const displayName = isOwn ? 'Jij' : truncName(msg.user);
               return (
                 <div key={msg.id} className="py-0.5">
                   <p className="text-xs leading-relaxed">
@@ -287,7 +287,7 @@ export default function EscalchatScreen({ user }: EscalchatScreenProps) {
                       onClick={() => !isOwn && msg.user !== '__me__' && setSelectedProfile(msg.user)}
                       className={`font-semibold ${isOwn ? 'text-orange-400' : 'text-orange-300 active:underline'}`}
                     >
-                      {displayName}
+                      {isOwn ? 'Jij' : truncName(msg.user)}
                     </button>
                     <span className="text-slate-500 mx-1">&middot;</span>
                     <span className="text-slate-300">{msg.text}</span>
@@ -308,9 +308,9 @@ export default function EscalchatScreen({ user }: EscalchatScreenProps) {
               className="flex-1 bg-transparent text-xs text-white placeholder-slate-500 outline-none"
               value={messageText}
               onChange={(e) => setMessageText(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
+              onKeyDown={(e) => e.key === 'Enter' && handleSendFriendsMessage()}
             />
-            <button onClick={handleSendMessage} className="active:scale-90 transition-transform">
+            <button onClick={handleSendFriendsMessage} className="active:scale-90 transition-transform">
               <Send className={`h-4 w-4 ${messageText.trim() ? 'text-orange-400' : 'text-slate-600'}`} />
             </button>
           </div>
@@ -319,9 +319,9 @@ export default function EscalchatScreen({ user }: EscalchatScreenProps) {
     );
   }
 
-  // ====== OVERVIEW / LOBBY ======
+  // ====== MAIN VIEW ======
   return (
-    <div className="relative flex flex-col gap-4 p-5">
+    <div className="relative flex flex-col gap-3 p-5">
       {MiniProfile}
 
       {/* Header */}
@@ -335,6 +335,23 @@ export default function EscalchatScreen({ user }: EscalchatScreenProps) {
         >
           <Search className="h-4 w-4 text-slate-300" />
         </button>
+      </div>
+
+      {/* Mode toggle — Public / Friends */}
+      <div className="flex rounded-full bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] p-0.5">
+        {(['public', 'friends'] as const).map((m) => (
+          <button
+            key={m}
+            onClick={() => setMode(m)}
+            className={`flex-1 rounded-full py-1.5 text-xs font-semibold transition-colors ${
+              mode === m
+                ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/20'
+                : 'text-slate-400'
+            }`}
+          >
+            {m === 'public' ? 'Public' : 'Friends'}
+          </button>
+        ))}
       </div>
 
       {/* Search by code */}
@@ -386,123 +403,213 @@ export default function EscalchatScreen({ user }: EscalchatScreenProps) {
         </div>
       )}
 
-      {/* === SECTION 1: Public Rooms === */}
-      <div>
-        <h2 className="mb-2 flex items-center gap-1.5 text-[11px] font-semibold uppercase text-slate-500">
-          <Hash className="h-3 w-3" /> Public Rooms
-        </h2>
-        <div className="flex flex-col gap-1.5">
-          {DEMO_ROOMS.map((room) => {
-            const msgs = allMessages[room.id] || [];
-            const lastMsg = msgs.slice(-1)[0];
-            const onlineCount = room.id === 'public' ? DEMO_PEOPLE.filter((p) => p.online).length : Math.floor(Math.random() * 5) + 2;
-            return (
+      {/* ====== PUBLIC MODE ====== */}
+      {mode === 'public' && (
+        <>
+          {/* Room filter chips */}
+          <div className="scrollbar-hide flex gap-2 overflow-x-auto pb-0.5">
+            {DEMO_ROOMS.map((room) => (
               <button
                 key={room.id}
-                onClick={() => setActiveChat({ type: 'room', id: room.id })}
-                className="flex items-center gap-3 rounded-[16px] bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] px-3 py-2.5 text-left active:bg-white/[0.1] transition-colors"
+                onClick={() => setActiveRoom(room.id)}
+                className={`flex shrink-0 items-center gap-1 rounded-full px-3 py-1 text-[11px] font-medium ${
+                  activeRoom === room.id
+                    ? 'bg-orange-500 text-white'
+                    : 'bg-white/[0.06] text-slate-400'
+                }`}
               >
-                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-orange-500/15">
-                  <Hash className="h-4 w-4 text-orange-400" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-semibold text-white">{room.label}</span>
-                    {lastMsg && <span className="text-[10px] text-slate-600">{lastMsg.time}</span>}
-                  </div>
-                  {lastMsg && (
-                    <p className="truncate text-[10px] text-slate-400 mt-0.5">
-                      {lastMsg.user}: {lastMsg.text}
-                    </p>
-                  )}
-                </div>
-                <span className="text-[9px] text-slate-500 shrink-0">{onlineCount} online</span>
+                <Hash className="h-3 w-3" />
+                {room.label}
               </button>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* === SECTION 2: Friend Groups === */}
-      {friendGroups.length > 0 && (
-        <div>
-          <h2 className="mb-2 flex items-center gap-1.5 text-[11px] font-semibold uppercase text-slate-500">
-            <Users className="h-3 w-3" /> Vriendengroepen
-          </h2>
-          <div className="flex flex-col gap-1.5">
-            {friendGroups.map((group) => {
-              const msgs = allMessages[group.id] || [];
-              const lastMsg = msgs.slice(-1)[0];
-              return (
-                <button
-                  key={group.id}
-                  onClick={() => setActiveChat({ type: 'group', id: group.id })}
-                  className="flex items-center gap-3 rounded-[16px] bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] px-3 py-2.5 text-left active:bg-white/[0.1] transition-colors"
-                >
-                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-purple-500/15">
-                    <Users className="h-4 w-4 text-purple-400" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-semibold text-white">{group.name}</span>
-                      {lastMsg && <span className="text-[10px] text-slate-600">{lastMsg.time}</span>}
-                    </div>
-                    {lastMsg ? (
-                      <p className="truncate text-[10px] text-slate-400 mt-0.5">
-                        {lastMsg.user === '__me__' ? 'Jij' : lastMsg.user}: {lastMsg.text}
-                      </p>
-                    ) : (
-                      <p className="text-[10px] text-slate-500 mt-0.5">{group.members.length} leden</p>
-                    )}
-                  </div>
-                </button>
-              );
-            })}
+            ))}
           </div>
-        </div>
+
+          {/* Chat block */}
+          <div className="rounded-[20px] bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] shadow-lg shadow-black/20 flex flex-col overflow-hidden" style={{ minHeight: 200 }}>
+            <div className="flex-1 overflow-y-auto px-3 py-3 scrollbar-hide" style={{ maxHeight: 280 }}>
+              {filteredPublicMessages.map((msg) => {
+                const isOwn = msg.user === user.username.slice(0, 7);
+                return (
+                  <div key={msg.id} className="py-0.5">
+                    <p className="text-xs leading-relaxed">
+                      <button
+                        onClick={() => !isOwn && setSelectedProfile(msg.user)}
+                        className={`font-semibold ${isOwn ? 'text-orange-400' : 'text-orange-300 active:underline'}`}
+                      >
+                        {isOwn ? 'Jij' : truncName(msg.user)}
+                      </button>
+                      <span className="text-slate-500 mx-1">&middot;</span>
+                      <span className="text-slate-300">{msg.text}</span>
+                      <span className="ml-1.5 text-[10px] text-slate-600">{msg.time}</span>
+                    </p>
+                  </div>
+                );
+              })}
+              <div ref={chatEndRef} />
+            </div>
+            <div className="border-t border-white/[0.08] px-3 py-2 flex items-center gap-2">
+              <input
+                type="text"
+                placeholder="Bericht..."
+                className="flex-1 bg-transparent text-xs text-white placeholder-slate-500 outline-none"
+                value={messageText}
+                onChange={(e) => setMessageText(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSendPublicMessage()}
+              />
+              <button onClick={handleSendPublicMessage} className="active:scale-90 transition-transform">
+                <Send className={`h-4 w-4 ${messageText.trim() ? 'text-orange-400' : 'text-slate-600'}`} />
+              </button>
+            </div>
+          </div>
+
+          {/* Online users block */}
+          <div className="rounded-[20px] bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] shadow-lg shadow-black/20 overflow-hidden">
+            <button
+              onClick={() => setUsersExpanded(!usersExpanded)}
+              className="w-full flex items-center justify-between px-3 py-2"
+            >
+              <h3 className="flex items-center gap-1.5 text-[11px] font-semibold text-slate-400">
+                <Users className="h-3 w-3" />
+                Online ({DEMO_PEOPLE.filter(p => p.online).length + 1})
+              </h3>
+              {usersExpanded ? (
+                <ChevronUp className="h-3.5 w-3.5 text-slate-500" />
+              ) : (
+                <ChevronDown className="h-3.5 w-3.5 text-slate-500" />
+              )}
+            </button>
+            <div
+              className="px-3 pb-3 overflow-hidden transition-all duration-200"
+              style={{ maxHeight: usersExpanded ? 500 : 72 }}
+            >
+              <div className="flex flex-wrap gap-2">
+                <div className="flex items-center gap-1.5 rounded-full bg-orange-500/15 border border-orange-500/20 px-2 py-1">
+                  <div className="relative">
+                    <div className="flex h-5 w-5 items-center justify-center rounded-full bg-orange-500/50 text-[8px] font-bold text-white">
+                      {user.username.slice(0, 2).toUpperCase()}
+                    </div>
+                    <div className="absolute -bottom-px -right-px h-1.5 w-1.5 rounded-full bg-green-400" />
+                  </div>
+                  <span className="text-[10px] text-orange-400 font-medium">Jij</span>
+                </div>
+                {DEMO_PEOPLE.map((person) => (
+                  <button
+                    key={person.name}
+                    onClick={() => setSelectedProfile(person.name)}
+                    className={`flex items-center gap-1.5 rounded-full px-2 py-1 active:scale-95 transition-transform ${
+                      isFriend(person.name)
+                        ? 'bg-green-500/10 border border-green-500/15'
+                        : 'bg-white/[0.04] border border-white/[0.06]'
+                    }`}
+                  >
+                    <div className="relative">
+                      <div className="flex h-5 w-5 items-center justify-center rounded-full bg-orange-500/20 text-[8px] font-bold text-orange-300">
+                        {person.initials}
+                      </div>
+                      {person.online && (
+                        <div className="absolute -bottom-px -right-px h-1.5 w-1.5 rounded-full bg-green-400" />
+                      )}
+                    </div>
+                    <span className={`text-[10px] ${person.online ? 'text-slate-300' : 'text-slate-600'}`}>
+                      {person.name}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </>
       )}
 
-      {/* === SECTION 3: Private Messages === */}
-      {dmConversations.length > 0 && (
-        <div>
-          <h2 className="mb-2 flex items-center gap-1.5 text-[11px] font-semibold uppercase text-slate-500">
-            <Lock className="h-3 w-3" /> Priveberichten
-          </h2>
-          <div className="flex flex-col gap-1.5">
-            {dmConversations.map((dm) => {
-              const person = DEMO_PEOPLE.find((p) => p.name === dm.name);
-              const unread = dm.lastMsg && dm.lastMsg.user !== '__me__';
-              return (
-                <button
-                  key={dm.name}
-                  onClick={() => setActiveChat({ type: 'dm', name: dm.name })}
-                  className="flex items-center gap-3 rounded-[16px] bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] px-3 py-2.5 text-left active:bg-white/[0.1] transition-colors"
-                >
-                  <div className="relative">
-                    <div className="flex h-9 w-9 items-center justify-center rounded-full bg-orange-500/25 text-[10px] font-bold text-orange-300">
-                      {person?.initials || dm.name.slice(0, 2)}
-                    </div>
-                    {person?.online && (
-                      <div className="absolute bottom-0 right-0 h-2 w-2 rounded-full bg-green-400 border-[2px] border-[#1A1D23]" />
-                    )}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-semibold text-white">{dm.name}</span>
-                      {dm.lastMsg && <span className="text-[10px] text-slate-600">{dm.lastMsg.time}</span>}
-                    </div>
-                    {dm.lastMsg && (
-                      <p className="truncate text-[10px] text-slate-400 mt-0.5">
-                        {dm.lastMsg.user === '__me__' ? 'Jij: ' : ''}{dm.lastMsg.text}
-                      </p>
-                    )}
-                  </div>
-                  {unread && (
-                    <Circle className="h-2.5 w-2.5 text-orange-400 shrink-0" fill="currentColor" />
-                  )}
-                </button>
-              );
-            })}
+      {/* ====== FRIENDS MODE ====== */}
+      {mode === 'friends' && (
+        <div className="flex flex-col gap-4">
+          {/* Friend Groups */}
+          {friendGroups.length > 0 && (
+            <div>
+              <h2 className="mb-2 flex items-center gap-1.5 text-[11px] font-semibold uppercase text-slate-500">
+                <Users className="h-3 w-3" /> Vriendengroepen
+              </h2>
+              <div className="flex flex-col gap-1.5">
+                {friendGroups.map((group) => {
+                  const msgs = allMessages[group.id] || [];
+                  const lastMsg = msgs.slice(-1)[0];
+                  return (
+                    <button
+                      key={group.id}
+                      onClick={() => setActiveFriendsChat({ type: 'group', id: group.id })}
+                      className="flex items-center gap-3 rounded-[16px] bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] px-3 py-2.5 text-left active:bg-white/[0.1] transition-colors"
+                    >
+                      <div className="flex h-9 w-9 items-center justify-center rounded-full bg-purple-500/15">
+                        <Users className="h-4 w-4 text-purple-400" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-semibold text-white">{group.name}</span>
+                          {lastMsg && <span className="text-[10px] text-slate-600">{lastMsg.time}</span>}
+                        </div>
+                        {lastMsg ? (
+                          <p className="truncate text-[10px] text-slate-400 mt-0.5">
+                            {lastMsg.user === '__me__' ? 'Jij' : lastMsg.user}: {lastMsg.text}
+                          </p>
+                        ) : (
+                          <p className="text-[10px] text-slate-500 mt-0.5">{group.members.length} leden</p>
+                        )}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Private Messages */}
+          <div>
+            <h2 className="mb-2 flex items-center gap-1.5 text-[11px] font-semibold uppercase text-slate-500">
+              <Lock className="h-3 w-3" /> Priveberichten
+            </h2>
+            {dmConversations.length === 0 ? (
+              <div className="rounded-[16px] bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] p-4 text-center">
+                <p className="text-[11px] text-slate-500">Nog geen priveberichten</p>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-1.5">
+                {dmConversations.map((dm) => {
+                  const person = DEMO_PEOPLE.find((p) => p.name === dm.name);
+                  const unread = dm.lastMsg && dm.lastMsg.user !== '__me__';
+                  return (
+                    <button
+                      key={dm.name}
+                      onClick={() => setActiveFriendsChat({ type: 'dm', name: dm.name })}
+                      className="flex items-center gap-3 rounded-[16px] bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] px-3 py-2.5 text-left active:bg-white/[0.1] transition-colors"
+                    >
+                      <div className="relative">
+                        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-orange-500/25 text-[10px] font-bold text-orange-300">
+                          {person?.initials || dm.name.slice(0, 2)}
+                        </div>
+                        {person?.online && (
+                          <div className="absolute bottom-0 right-0 h-2 w-2 rounded-full bg-green-400 border-[2px] border-[#1A1D23]" />
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-semibold text-white">{dm.name}</span>
+                          {dm.lastMsg && <span className="text-[10px] text-slate-600">{dm.lastMsg.time}</span>}
+                        </div>
+                        {dm.lastMsg && (
+                          <p className="truncate text-[10px] text-slate-400 mt-0.5">
+                            {dm.lastMsg.user === '__me__' ? 'Jij: ' : ''}{dm.lastMsg.text}
+                          </p>
+                        )}
+                      </div>
+                      {unread && (
+                        <Circle className="h-2.5 w-2.5 text-orange-400 shrink-0" fill="currentColor" />
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </div>
       )}
