@@ -45,11 +45,12 @@ function loadEvents(): EnrichedEvent[] {
   try {
     const fileContent = fs.readFileSync(ENRICHED_DATA_PATH, 'utf-8');
     const data = JSON.parse(fileContent);
-    eventsCache = data.events || [];
+    const loadedEvents: EnrichedEvent[] = data.events || [];
+    eventsCache = loadedEvents;
     cacheTimestamp = now;
 
-    console.log(`[Clubguide API] Loaded ${eventsCache.length} events from enriched data`);
-    return eventsCache;
+    console.log(`[Clubguide API] Loaded ${loadedEvents.length} events from enriched data`);
+    return loadedEvents;
   } catch (error) {
     console.error('[Clubguide API] Error loading enriched events:', error);
     return [];
