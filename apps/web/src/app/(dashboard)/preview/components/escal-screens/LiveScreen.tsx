@@ -16,12 +16,12 @@ export default function LiveScreen() {
   const alertPairs = pairs.filter((p) => p.status === 'alert');
 
   return (
-    <div className="flex flex-col gap-4 p-4">
+    <div className="flex flex-col gap-5 p-5">
       <h1 className="text-lg font-bold text-white">Live</h1>
 
       {/* Live stats bar */}
       <div className="flex gap-2">
-        <div className="flex flex-1 items-center gap-2 rounded-xl bg-green-500/10 px-3 py-2">
+        <div className="flex flex-1 items-center gap-2 rounded-[20px] bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] shadow-lg shadow-black/20 px-3 py-2">
           <div className="relative">
             <Radio className="h-4 w-4 text-green-400" />
             <span className="absolute -right-0.5 -top-0.5 h-2 w-2 animate-pulse rounded-full bg-green-400" />
@@ -31,14 +31,14 @@ export default function LiveScreen() {
             <p className="text-[10px] text-slate-400">Live</p>
           </div>
         </div>
-        <div className="flex flex-1 items-center gap-2 rounded-xl bg-blue-500/10 px-3 py-2">
+        <div className="flex flex-1 items-center gap-2 rounded-[20px] bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] shadow-lg shadow-black/20 px-3 py-2">
           <MessageCircle className="h-4 w-4 text-blue-400" />
           <div>
             <p className="text-sm font-bold text-blue-400">{msgsLoading ? '...' : messages.length}</p>
             <p className="text-[10px] text-slate-400">Chat</p>
           </div>
         </div>
-        <div className="flex flex-1 items-center gap-2 rounded-xl bg-orange-500/10 px-3 py-2">
+        <div className="flex flex-1 items-center gap-2 rounded-[20px] bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] shadow-lg shadow-black/20 px-3 py-2">
           <Shield className="h-4 w-4 text-orange-400" />
           <div>
             <p className="text-sm font-bold text-orange-400">{pairsLoading ? '...' : activePairs.length}</p>
@@ -51,21 +51,21 @@ export default function LiveScreen() {
       <div className="flex gap-2">
         <button
           onClick={() => setCheckedIn(!checkedIn)}
-          className={`flex flex-1 items-center justify-center gap-1.5 rounded-xl py-2.5 text-xs font-semibold ${
+          className={`flex flex-1 items-center justify-center gap-1.5 rounded-[20px] py-2.5 text-xs font-semibold ${
             checkedIn ? 'bg-green-500 text-white' : 'bg-orange-500 text-white'
           }`}
         >
           <CheckCircle className="h-3.5 w-3.5" />
           {checkedIn ? 'Ingecheckt!' : 'Check-in'}
         </button>
-        <button className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-slate-700 py-2.5 text-xs font-medium text-slate-300">
+        <button className="flex flex-1 items-center justify-center gap-1.5 rounded-[20px] bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] py-2.5 text-xs font-medium text-slate-300">
           <Navigation className="h-3.5 w-3.5" />
           Locatie Delen
         </button>
       </div>
 
       {/* Stage Position */}
-      <div className="rounded-xl bg-slate-800/80 p-3">
+      <div className="rounded-[20px] bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] shadow-lg shadow-black/20 p-3">
         <p className="mb-2 text-[11px] font-medium text-slate-400">Waar sta je?</p>
         <div className="flex flex-wrap gap-1.5">
           {['Main Stage', 'Stage 2', 'Bar', 'Toilet', 'Ingang', 'Chill Zone'].map((pos) => (
@@ -75,7 +75,7 @@ export default function LiveScreen() {
               className={`rounded-full px-2.5 py-1 text-[10px] font-medium ${
                 stagePosition === pos
                   ? 'bg-orange-500 text-white'
-                  : 'bg-slate-700 text-slate-400'
+                  : 'bg-white/[0.06] text-slate-400'
               }`}
             >
               {pos}
@@ -85,7 +85,7 @@ export default function LiveScreen() {
       </div>
 
       {/* Status Update */}
-      <div className="flex items-center gap-2 rounded-xl bg-slate-800 px-3 py-2">
+      <div className="flex items-center gap-2 rounded-[20px] bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] px-3 py-2">
         <input
           type="text"
           placeholder="Status: 'Epic set!', 'Bij de bar'..."
@@ -97,7 +97,7 @@ export default function LiveScreen() {
       </div>
 
       {/* Stappenteller */}
-      <div className="rounded-xl bg-slate-800/80 p-3">
+      <div className="rounded-[20px] bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] shadow-lg shadow-black/20 p-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Footprints className="h-4 w-4 text-green-400" />
@@ -109,7 +109,7 @@ export default function LiveScreen() {
       </div>
 
       {/* Fake map area */}
-      <div className="relative h-32 overflow-hidden rounded-xl bg-slate-800/80">
+      <div className="relative h-32 overflow-hidden rounded-[20px] bg-white/[0.06] backdrop-blur-xl border border-white/[0.08]">
         <div className="absolute inset-0 bg-gradient-to-br from-slate-700/50 to-slate-800/50" />
         {!locsLoading && locations.slice(0, 8).map((loc, i) => (
           <div
@@ -139,7 +139,7 @@ export default function LiveScreen() {
           { icon: MapPin, label: 'EHBO', color: 'text-red-400', bg: 'bg-red-500/10' },
           { icon: Volume2, label: 'dB Meter', color: 'text-orange-400', bg: 'bg-orange-500/10' },
         ].map((item) => (
-          <button key={item.label} className={`flex flex-col items-center gap-1 rounded-xl ${item.bg} py-2.5`}>
+          <button key={item.label} className={`flex flex-col items-center gap-1 rounded-[20px] ${item.bg} backdrop-blur-xl border border-white/[0.08] py-2.5`}>
             <item.icon className={`h-4 w-4 ${item.color}`} />
             <span className="text-[9px] font-medium text-slate-300">{item.label}</span>
           </button>
@@ -147,7 +147,7 @@ export default function LiveScreen() {
       </div>
 
       {/* SOS Button */}
-      <button className="flex items-center justify-center gap-2 rounded-xl border border-red-500/30 bg-red-500/10 py-3 text-sm font-bold text-red-400 active:bg-red-500/20">
+      <button className="flex items-center justify-center gap-2 rounded-[20px] border border-red-500/30 bg-red-500/10 py-3 text-sm font-bold text-red-400 active:bg-red-500/20">
         <Phone className="h-4 w-4" />
         SOS Noodknop
       </button>
@@ -160,10 +160,10 @@ export default function LiveScreen() {
         </h2>
         <div className="flex flex-col gap-1.5">
           {msgsLoading ? (
-            <div className="h-16 animate-pulse rounded-lg bg-slate-800/80" />
+            <div className="h-16 animate-pulse rounded-[16px] bg-white/[0.06]" />
           ) : (
             messages.slice(0, 4).map((msg) => (
-              <div key={msg.id} className="rounded-lg bg-slate-800/60 px-3 py-2">
+              <div key={msg.id} className="rounded-[16px] bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] px-3 py-2">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-medium text-orange-300">{msg.username}</span>
                   <span className="text-[10px] text-slate-500">
@@ -176,7 +176,7 @@ export default function LiveScreen() {
           )}
         </div>
         {/* Chat input */}
-        <div className="mt-2 flex items-center gap-2 rounded-lg bg-slate-800 px-3 py-2">
+        <div className="mt-2 flex items-center gap-2 rounded-[16px] bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] px-3 py-2">
           <input
             type="text"
             placeholder="Bericht versturen..."
@@ -200,10 +200,10 @@ export default function LiveScreen() {
         </h2>
         <div className="flex flex-col gap-1.5">
           {pairsLoading ? (
-            <div className="h-12 animate-pulse rounded-lg bg-slate-800/80" />
+            <div className="h-12 animate-pulse rounded-[16px] bg-white/[0.06]" />
           ) : (
             pairs.slice(0, 4).map((pair) => (
-              <div key={pair.id} className="flex items-center gap-3 rounded-lg bg-slate-800/60 px-3 py-2">
+              <div key={pair.id} className="flex items-center gap-3 rounded-[16px] bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] px-3 py-2">
                 <div className={`h-2 w-2 rounded-full ${
                   pair.status === 'active' ? 'bg-green-400' :
                   pair.status === 'alert' ? 'bg-red-400 animate-pulse' : 'bg-slate-500'
@@ -227,7 +227,7 @@ export default function LiveScreen() {
       </div>
 
       {/* Veilig Thuiskomen */}
-      <button className="flex items-center justify-center gap-2 rounded-xl bg-green-500/10 py-3 text-sm font-semibold text-green-400 active:bg-green-500/20">
+      <button className="flex items-center justify-center gap-2 rounded-[20px] bg-green-500/10 py-3 text-sm font-semibold text-green-400 active:bg-green-500/20">
         <CheckCircle className="h-4 w-4" />
         Ik ben veilig thuis
       </button>

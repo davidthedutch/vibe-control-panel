@@ -115,12 +115,12 @@ export default function HomeScreen({ onSelectEvent }: HomeScreenProps) {
   }, [allEvents]);
 
   return (
-    <div className="flex flex-col gap-3 p-4">
+    <div className="flex flex-col gap-5 p-5">
       {/* Header */}
       <div className="flex items-center justify-between">
         <h1 className="text-lg font-bold text-white">Escalatie Guide</h1>
         <div className="flex items-center gap-2">
-          <button className="relative flex h-8 w-8 items-center justify-center rounded-full bg-slate-800">
+          <button className="relative flex h-8 w-8 items-center justify-center rounded-full bg-white/[0.06] backdrop-blur-xl border border-white/[0.08]">
             <Bell className="h-4 w-4 text-slate-300" />
             <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[8px] font-bold text-white">3</span>
           </button>
@@ -131,7 +131,7 @@ export default function HomeScreen({ onSelectEvent }: HomeScreenProps) {
       </div>
 
       {/* Search bar */}
-      <div className="flex items-center gap-2 rounded-xl bg-slate-800 px-3 py-2">
+      <div className="flex items-center gap-2 rounded-[20px] bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] px-3 py-2">
         <Search className="h-4 w-4 text-slate-400" />
         <input
           type="text"
@@ -144,7 +144,7 @@ export default function HomeScreen({ onSelectEvent }: HomeScreenProps) {
       </div>
 
       {/* Date filter */}
-      <div className="flex gap-2 overflow-x-auto pb-0.5">
+      <div className="scrollbar-hide flex gap-2 overflow-x-auto pb-0.5">
         {DATE_FILTERS.map((d) => (
           <button
             key={d.id}
@@ -152,7 +152,7 @@ export default function HomeScreen({ onSelectEvent }: HomeScreenProps) {
             className={`flex shrink-0 items-center gap-1 rounded-full px-3 py-1 text-[11px] font-medium ${
               activeDate === d.id
                 ? 'bg-orange-500 text-white'
-                : 'bg-slate-800 text-slate-400'
+                : 'bg-white/[0.06] text-slate-400'
             }`}
           >
             {d.id !== 'all' && <CalendarDays className="h-3 w-3" />}
@@ -162,7 +162,7 @@ export default function HomeScreen({ onSelectEvent }: HomeScreenProps) {
       </div>
 
       {/* Genre filter */}
-      <div className="flex gap-2 overflow-x-auto pb-0.5">
+      <div className="scrollbar-hide flex gap-2 overflow-x-auto pb-0.5">
         {GENRE_FILTERS.map((genre) => (
           <button
             key={genre.id}
@@ -170,7 +170,7 @@ export default function HomeScreen({ onSelectEvent }: HomeScreenProps) {
             className={`shrink-0 rounded-full px-3 py-1 text-xs font-medium ${
               activeGenre === genre.id
                 ? 'bg-orange-500 text-white'
-                : 'bg-slate-800 text-slate-400'
+                : 'bg-white/[0.06] text-slate-400'
             }`}
           >
             {genre.label}
@@ -180,10 +180,10 @@ export default function HomeScreen({ onSelectEvent }: HomeScreenProps) {
 
       {/* Events grouped by date */}
       {loading ? (
-        <div className="flex flex-col gap-3">
-          <div className="h-5 w-40 animate-pulse rounded bg-slate-700" />
+        <div className="flex flex-col gap-5">
+          <div className="h-5 w-40 animate-pulse rounded bg-white/[0.06]" />
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="h-14 animate-pulse rounded-xl bg-slate-800/80" />
+            <div key={i} className="h-14 animate-pulse rounded-[20px] bg-white/[0.06]" />
           ))}
         </div>
       ) : groupedEvents.length === 0 ? (
@@ -192,9 +192,9 @@ export default function HomeScreen({ onSelectEvent }: HomeScreenProps) {
           <p className="text-sm text-slate-400">Geen events gevonden</p>
         </div>
       ) : (
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-5">
           {groupedEvents.map((group) => (
-            <div key={group.key} className="flex flex-col gap-1.5">
+            <div key={group.key} className="flex flex-col gap-2">
               {/* Date header */}
               <h2 className="text-xs font-semibold text-orange-400">{group.label}</h2>
 
@@ -205,7 +205,7 @@ export default function HomeScreen({ onSelectEvent }: HomeScreenProps) {
                   <button
                     key={event.id}
                     onClick={() => onSelectEvent?.(event.id)}
-                    className="rounded-xl bg-slate-800/80 px-3 py-2.5 text-left transition-colors active:bg-slate-700/80"
+                    className="rounded-[20px] bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] shadow-lg shadow-black/20 px-3 py-2.5 text-left transition-colors active:bg-white/[0.1]"
                   >
                     {/* Row 1: Name + time range + capacity/going/friends */}
                     <div className="flex items-center justify-between gap-2">

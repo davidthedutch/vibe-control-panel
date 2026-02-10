@@ -46,14 +46,14 @@ export default function ProfileScreen() {
   const earnedBadges = DEMO_BADGES.filter(b => b.earned).length;
 
   return (
-    <div className="flex flex-col gap-4 p-4">
+    <div className="flex flex-col gap-5 p-5">
       {/* Profile header */}
       <div className="flex flex-col items-center pt-2">
         <div className="relative mb-3">
           <div className="flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-orange-500 to-amber-500">
             <User className="h-10 w-10 text-white" />
           </div>
-          <div className="absolute -bottom-1 -right-1 flex h-7 w-7 items-center justify-center rounded-full border-2 border-slate-900 bg-orange-500 text-[10px] font-bold text-white">
+          <div className="absolute -bottom-1 -right-1 flex h-7 w-7 items-center justify-center rounded-full border-2 border-[#1A1D23] bg-orange-500 text-[10px] font-bold text-white">
             {profile.level}
           </div>
         </div>
@@ -63,14 +63,14 @@ export default function ProfileScreen() {
           <button className="rounded-full bg-orange-500 px-4 py-1.5 text-[11px] font-semibold text-white">
             Profiel Bewerken
           </button>
-          <button className="rounded-full bg-slate-700 px-3 py-1.5">
+          <button className="rounded-full bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] px-3 py-1.5">
             <Share2 className="h-3.5 w-3.5 text-slate-300" />
           </button>
         </div>
       </div>
 
       {/* XP Progress */}
-      <div className="rounded-xl bg-slate-800/80 p-3">
+      <div className="rounded-[20px] bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] shadow-lg shadow-black/20 p-3">
         <div className="mb-1 flex items-center justify-between">
           <span className="flex items-center gap-1 text-xs font-medium text-orange-300">
             <Star className="h-3 w-3" />
@@ -78,7 +78,7 @@ export default function ProfileScreen() {
           </span>
           <span className="text-[11px] text-slate-400">{profile.xp} / {profile.xpNext}</span>
         </div>
-        <div className="h-2 overflow-hidden rounded-full bg-slate-700">
+        <div className="h-2 overflow-hidden rounded-full bg-white/[0.06]">
           <div
             className="h-full rounded-full bg-gradient-to-r from-orange-500 to-amber-500 transition-all"
             style={{ width: `${xpProgress}%` }}
@@ -88,7 +88,7 @@ export default function ProfileScreen() {
       </div>
 
       {/* Streak */}
-      <div className="rounded-xl border border-orange-500/20 bg-orange-500/5 p-3">
+      <div className="rounded-[20px] bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] shadow-lg shadow-black/20 p-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Flame className="h-4 w-4 text-orange-400" />
@@ -100,19 +100,19 @@ export default function ProfileScreen() {
 
       {/* Stats row */}
       <div className="grid grid-cols-4 gap-2">
-        <div className="rounded-xl bg-slate-800/80 p-2.5 text-center">
+        <div className="rounded-[20px] bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] shadow-lg shadow-black/20 p-2.5 text-center">
           <p className="text-base font-bold text-white">{profile.eventsAttended}</p>
           <p className="text-[9px] text-slate-400">Events</p>
         </div>
-        <div className="rounded-xl bg-slate-800/80 p-2.5 text-center">
+        <div className="rounded-[20px] bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] shadow-lg shadow-black/20 p-2.5 text-center">
           <p className="text-base font-bold text-white">{profile.friends}</p>
           <p className="text-[9px] text-slate-400">Vrienden</p>
         </div>
-        <div className="rounded-xl bg-slate-800/80 p-2.5 text-center">
+        <div className="rounded-[20px] bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] shadow-lg shadow-black/20 p-2.5 text-center">
           <p className="text-base font-bold text-white">{earnedBadges}</p>
           <p className="text-[9px] text-slate-400">Badges</p>
         </div>
-        <div className="rounded-xl bg-slate-800/80 p-2.5 text-center">
+        <div className="rounded-[20px] bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] shadow-lg shadow-black/20 p-2.5 text-center">
           <p className="text-base font-bold text-white">{profile.venuesVisited}</p>
           <p className="text-[9px] text-slate-400">Venues</p>
         </div>
@@ -128,8 +128,8 @@ export default function ProfileScreen() {
           {DEMO_BADGES.map((badge) => (
             <div
               key={badge.name}
-              className={`flex flex-col items-center gap-1 rounded-xl p-2.5 ${
-                badge.earned ? badge.bg : 'bg-slate-800/40 opacity-40'
+              className={`flex flex-col items-center gap-1 rounded-[20px] p-2.5 ${
+                badge.earned ? `${badge.bg} backdrop-blur-xl border border-white/[0.08]` : 'bg-white/[0.03] opacity-40'
               }`}
             >
               <badge.icon className={`h-5 w-5 ${badge.earned ? badge.color : 'text-slate-600'}`} />
@@ -149,12 +149,12 @@ export default function ProfileScreen() {
         </div>
         <div className="flex flex-col gap-1.5">
           {DEMO_FRIENDS.map((friend) => (
-            <div key={friend.name} className="flex items-center gap-3 rounded-lg bg-slate-800/50 px-3 py-2">
+            <div key={friend.name} className="flex items-center gap-3 rounded-[16px] bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] px-3 py-2">
               <div className="relative">
                 <div className="flex h-8 w-8 items-center justify-center rounded-full bg-orange-500/30 text-[10px] font-bold text-orange-300">
                   {friend.name.slice(0, 2).toUpperCase()}
                 </div>
-                <div className={`absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-slate-800 ${
+                <div className={`absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-[#1A1D23] ${
                   friend.status === 'online' ? 'bg-green-400' : 'bg-slate-500'
                 }`} />
               </div>
@@ -176,7 +176,7 @@ export default function ProfileScreen() {
         </div>
         <div className="flex flex-col gap-1.5">
           {DEMO_EVENT_HISTORY.map((event) => (
-            <div key={event.name} className="flex items-center gap-3 rounded-lg bg-slate-800/50 px-3 py-2">
+            <div key={event.name} className="flex items-center gap-3 rounded-[16px] bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] px-3 py-2">
               <Calendar className="h-4 w-4 text-orange-400" />
               <div className="flex-1">
                 <p className="text-xs font-medium text-slate-200">{event.name}</p>
@@ -188,7 +188,7 @@ export default function ProfileScreen() {
       </div>
 
       {/* Menu items */}
-      <div className="flex flex-col gap-1">
+      <div className="flex flex-col gap-1.5">
         {[
           { icon: Heart, label: 'Favorieten', count: 12 },
           { icon: Music, label: 'Gevolgde DJ\'s', count: 8 },
@@ -197,7 +197,7 @@ export default function ProfileScreen() {
         ].map((item) => (
           <button
             key={item.label}
-            className="flex items-center gap-3 rounded-xl bg-slate-800/50 px-4 py-3 text-left active:bg-slate-700/50"
+            className="flex items-center gap-3 rounded-[20px] bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] px-4 py-3 text-left active:bg-white/[0.1]"
           >
             <item.icon className="h-5 w-5 text-slate-400" />
             <span className="flex-1 text-sm font-medium text-slate-200">{item.label}</span>
@@ -210,7 +210,7 @@ export default function ProfileScreen() {
       </div>
 
       {/* Logout */}
-      <button className="mt-1 flex items-center justify-center gap-2 rounded-xl py-3 text-sm font-medium text-red-400 active:bg-red-500/10">
+      <button className="mt-1 flex items-center justify-center gap-2 rounded-[20px] py-3 text-sm font-medium text-red-400 active:bg-red-500/10">
         <LogOut className="h-4 w-4" />
         Uitloggen
       </button>

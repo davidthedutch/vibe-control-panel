@@ -44,21 +44,21 @@ export default function EventsScreen({ onSelectEvent }: EventsScreenProps) {
 
   if (loading) {
     return (
-      <div className="flex flex-col gap-3 p-4">
+      <div className="flex flex-col gap-5 p-5">
         <h1 className="text-lg font-bold text-white">Events</h1>
         {[1, 2, 3, 4].map((i) => (
-          <div key={i} className="h-24 animate-pulse rounded-xl bg-slate-800/80" />
+          <div key={i} className="h-24 animate-pulse rounded-[20px] bg-white/[0.06]" />
         ))}
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col gap-3 p-4">
+    <div className="flex flex-col gap-5 p-5">
       <h1 className="text-lg font-bold text-white">Events</h1>
 
       {/* Search bar */}
-      <div className="flex items-center gap-2 rounded-xl bg-slate-800 px-3 py-2">
+      <div className="flex items-center gap-2 rounded-[20px] bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] px-3 py-2">
         <Search className="h-4 w-4 text-slate-400" />
         <input
           type="text"
@@ -71,7 +71,7 @@ export default function EventsScreen({ onSelectEvent }: EventsScreenProps) {
       </div>
 
       {/* Date filter */}
-      <div className="flex gap-2 overflow-x-auto pb-0.5">
+      <div className="scrollbar-hide flex gap-2 overflow-x-auto pb-0.5">
         {[
           { id: 'all', label: 'Alles' },
           { id: 'today', label: 'Vandaag' },
@@ -84,8 +84,8 @@ export default function EventsScreen({ onSelectEvent }: EventsScreenProps) {
             onClick={() => setActiveDate(d.id)}
             className={`flex shrink-0 items-center gap-1 rounded-full px-3 py-1 text-[11px] font-medium ${
               activeDate === d.id
-                ? 'bg-blue-500 text-white'
-                : 'bg-slate-800 text-slate-400'
+                ? 'bg-orange-500 text-white'
+                : 'bg-white/[0.06] text-slate-400'
             }`}
           >
             {d.id !== 'all' && <CalendarDays className="h-3 w-3" />}
@@ -95,7 +95,7 @@ export default function EventsScreen({ onSelectEvent }: EventsScreenProps) {
       </div>
 
       {/* Genre filter chips */}
-      <div className="flex gap-2 overflow-x-auto pb-1">
+      <div className="scrollbar-hide flex gap-2 overflow-x-auto pb-1">
         {[
           { id: 'all', label: 'Alle genres' },
           { id: 'techno', label: 'Techno' },
@@ -111,7 +111,7 @@ export default function EventsScreen({ onSelectEvent }: EventsScreenProps) {
             className={`shrink-0 rounded-full px-3 py-1 text-xs font-medium ${
               activeGenre === genre.id
                 ? 'bg-orange-500 text-white'
-                : 'bg-slate-800 text-slate-400'
+                : 'bg-white/[0.06] text-slate-400'
             }`}
           >
             {genre.label}
@@ -120,17 +120,17 @@ export default function EventsScreen({ onSelectEvent }: EventsScreenProps) {
       </div>
 
       {/* Events list */}
-      <div className="flex flex-col gap-2.5">
+      <div className="flex flex-col gap-3">
         {events.map((event) => {
           const friendsGoing = getFriendsGoing(event.id);
           return (
             <button
               key={event.id}
               onClick={() => onSelectEvent(event.id)}
-              className="flex items-start gap-3 rounded-xl bg-slate-800/80 p-3 text-left transition-colors active:bg-slate-700/80"
+              className="flex items-start gap-3 rounded-[20px] bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] shadow-lg shadow-black/20 p-3 text-left transition-colors active:bg-white/[0.1]"
             >
               {/* Date badge */}
-              <div className="flex h-12 w-12 shrink-0 flex-col items-center justify-center rounded-lg bg-orange-500/20">
+              <div className="flex h-12 w-12 shrink-0 flex-col items-center justify-center rounded-[16px] bg-orange-500/20">
                 <span className="text-[10px] font-medium uppercase text-orange-300">
                   {new Date(event.start_date).toLocaleDateString('nl-NL', { month: 'short' })}
                 </span>
@@ -156,7 +156,7 @@ export default function EventsScreen({ onSelectEvent }: EventsScreenProps) {
                     {event.going_count} going
                   </span>
                   {event.genres.length > 0 && (
-                    <span className="rounded bg-slate-700/50 px-1.5 py-0.5 text-[10px] text-slate-400">
+                    <span className="rounded bg-white/[0.06] px-1.5 py-0.5 text-[10px] text-slate-400">
                       {event.genres[0]}
                     </span>
                   )}
@@ -166,7 +166,7 @@ export default function EventsScreen({ onSelectEvent }: EventsScreenProps) {
                   <div className="mt-1.5 flex items-center gap-1">
                     <div className="flex -space-x-1.5">
                       {FRIEND_AVATARS.slice(0, friendsGoing).map((name, i) => (
-                        <div key={i} className="flex h-4 w-4 items-center justify-center rounded-full border border-slate-800 bg-orange-500/50 text-[7px] font-bold text-white">
+                        <div key={i} className="flex h-4 w-4 items-center justify-center rounded-full border border-white/[0.08] bg-orange-500/50 text-[7px] font-bold text-white">
                           {name}
                         </div>
                       ))}

@@ -63,11 +63,11 @@ export default function EscalAppPreview({ device }: EscalAppPreviewProps) {
     <div className="flex items-center justify-center">
       {/* Phone/Tablet frame */}
       <div
-        className="relative overflow-hidden rounded-[2.5rem] border-[3px] border-slate-600 bg-slate-900 shadow-2xl shadow-black/50"
+        className="relative overflow-hidden rounded-[2.5rem] border-[3px] border-slate-600 bg-[#1A1D23] shadow-2xl shadow-black/50"
         style={{ width: dims.width, height: dims.height }}
       >
         {/* Status bar */}
-        <div className="relative z-10 flex h-11 items-center justify-between bg-slate-900 px-6">
+        <div className="relative z-10 flex h-11 items-center justify-between bg-[#1A1D23] px-6">
           <span className="text-xs font-semibold text-white">
             {new Date().toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' })}
           </span>
@@ -90,14 +90,14 @@ export default function EscalAppPreview({ device }: EscalAppPreviewProps) {
 
         {/* App content - scrollable */}
         <div
-          className="overflow-y-auto overflow-x-hidden bg-slate-900"
+          className="scrollbar-hide overflow-y-auto overflow-x-hidden bg-[#1A1D23]"
           style={{ height: dims.height - 44 - 56 }}
         >
           {renderScreen()}
         </div>
 
         {/* Bottom tab bar */}
-        <div className="absolute bottom-0 left-0 right-0 z-10 border-t border-slate-700/50 bg-slate-900/95 backdrop-blur-lg">
+        <div className="absolute bottom-0 left-0 right-0 z-10 border-t border-white/[0.08] bg-[#1A1D23]/95 backdrop-blur-lg">
           <div className="flex items-center justify-around px-2 pb-4 pt-1.5">
             {tabs.map((tab) => {
               const isActive = activeTab === tab.id;

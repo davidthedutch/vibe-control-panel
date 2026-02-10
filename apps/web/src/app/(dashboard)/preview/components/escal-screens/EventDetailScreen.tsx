@@ -49,11 +49,11 @@ export default function EventDetailScreen({ eventId, onBack }: EventDetailScreen
 
   if (loading) {
     return (
-      <div className="flex flex-col p-4">
+      <div className="flex flex-col p-5">
         <button onClick={onBack} className="mb-4 flex items-center text-sm text-orange-400">
           <ArrowLeft className="mr-1 h-4 w-4" /> Terug
         </button>
-        <div className="h-40 animate-pulse rounded-xl bg-slate-800/80" />
+        <div className="h-40 animate-pulse rounded-[20px] bg-white/[0.06]" />
       </div>
     );
   }
@@ -90,13 +90,13 @@ export default function EventDetailScreen({ eventId, onBack }: EventDetailScreen
             <Share2 className="h-4 w-4 text-white" />
           </button>
         </div>
-        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-slate-900 to-transparent p-4 pt-12">
+        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-[#1A1D23] to-transparent p-4 pt-12">
           <h1 className="text-xl font-bold text-white">{event.title}</h1>
         </div>
       </div>
 
       {/* Content */}
-      <div className="flex flex-col gap-4 p-4">
+      <div className="flex flex-col gap-5 p-5">
         {/* Quick info */}
         <div className="flex flex-col gap-2.5">
           <div className="flex items-center gap-3 text-sm text-slate-300">
@@ -122,7 +122,7 @@ export default function EventDetailScreen({ eventId, onBack }: EventDetailScreen
         <div className="flex gap-2">
           <button
             onClick={() => setIsGoing(!isGoing)}
-            className={`flex-1 rounded-xl py-2.5 text-sm font-semibold ${
+            className={`flex-1 rounded-[20px] py-2.5 text-sm font-semibold ${
               isGoing
                 ? 'bg-green-500 text-white'
                 : 'bg-orange-500 text-white'
@@ -130,30 +130,30 @@ export default function EventDetailScreen({ eventId, onBack }: EventDetailScreen
           >
             {isGoing ? '✓ Ik ga!' : `Ik ga! (${event.going_count})`}
           </button>
-          <button className="rounded-xl bg-slate-700 px-4 py-2.5 text-sm font-medium text-slate-300">
+          <button className="rounded-[20px] bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] px-4 py-2.5 text-sm font-medium text-slate-300">
             Interesse
           </button>
         </div>
 
         {/* Attendance */}
         <div className="flex gap-3">
-          <div className="flex-1 rounded-xl bg-slate-800/80 p-3 text-center">
+          <div className="flex-1 rounded-[20px] bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] shadow-lg shadow-black/20 p-3 text-center">
             <p className="text-lg font-bold text-green-400">{event.going_count + (isGoing ? 1 : 0)}</p>
             <p className="text-[11px] text-slate-400">Going</p>
           </div>
-          <div className="flex-1 rounded-xl bg-slate-800/80 p-3 text-center">
+          <div className="flex-1 rounded-[20px] bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] shadow-lg shadow-black/20 p-3 text-center">
             <p className="text-lg font-bold text-blue-400">{event.interested_count}</p>
             <p className="text-[11px] text-slate-400">Interested</p>
           </div>
         </div>
 
         {/* Friends Going */}
-        <div className="rounded-xl bg-slate-800/60 p-3">
+        <div className="rounded-[20px] bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] shadow-lg shadow-black/20 p-3">
           <h3 className="mb-2 text-xs font-semibold uppercase text-slate-500">Vrienden die gaan</h3>
           <div className="flex items-center gap-2">
             <div className="flex -space-x-2">
               {DEMO_FRIENDS_GOING.map((f, i) => (
-                <div key={i} className="flex h-7 w-7 items-center justify-center rounded-full border-2 border-slate-800 bg-orange-500/60 text-[9px] font-bold text-white">
+                <div key={i} className="flex h-7 w-7 items-center justify-center rounded-full border-2 border-[#1A1D23] bg-orange-500/60 text-[9px] font-bold text-white">
                   {f.initials}
                 </div>
               ))}
@@ -172,7 +172,7 @@ export default function EventDetailScreen({ eventId, onBack }: EventDetailScreen
           </div>
           <div className="flex flex-col gap-1.5">
             {DEMO_LINEUP.map((dj, i) => (
-              <div key={i} className="flex items-center justify-between rounded-lg bg-slate-800/60 px-3 py-2">
+              <div key={i} className="flex items-center justify-between rounded-[16px] bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] px-3 py-2">
                 <div className="flex items-center gap-2">
                   <div className="flex h-7 w-7 items-center justify-center rounded-full bg-orange-500/20 text-[9px] font-bold text-orange-300">
                     {dj.name.split(' ').map(n => n[0]).join('')}
@@ -225,7 +225,7 @@ export default function EventDetailScreen({ eventId, onBack }: EventDetailScreen
           </div>
           <div className="flex flex-col gap-2">
             {DEMO_REVIEWS.map((review, i) => (
-              <div key={i} className="rounded-lg bg-slate-800/60 px-3 py-2">
+              <div key={i} className="rounded-[16px] bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] px-3 py-2">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-1.5">
                     <span className="text-xs font-medium text-orange-300">{review.user}</span>
@@ -241,7 +241,7 @@ export default function EventDetailScreen({ eventId, onBack }: EventDetailScreen
               </div>
             ))}
           </div>
-          <button className="mt-2 w-full rounded-lg bg-slate-800/40 py-2 text-xs text-orange-400">
+          <button className="mt-2 w-full rounded-[16px] bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] py-2 text-xs text-orange-400">
             Schrijf een review
           </button>
         </div>
@@ -250,7 +250,7 @@ export default function EventDetailScreen({ eventId, onBack }: EventDetailScreen
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="text-[11px] text-slate-500">Bron:</span>
-            <span className="rounded bg-slate-700 px-2 py-0.5 text-[11px] font-medium uppercase text-slate-300">
+            <span className="rounded bg-white/[0.06] px-2 py-0.5 text-[11px] font-medium uppercase text-slate-300">
               {event.source}
             </span>
           </div>
