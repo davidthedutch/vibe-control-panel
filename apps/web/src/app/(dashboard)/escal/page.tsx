@@ -16,11 +16,11 @@ import {
   Radio,
 } from 'lucide-react';
 import {
-  useClubguideMetrics,
+  useEscalMetrics,
   useRecentActivity,
   useTopEvents,
   useLiveLocations,
-} from '@/lib/hooks/use-clubguide-data';
+} from '@/lib/hooks/use-escal-data';
 
 // ---------------------------------------------------------------------------
 // Accent Styles
@@ -60,12 +60,12 @@ type AccentColor = keyof typeof accentStyles;
 // ---------------------------------------------------------------------------
 
 const subNavItems = [
-  { label: 'Dashboard', href: '/clubguide', icon: Activity },
-  { label: 'Events', href: '/clubguide/events', icon: Calendar },
-  { label: 'Users', href: '/clubguide/users', icon: Users },
-  { label: 'Live', href: '/clubguide/live', icon: Radio },
-  { label: 'Scrapers', href: '/clubguide/scrapers', icon: Bot },
-  { label: 'Analytics', href: '/clubguide/analytics', icon: TrendingUp },
+  { label: 'Dashboard', href: '/escal', icon: Activity },
+  { label: 'Events', href: '/escal/events', icon: Calendar },
+  { label: 'Users', href: '/escal/users', icon: Users },
+  { label: 'Live', href: '/escal/live', icon: Radio },
+  { label: 'Scrapers', href: '/escal/scrapers', icon: Bot },
+  { label: 'Analytics', href: '/escal/analytics', icon: TrendingUp },
 ];
 
 function SubNav({ current }: { current: string }) {
@@ -156,8 +156,8 @@ function formatTimeAgo(date: Date): string {
 // Main Component
 // ---------------------------------------------------------------------------
 
-export default function ClubguideDashboard() {
-  const { metrics, loading: metricsLoading } = useClubguideMetrics();
+export default function EscalDashboard() {
+  const { metrics, loading: metricsLoading } = useEscalMetrics();
   const { activities, loading: activitiesLoading } = useRecentActivity();
   const { events: topEvents, loading: topEventsLoading } = useTopEvents();
   const { locations, loading: locationsLoading } = useLiveLocations();
@@ -176,7 +176,7 @@ export default function ClubguideDashboard() {
       value: metricsLoading ? '-' : metrics.totalEvents.toLocaleString('nl-NL'),
       accent: 'indigo',
       trend: metrics.trends.totalEvents,
-      href: '/clubguide/events',
+      href: '/escal/events',
     },
     {
       icon: <Users className="h-5 w-5" />,
@@ -184,7 +184,7 @@ export default function ClubguideDashboard() {
       value: metricsLoading ? '-' : metrics.activeUsers.toLocaleString('nl-NL'),
       accent: 'emerald',
       trend: metrics.trends.activeUsers,
-      href: '/clubguide/users',
+      href: '/escal/users',
     },
     {
       icon: <MapPin className="h-5 w-5" />,
@@ -192,7 +192,7 @@ export default function ClubguideDashboard() {
       value: metricsLoading ? '-' : metrics.liveNow,
       accent: 'purple',
       trend: metrics.trends.liveNow,
-      href: '/clubguide/live',
+      href: '/escal/live',
     },
     {
       icon: <Bot className="h-5 w-5" />,
@@ -200,7 +200,7 @@ export default function ClubguideDashboard() {
       value: metricsLoading ? '-' : `${metrics.scrapersOk}/3`,
       accent: 'amber',
       trend: 0,
-      href: '/clubguide/scrapers',
+      href: '/escal/scrapers',
     },
   ];
 
@@ -213,7 +213,7 @@ export default function ClubguideDashboard() {
             <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-600 text-white">
               <Music className="h-5 w-5" />
             </div>
-            Clubguide
+            Escal
           </h1>
           <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
             Monitor and manage your DJ events platform
@@ -236,7 +236,7 @@ export default function ClubguideDashboard() {
       </div>
 
       {/* Sub Navigation */}
-      <SubNav current="/clubguide" />
+      <SubNav current="/escal" />
 
       {/* Metric cards */}
       {metricsLoading ? (
@@ -305,7 +305,7 @@ export default function ClubguideDashboard() {
               Live Events Map
             </h2>
             <Link
-              href="/clubguide/live"
+              href="/escal/live"
               className="text-sm font-medium text-indigo-600 hover:text-indigo-700 dark:text-indigo-400"
             >
               View all
@@ -358,7 +358,7 @@ export default function ClubguideDashboard() {
             Top Events
           </h2>
           <Link
-            href="/clubguide/events"
+            href="/escal/events"
             className="text-sm font-medium text-indigo-600 hover:text-indigo-700 dark:text-indigo-400"
           >
             View all events
@@ -389,7 +389,7 @@ export default function ClubguideDashboard() {
                   <tr key={event.id} className="group">
                     <td className="py-3">
                       <Link
-                        href={`/clubguide/events/${event.id}`}
+                        href={`/escal/events/${event.id}`}
                         className="flex items-center gap-3"
                       >
                         <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-100 text-sm font-semibold text-slate-600 dark:bg-slate-800 dark:text-slate-400">

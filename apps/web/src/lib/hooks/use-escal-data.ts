@@ -3,13 +3,13 @@
 import { useEffect, useState, useCallback } from 'react';
 import { supabase } from '../supabase';
 import type { RealtimeChannel } from '@supabase/supabase-js';
-import { fetchClubguideEvents, fetchClubguideMetrics } from '../actions/clubguide-actions';
+import { fetchEscalEvents, fetchEscalMetrics } from '../actions/escal-actions';
 
 // ============================================================================
 // Types
 // ============================================================================
 
-export interface ClubguideEvent {
+export interface EscalEvent {
   id: string;
   title: string;
   description: string | null;
@@ -27,7 +27,7 @@ export interface ClubguideEvent {
   created_at: string;
 }
 
-export interface ClubguideUser {
+export interface EscalUser {
   id: string;
   username: string;
   email: string;
@@ -80,7 +80,7 @@ export interface ScraperLog {
   timestamp: string;
 }
 
-export interface ClubguideMetrics {
+export interface EscalMetrics {
   totalEvents: number;
   activeUsers: number;
   liveNow: number;
@@ -140,7 +140,7 @@ export interface AnalyticsData {
   checkinsHeatmap: { day: number; hour: number; count: number }[];
 }
 
-export interface ClubguideSettings {
+export interface EscalSettings {
   scraperIntervals: {
     ra: string;
     partyflock: string;
@@ -162,7 +162,7 @@ export interface ClubguideSettings {
 // Demo Data Generators
 // ============================================================================
 
-function generateDemoEvents(count: number): ClubguideEvent[] {
+function generateDemoEvents(count: number): EscalEvent[] {
   const venues = [
     { name: 'Paradiso', city: 'Amsterdam' },
     { name: 'De School', city: 'Amsterdam' },
@@ -202,7 +202,7 @@ function generateDemoEvents(count: number): ClubguideEvent[] {
   });
 }
 
-function generateDemoUsers(count: number): ClubguideUser[] {
+function generateDemoUsers(count: number): EscalUser[] {
   const names = ['DJFan123', 'TechnoLover', 'RaveQueen', 'BassDrop', 'NightOwl', 'ClubKid', 'PartyPeople', 'BeatJunkie'];
   const statuses: ('active' | 'banned' | 'suspended')[] = ['active', 'active', 'active', 'active', 'active', 'banned', 'suspended'];
 
@@ -405,8 +405,8 @@ function generateDemoAnalytics(): AnalyticsData {
 // Hooks
 // ============================================================================
 
-export function useClubguideMetrics() {
-  const [metrics, setMetrics] = useState<ClubguideMetrics>({
+export function useEscalMetrics() {
+  const [metrics, setMetrics] = useState<EscalMetrics>({
     totalEvents: 0,
     activeUsers: 0,
     liveNow: 0,
@@ -418,12 +418,12 @@ export function useClubguideMetrics() {
 
   useEffect(() => {
     const fetchMetrics = async () => {
-      console.log('[useClubguideMetrics] Starting fetchMetrics...');
+      console.log('[useEscalMetrics] Starting fetchMetrics...');
       try {
-        console.log('[useClubguideMetrics] Calling fetchClubguideMetrics server action...');
+        console.log('[useEscalMetrics] Calling fetchEscalMetrics server action...');
         // Fetch real metrics using server action
-        const data = await fetchClubguideMetrics();
-        console.log('[useClubguideMetrics] Received data:', data);
+        const data = await fetchEscalMetrics();
+        console.log('[useEscalMetrics] Received data:', data);
 
         setMetrics({
           totalEvents: data.totalEvents || 0,
@@ -432,10 +432,10 @@ export function useClubguideMetrics() {
           scrapersOk: data.scrapersOk || 0,
           trends: data.trends || { totalEvents: 0, activeUsers: 0, liveNow: 0 },
         });
-        console.log('[useClubguideMetrics] Metrics updated, setting loading to false');
+        console.log('[useEscalMetrics] Metrics updated, setting loading to false');
         setLoading(false);
       } catch (err) {
-        console.error('[useClubguideMetrics] Error fetching Clubguide metrics:', err);
+        console.error('[useEscalMetrics] Error fetching Escal metrics:', err);
         // Fallback to demo data
         const scrapers = generateDemoScraperStatus();
         const scrapersOk = scrapers.filter((s) => s.status === 'success' || s.status === 'idle').length;
@@ -463,14 +463,14 @@ export function useClubguideMetrics() {
   return { metrics, loading, error };
 }
 
-export function useClubguideEvents(filters?: {
+export function useEscalEvents(filters?: {
   status?: string;
   source?: string;
   search?: string;
   page?: number;
   limit?: number;
 }) {
-  const [events, setEvents] = useState<ClubguideEvent[]>([]);
+  const [events, setEvents] = useState<EscalEvent[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
@@ -479,7 +479,7 @@ export function useClubguideEvents(filters?: {
     setLoading(true);
     try {
       // Fetch real data using server action
-      const data = await fetchClubguideEvents({
+      const data = await fetchEscalEvents({
         status: filters?.status as any,
         source: filters?.source,
         search: filters?.search,
@@ -526,8 +526,8 @@ export function useClubguideEvents(filters?: {
   return { events, total, loading, error, refetch: fetchEvents };
 }
 
-export function useClubguideEvent(eventId: string) {
-  const [event, setEvent] = useState<ClubguideEvent | null>(null);
+export function useEscalEvent(eventId: string) {
+  const [event, setEvent] = useState<EscalEvent | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
@@ -554,13 +554,13 @@ export function useClubguideEvent(eventId: string) {
   return { event, loading, error };
 }
 
-export function useClubguideUsers(filters?: {
+export function useEscalUsers(filters?: {
   status?: string;
   search?: string;
   page?: number;
   limit?: number;
 }) {
-  const [users, setUsers] = useState<ClubguideUser[]>([]);
+  const [users, setUsers] = useState<EscalUser[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
@@ -605,8 +605,8 @@ export function useClubguideUsers(filters?: {
   return { users, total, loading, error, refetch: fetchUsers };
 }
 
-export function useClubguideUser(userId: string) {
-  const [user, setUser] = useState<ClubguideUser | null>(null);
+export function useEscalUser(userId: string) {
+  const [user, setUser] = useState<EscalUser | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
@@ -789,7 +789,7 @@ export function useSafetyAlerts() {
   return { alerts, loading };
 }
 
-export function useClubguideAnalytics() {
+export function useEscalAnalytics() {
   const [data, setData] = useState<AnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -806,8 +806,8 @@ export function useClubguideAnalytics() {
   return { data, loading };
 }
 
-export function useClubguideSettings() {
-  const [settings, setSettings] = useState<ClubguideSettings>({
+export function useEscalSettings() {
+  const [settings, setSettings] = useState<EscalSettings>({
     scraperIntervals: {
       ra: '0 */4 * * *',
       partyflock: '0 */4 * * *',
@@ -836,7 +836,7 @@ export function useClubguideSettings() {
     fetchSettings();
   }, []);
 
-  const saveSettings = useCallback(async (newSettings: ClubguideSettings) => {
+  const saveSettings = useCallback(async (newSettings: EscalSettings) => {
     setSaving(true);
     try {
       await new Promise((resolve) => setTimeout(resolve, 500));

@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import eventsData from '@/data/events.json';
 
 // ====================================================================
-// Clubguide Metrics API
+// Escal Metrics API
 // Provides real metrics from bundled event data
 // ====================================================================
 

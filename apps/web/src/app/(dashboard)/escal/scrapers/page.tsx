@@ -26,19 +26,19 @@ import {
   useScraperLogs,
   type ScraperStatus,
   type ScraperLog,
-} from '@/lib/hooks/use-clubguide-data';
+} from '@/lib/hooks/use-escal-data';
 
 // ---------------------------------------------------------------------------
 // Sub Navigation
 // ---------------------------------------------------------------------------
 
 const subNavItems = [
-  { label: 'Dashboard', href: '/clubguide', icon: Activity },
-  { label: 'Events', href: '/clubguide/events', icon: Calendar },
-  { label: 'Users', href: '/clubguide/users', icon: Users },
-  { label: 'Live', href: '/clubguide/live', icon: Radio },
-  { label: 'Scrapers', href: '/clubguide/scrapers', icon: Bot },
-  { label: 'Analytics', href: '/clubguide/analytics', icon: TrendingUp },
+  { label: 'Dashboard', href: '/escal', icon: Activity },
+  { label: 'Events', href: '/escal/events', icon: Calendar },
+  { label: 'Users', href: '/escal/users', icon: Users },
+  { label: 'Live', href: '/escal/live', icon: Radio },
+  { label: 'Scrapers', href: '/escal/scrapers', icon: Bot },
+  { label: 'Analytics', href: '/escal/analytics', icon: TrendingUp },
 ];
 
 function SubNav({ current }: { current: string }) {
@@ -341,7 +341,7 @@ export default function ScrapersPage() {
       </div>
 
       {/* Sub Navigation */}
-      <SubNav current="/clubguide/scrapers" />
+      <SubNav current="/escal/scrapers" />
 
       {/* Scraper Cards */}
       {scrapersLoading ? (

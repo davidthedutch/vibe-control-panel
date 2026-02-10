@@ -1,8 +1,8 @@
 import eventsData from '@/data/events.json';
 
 // ====================================================================
-// Clubguide Data Loader
-// Direct data loading for clubguide (uses bundled event data)
+// Escal Data Loader
+// Direct data loading for escal (uses bundled event data)
 // ====================================================================
 
 interface EnrichedEvent {
@@ -26,7 +26,7 @@ export function loadEnrichedEvents(): EnrichedEvent[] {
   return (eventsData.events || []) as EnrichedEvent[];
 }
 
-export function getClubguideMetrics() {
+export function getEscalMetrics() {
   const events = loadEnrichedEvents();
   const now = new Date();
 
@@ -54,7 +54,7 @@ export function getClubguideMetrics() {
   };
 }
 
-export interface ClubguideFilters {
+export interface EscalFilters {
   status?: 'active' | 'past' | 'all';
   source?: string;
   search?: string;
@@ -62,7 +62,7 @@ export interface ClubguideFilters {
   limit?: number;
 }
 
-export function getClubguideEvents(filters: ClubguideFilters = {}) {
+export function getEscalEvents(filters: EscalFilters = {}) {
   const {
     status = 'all',
     source = 'all',
@@ -110,7 +110,7 @@ export function getClubguideEvents(filters: ClubguideFilters = {}) {
   const start = (page - 1) * limit;
   const paginatedEvents = filteredEvents.slice(start, start + limit);
 
-  // Convert to clubguide format
+  // Convert to escal format
   const events = paginatedEvents.map((event, index) => {
     const date = new Date(event.date);
     const isActive = date >= new Date();

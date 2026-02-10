@@ -19,19 +19,19 @@ import {
   Heart,
   CheckCircle,
 } from 'lucide-react';
-import { useClubguideAnalytics } from '@/lib/hooks/use-clubguide-data';
+import { useEscalAnalytics } from '@/lib/hooks/use-escal-data';
 
 // ---------------------------------------------------------------------------
 // Sub Navigation
 // ---------------------------------------------------------------------------
 
 const subNavItems = [
-  { label: 'Dashboard', href: '/clubguide', icon: Activity },
-  { label: 'Events', href: '/clubguide/events', icon: Calendar },
-  { label: 'Users', href: '/clubguide/users', icon: Users },
-  { label: 'Live', href: '/clubguide/live', icon: Radio },
-  { label: 'Scrapers', href: '/clubguide/scrapers', icon: Bot },
-  { label: 'Analytics', href: '/clubguide/analytics', icon: TrendingUp },
+  { label: 'Dashboard', href: '/escal', icon: Activity },
+  { label: 'Events', href: '/escal/events', icon: Calendar },
+  { label: 'Users', href: '/escal/users', icon: Users },
+  { label: 'Live', href: '/escal/live', icon: Radio },
+  { label: 'Scrapers', href: '/escal/scrapers', icon: Bot },
+  { label: 'Analytics', href: '/escal/analytics', icon: TrendingUp },
 ];
 
 function SubNav({ current }: { current: string }) {
@@ -290,13 +290,13 @@ function CheckinHeatmap({ data }: { data: { day: number; hour: number; count: nu
 // ---------------------------------------------------------------------------
 
 export default function AnalyticsPage() {
-  const { data, loading } = useClubguideAnalytics();
+  const { data, loading } = useEscalAnalytics();
   const [dateRange, setDateRange] = useState<'7d' | '30d' | '90d'>('30d');
 
   if (loading) {
     return (
       <div className="mx-auto max-w-7xl">
-        <SubNav current="/clubguide/analytics" />
+        <SubNav current="/escal/analytics" />
         <div className="flex items-center justify-center py-24">
           <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
         </div>
@@ -307,7 +307,7 @@ export default function AnalyticsPage() {
   if (!data) {
     return (
       <div className="mx-auto max-w-7xl">
-        <SubNav current="/clubguide/analytics" />
+        <SubNav current="/escal/analytics" />
         <div className="flex flex-col items-center justify-center py-24">
           <BarChart3 className="h-12 w-12 text-slate-300 dark:text-slate-600" />
           <p className="mt-4 text-lg font-medium text-slate-900 dark:text-slate-100">No analytics data</p>
@@ -384,7 +384,7 @@ export default function AnalyticsPage() {
       </div>
 
       {/* Sub Navigation */}
-      <SubNav current="/clubguide/analytics" />
+      <SubNav current="/escal/analytics" />
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">

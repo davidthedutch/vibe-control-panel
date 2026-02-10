@@ -11,32 +11,31 @@ import {
   Activity,
   Radio,
   Search,
+  Filter,
   Download,
   MoreHorizontal,
   ChevronLeft,
   ChevronRight,
   Eye,
-  Ban,
   Trash2,
-  Shield,
+  Star,
+  EyeOff,
   Loader2,
   Music,
-  Award,
-  UserCheck,
 } from 'lucide-react';
-import { useClubguideUsers, type ClubguideUser } from '@/lib/hooks/use-clubguide-data';
+import { useEscalEvents, type EscalEvent } from '@/lib/hooks/use-escal-data';
 
 // ---------------------------------------------------------------------------
 // Sub Navigation
 // ---------------------------------------------------------------------------
 
 const subNavItems = [
-  { label: 'Dashboard', href: '/clubguide', icon: Activity },
-  { label: 'Events', href: '/clubguide/events', icon: Calendar },
-  { label: 'Users', href: '/clubguide/users', icon: Users },
-  { label: 'Live', href: '/clubguide/live', icon: Radio },
-  { label: 'Scrapers', href: '/clubguide/scrapers', icon: Bot },
-  { label: 'Analytics', href: '/clubguide/analytics', icon: TrendingUp },
+  { label: 'Dashboard', href: '/escal', icon: Activity },
+  { label: 'Events', href: '/escal/events', icon: Calendar },
+  { label: 'Users', href: '/escal/users', icon: Users },
+  { label: 'Live', href: '/escal/live', icon: Radio },
+  { label: 'Scrapers', href: '/escal/scrapers', icon: Bot },
+  { label: 'Analytics', href: '/escal/analytics', icon: TrendingUp },
 ];
 
 function SubNav({ current }: { current: string }) {
@@ -68,11 +67,12 @@ function SubNav({ current }: { current: string }) {
 // Status Badge
 // ---------------------------------------------------------------------------
 
-function StatusBadge({ status }: { status: ClubguideUser['status'] }) {
+function StatusBadge({ status }: { status: EscalEvent['status'] }) {
   const styles = {
     active: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400',
-    banned: 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-400',
-    suspended: 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400',
+    cancelled: 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-400',
+    draft: 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400',
+    past: 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400',
   };
 
   return (
@@ -83,53 +83,42 @@ function StatusBadge({ status }: { status: ClubguideUser['status'] }) {
 }
 
 // ---------------------------------------------------------------------------
-// Level Badge
+// Source Badge
 // ---------------------------------------------------------------------------
 
-function LevelBadge({ level, xp }: { level: number; xp: number }) {
-  const getColor = (lvl: number) => {
-    if (lvl >= 15) return 'bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-400';
-    if (lvl >= 10) return 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-400';
-    if (lvl >= 5) return 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-400';
-    return 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400';
+function SourceBadge({ source }: { source: EscalEvent['source'] }) {
+  const styles = {
+    ra: 'bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-400',
+    partyflock: 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-400',
+    djguide: 'bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-400',
+    manual: 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400',
+  };
+
+  const labels = {
+    ra: 'RA',
+    partyflock: 'Partyflock',
+    djguide: 'DJ Guide',
+    manual: 'Manual',
   };
 
   return (
-    <div className="flex items-center gap-2">
-      <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${getColor(level)}`}>
-        Lvl {level}
-      </span>
-      <span className="text-xs text-slate-500 dark:text-slate-400">{xp.toLocaleString()} XP</span>
-    </div>
+    <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${styles[source]}`}>
+      {labels[source]}
+    </span>
   );
 }
 
 // ---------------------------------------------------------------------------
-// User Row
+// Event Row
 // ---------------------------------------------------------------------------
 
-function UserRow({ user, selected, onSelect }: { user: ClubguideUser; selected: boolean; onSelect: () => void }) {
+function EventRow({ event, selected, onSelect }: { event: EscalEvent; selected: boolean; onSelect: () => void }) {
   const [menuOpen, setMenuOpen] = useState(false);
 
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);
     return date.toLocaleDateString('nl-NL', { day: 'numeric', month: 'short', year: 'numeric' });
   };
-
-  const formatLastSeen = (dateStr: string | null) => {
-    if (!dateStr) return 'Never';
-    const date = new Date(dateStr);
-    const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
-    const diffMins = Math.floor(diffMs / 60000);
-    if (diffMins < 5) return 'Online';
-    if (diffMins < 60) return `${diffMins}m ago`;
-    const diffHours = Math.floor(diffMins / 60);
-    if (diffHours < 24) return `${diffHours}h ago`;
-    return formatDate(dateStr);
-  };
-
-  const isOnline = user.last_seen && new Date(user.last_seen).getTime() > Date.now() - 5 * 60 * 1000;
 
   return (
     <tr className="group border-b border-slate-100 hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-800/50">
@@ -142,46 +131,46 @@ function UserRow({ user, selected, onSelect }: { user: ClubguideUser; selected: 
         />
       </td>
       <td className="py-3 pr-4">
-        <Link href={`/clubguide/users/${user.id}`} className="flex items-center gap-3">
-          <div className="relative h-10 w-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
-            <Users className="h-5 w-5 text-slate-400" />
-            {isOnline && (
-              <span className="absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-white bg-emerald-500 dark:border-slate-900" />
-            )}
+        <Link href={`/escal/events/${event.id}`} className="flex items-center gap-3">
+          <div className="h-10 w-10 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
+            <Music className="h-5 w-5 text-slate-400" />
           </div>
           <div>
             <p className="font-medium text-slate-900 group-hover:text-indigo-600 dark:text-slate-100 dark:group-hover:text-indigo-400">
-              {user.username}
+              {event.title}
             </p>
-            <p className="text-sm text-slate-500 dark:text-slate-400">{user.email}</p>
+            <p className="text-sm text-slate-500 dark:text-slate-400">
+              {event.venue_name}, {event.venue_city}
+            </p>
           </div>
         </Link>
       </td>
       <td className="py-3 px-4">
-        <LevelBadge level={user.level} xp={user.xp} />
+        <p className="text-sm text-slate-900 dark:text-slate-100">{formatDate(event.start_date)}</p>
       </td>
-      <td className="py-3 px-4 text-center">
-        <span className="font-medium text-slate-900 dark:text-slate-100">{user.events_attended}</span>
-      </td>
-      <td className="py-3 px-4 text-center">
-        <span className="text-slate-600 dark:text-slate-400">{user.friends_count}</span>
-      </td>
-      <td className="py-3 px-4 text-center">
-        <div className="flex items-center justify-center gap-1">
-          <Award className="h-4 w-4 text-amber-500" />
-          <span className="text-slate-600 dark:text-slate-400">{user.badges_count}</span>
+      <td className="py-3 px-4">
+        <div className="flex flex-wrap gap-1">
+          {event.genres.slice(0, 2).map((genre) => (
+            <span
+              key={genre}
+              className="inline-flex items-center rounded bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600 dark:bg-slate-800 dark:text-slate-400"
+            >
+              {genre}
+            </span>
+          ))}
         </div>
       </td>
-      <td className="py-3 px-4">
-        <span className="text-sm text-slate-500 dark:text-slate-400">{formatDate(user.created_at)}</span>
+      <td className="py-3 px-4 text-center">
+        <span className="font-medium text-emerald-600 dark:text-emerald-400">{event.going_count}</span>
+      </td>
+      <td className="py-3 px-4 text-center">
+        <span className="text-amber-600 dark:text-amber-400">{event.interested_count}</span>
       </td>
       <td className="py-3 px-4">
-        <span className={`text-sm ${isOnline ? 'text-emerald-600 dark:text-emerald-400 font-medium' : 'text-slate-500 dark:text-slate-400'}`}>
-          {formatLastSeen(user.last_seen)}
-        </span>
+        <SourceBadge source={event.source} />
       </td>
       <td className="py-3 px-4">
-        <StatusBadge status={user.status} />
+        <StatusBadge status={event.status} />
       </td>
       <td className="py-3 px-4">
         <div className="relative">
@@ -196,27 +185,24 @@ function UserRow({ user, selected, onSelect }: { user: ClubguideUser; selected: 
               <div className="fixed inset-0 z-10" onClick={() => setMenuOpen(false)} />
               <div className="absolute right-0 z-20 mt-1 w-48 rounded-lg border border-slate-200 bg-white py-1 shadow-lg dark:border-slate-700 dark:bg-slate-800">
                 <Link
-                  href={`/clubguide/users/${user.id}`}
+                  href={`/escal/events/${event.id}`}
                   className="flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-700"
                 >
                   <Eye className="h-4 w-4" />
-                  View Profile
+                  View Details
                 </Link>
-                {user.status === 'active' ? (
-                  <button className="flex w-full items-center gap-2 px-4 py-2 text-sm text-amber-600 hover:bg-amber-50 dark:text-amber-400 dark:hover:bg-amber-900/20">
-                    <Ban className="h-4 w-4" />
-                    Suspend User
-                  </button>
-                ) : (
-                  <button className="flex w-full items-center gap-2 px-4 py-2 text-sm text-emerald-600 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-900/20">
-                    <Shield className="h-4 w-4" />
-                    Activate User
-                  </button>
-                )}
+                <button className="flex w-full items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-700">
+                  <Star className="h-4 w-4" />
+                  Feature Event
+                </button>
+                <button className="flex w-full items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-700">
+                  <EyeOff className="h-4 w-4" />
+                  Hide Event
+                </button>
                 <hr className="my-1 border-slate-100 dark:border-slate-700" />
                 <button className="flex w-full items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20">
                   <Trash2 className="h-4 w-4" />
-                  Delete User
+                  Delete
                 </button>
               </div>
             </>
@@ -231,14 +217,16 @@ function UserRow({ user, selected, onSelect }: { user: ClubguideUser; selected: 
 // Main Component
 // ---------------------------------------------------------------------------
 
-export default function UsersPage() {
+export default function EventsPage() {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [sourceFilter, setSourceFilter] = useState('all');
   const [page, setPage] = useState(1);
-  const [selectedUsers, setSelectedUsers] = useState<Set<string>>(new Set());
+  const [selectedEvents, setSelectedEvents] = useState<Set<string>>(new Set());
 
-  const { users, total, loading, refetch } = useClubguideUsers({
+  const { events, total, loading, refetch } = useEscalEvents({
     status: statusFilter,
+    source: sourceFilter,
     search,
     page,
     limit: 10,
@@ -247,32 +235,33 @@ export default function UsersPage() {
   const totalPages = Math.ceil(total / 10);
 
   const handleSelectAll = () => {
-    if (selectedUsers.size === users.length) {
-      setSelectedUsers(new Set());
+    if (selectedEvents.size === events.length) {
+      setSelectedEvents(new Set());
     } else {
-      setSelectedUsers(new Set(users.map((u) => u.id)));
+      setSelectedEvents(new Set(events.map((e) => e.id)));
     }
   };
 
-  const handleSelectUser = (id: string) => {
-    const newSelected = new Set(selectedUsers);
+  const handleSelectEvent = (id: string) => {
+    const newSelected = new Set(selectedEvents);
     if (newSelected.has(id)) {
       newSelected.delete(id);
     } else {
       newSelected.add(id);
     }
-    setSelectedUsers(newSelected);
+    setSelectedEvents(newSelected);
   };
 
   const handleExport = () => {
-    const csv = users
-      .map((u) => `${u.username},${u.email},${u.level},${u.xp},${u.events_attended},${u.status}`)
+    // In production, this would generate a CSV
+    const csv = events
+      .map((e) => `${e.title},${e.venue_name},${e.start_date},${e.going_count},${e.interested_count}`)
       .join('\n');
-    const blob = new Blob([`Username,Email,Level,XP,Events,Status\n${csv}`], { type: 'text/csv' });
+    const blob = new Blob([`Title,Venue,Date,Going,Interested\n${csv}`], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'clubguide-users.csv';
+    a.download = 'escal-events.csv';
     a.click();
   };
 
@@ -285,16 +274,16 @@ export default function UsersPage() {
             <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-600 text-white">
               <Music className="h-5 w-5" />
             </div>
-            Users Management
+            Events Management
           </h1>
           <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-            Manage app users, moderation, and user data
+            Manage and monitor all events in the platform
           </p>
         </div>
       </div>
 
       {/* Sub Navigation */}
-      <SubNav current="/clubguide/users" />
+      <SubNav current="/escal/events" />
 
       {/* Filters & Actions */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -304,7 +293,7 @@ export default function UsersPage() {
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
             <input
               type="text"
-              placeholder="Search users..."
+              placeholder="Search events..."
               value={search}
               onChange={(e) => {
                 setSearch(e.target.value);
@@ -325,23 +314,34 @@ export default function UsersPage() {
           >
             <option value="all">All Statuses</option>
             <option value="active">Active</option>
-            <option value="suspended">Suspended</option>
-            <option value="banned">Banned</option>
+            <option value="draft">Draft</option>
+            <option value="past">Past</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
+
+          {/* Source Filter */}
+          <select
+            value={sourceFilter}
+            onChange={(e) => {
+              setSourceFilter(e.target.value);
+              setPage(1);
+            }}
+            className="h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+          >
+            <option value="all">All Sources</option>
+            <option value="ra">Resident Advisor</option>
+            <option value="partyflock">Partyflock</option>
+            <option value="djguide">DJ Guide</option>
+            <option value="manual">Manual</option>
           </select>
         </div>
 
         <div className="flex items-center gap-3">
-          {selectedUsers.size > 0 && (
-            <>
-              <button className="inline-flex items-center gap-2 rounded-lg border border-amber-200 bg-white px-4 py-2 text-sm font-medium text-amber-600 hover:bg-amber-50 dark:border-amber-800 dark:bg-slate-800 dark:text-amber-400 dark:hover:bg-amber-900/20">
-                <Ban className="h-4 w-4" />
-                Suspend ({selectedUsers.size})
-              </button>
-              <button className="inline-flex items-center gap-2 rounded-lg border border-red-200 bg-white px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 dark:border-red-800 dark:bg-slate-800 dark:text-red-400 dark:hover:bg-red-900/20">
-                <Trash2 className="h-4 w-4" />
-                Delete ({selectedUsers.size})
-              </button>
-            </>
+          {selectedEvents.size > 0 && (
+            <button className="inline-flex items-center gap-2 rounded-lg border border-red-200 bg-white px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 dark:border-red-800 dark:bg-slate-800 dark:text-red-400 dark:hover:bg-red-900/20">
+              <Trash2 className="h-4 w-4" />
+              Delete ({selectedEvents.size})
+            </button>
           )}
           <button
             onClick={handleExport}
@@ -355,19 +355,19 @@ export default function UsersPage() {
 
       {/* Results count */}
       <p className="text-sm text-slate-500 dark:text-slate-400">
-        Showing {users.length} of {total} users
+        Showing {events.length} of {total} events
       </p>
 
-      {/* Users Table */}
+      {/* Events Table */}
       <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-900">
         {loading ? (
           <div className="flex items-center justify-center py-16">
             <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
           </div>
-        ) : users.length === 0 ? (
+        ) : events.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16">
-            <Users className="h-12 w-12 text-slate-300 dark:text-slate-600" />
-            <p className="mt-4 text-sm text-slate-500 dark:text-slate-400">No users found</p>
+            <Calendar className="h-12 w-12 text-slate-300 dark:text-slate-600" />
+            <p className="mt-4 text-sm text-slate-500 dark:text-slate-400">No events found</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -377,31 +377,28 @@ export default function UsersPage() {
                   <th className="py-3 pl-4 text-left">
                     <input
                       type="checkbox"
-                      checked={selectedUsers.size === users.length && users.length > 0}
+                      checked={selectedEvents.size === events.length && events.length > 0}
                       onChange={handleSelectAll}
                       className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
                     />
                   </th>
                   <th className="py-3 pr-4 text-left text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                    User
+                    Event
                   </th>
                   <th className="py-3 px-4 text-left text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                    Level
-                  </th>
-                  <th className="py-3 px-4 text-center text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                    Events
-                  </th>
-                  <th className="py-3 px-4 text-center text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                    Friends
-                  </th>
-                  <th className="py-3 px-4 text-center text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                    Badges
+                    Date
                   </th>
                   <th className="py-3 px-4 text-left text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                    Joined
+                    Genres
+                  </th>
+                  <th className="py-3 px-4 text-center text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                    Going
+                  </th>
+                  <th className="py-3 px-4 text-center text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                    Interested
                   </th>
                   <th className="py-3 px-4 text-left text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                    Last Seen
+                    Source
                   </th>
                   <th className="py-3 px-4 text-left text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-slate-400">
                     Status
@@ -412,12 +409,12 @@ export default function UsersPage() {
                 </tr>
               </thead>
               <tbody>
-                {users.map((user) => (
-                  <UserRow
-                    key={user.id}
-                    user={user}
-                    selected={selectedUsers.has(user.id)}
-                    onSelect={() => handleSelectUser(user.id)}
+                {events.map((event) => (
+                  <EventRow
+                    key={event.id}
+                    event={event}
+                    selected={selectedEvents.has(event.id)}
+                    onSelect={() => handleSelectEvent(event.id)}
                   />
                 ))}
               </tbody>

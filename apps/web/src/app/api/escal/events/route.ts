@@ -28,7 +28,7 @@ function loadEvents(): EnrichedEvent[] {
   return (eventsData.events || []) as EnrichedEvent[];
 }
 
-function convertToClubguideFormat(event: EnrichedEvent, index: number) {
+function convertToEscalFormat(event: EnrichedEvent, index: number) {
   const date = new Date(event.date);
   const isActive = date >= new Date();
 
@@ -113,8 +113,8 @@ export async function GET(request: NextRequest) {
     const start = (page - 1) * limit;
     const paginatedEvents = filteredEvents.slice(start, start + limit);
 
-    // Convert to clubguide format
-    const events = paginatedEvents.map((e, i) => convertToClubguideFormat(e, start + i));
+    // Convert to escal format
+    const events = paginatedEvents.map((e, i) => convertToEscalFormat(e, start + i));
 
     return NextResponse.json({
       events,
@@ -125,7 +125,7 @@ export async function GET(request: NextRequest) {
       hasMore: start + limit < total,
     });
   } catch (error) {
-    console.error('[Clubguide API] Error:', error);
+    console.error('[Escal API] Error:', error);
     return NextResponse.json(
       { error: 'Failed to load events' },
       { status: 500 }

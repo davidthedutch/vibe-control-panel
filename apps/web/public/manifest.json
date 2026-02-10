@@ -1,8 +1,8 @@
 {
-  "name": "Vibe Club Guide",
-  "short_name": "Club Guide",
-  "description": "Real-time club guide en event management",
-  "start_url": "/clubguide",
+  "name": "Vibe Escal",
+  "short_name": "Escal",
+  "description": "Real-time escal en event management",
+  "start_url": "/escal",
   "display": "standalone",
   "background_color": "#000000",
   "theme_color": "#6366f1",
@@ -27,21 +27,21 @@
       "name": "Events",
       "short_name": "Events",
       "description": "Bekijk events",
-      "url": "/clubguide/events",
+      "url": "/escal/events",
       "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
     },
     {
       "name": "Live",
       "short_name": "Live",
       "description": "Live updates",
-      "url": "/clubguide/live",
+      "url": "/escal/live",
       "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
     },
     {
       "name": "Users",
       "short_name": "Users",
       "description": "Gebruikers",
-      "url": "/clubguide/users",
+      "url": "/escal/users",
       "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
     }
   ]

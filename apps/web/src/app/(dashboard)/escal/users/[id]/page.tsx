@@ -25,19 +25,19 @@ import {
   MessageSquare,
   Image as ImageIcon,
 } from 'lucide-react';
-import { useClubguideUser } from '@/lib/hooks/use-clubguide-data';
+import { useEscalUser } from '@/lib/hooks/use-escal-data';
 
 // ---------------------------------------------------------------------------
 // Sub Navigation
 // ---------------------------------------------------------------------------
 
 const subNavItems = [
-  { label: 'Dashboard', href: '/clubguide', icon: Activity },
-  { label: 'Events', href: '/clubguide/events', icon: Calendar },
-  { label: 'Users', href: '/clubguide/users', icon: Users },
-  { label: 'Live', href: '/clubguide/live', icon: Radio },
-  { label: 'Scrapers', href: '/clubguide/scrapers', icon: Bot },
-  { label: 'Analytics', href: '/clubguide/analytics', icon: TrendingUp },
+  { label: 'Dashboard', href: '/escal', icon: Activity },
+  { label: 'Events', href: '/escal/events', icon: Calendar },
+  { label: 'Users', href: '/escal/users', icon: Users },
+  { label: 'Live', href: '/escal/live', icon: Radio },
+  { label: 'Scrapers', href: '/escal/scrapers', icon: Bot },
+  { label: 'Analytics', href: '/escal/analytics', icon: TrendingUp },
 ];
 
 function SubNav({ current }: { current: string }) {
@@ -167,7 +167,7 @@ function XpProgressBar({ xp, level }: { xp: number; level: number }) {
 
 export default function UserDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
-  const { user, loading, error } = useClubguideUser(id);
+  const { user, loading, error } = useEscalUser(id);
 
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);
@@ -182,7 +182,7 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
   if (loading) {
     return (
       <div className="mx-auto max-w-7xl">
-        <SubNav current="/clubguide/users" />
+        <SubNav current="/escal/users" />
         <div className="flex items-center justify-center py-24">
           <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
         </div>
@@ -193,12 +193,12 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
   if (!user) {
     return (
       <div className="mx-auto max-w-7xl">
-        <SubNav current="/clubguide/users" />
+        <SubNav current="/escal/users" />
         <div className="flex flex-col items-center justify-center py-24">
           <Users className="h-12 w-12 text-slate-300 dark:text-slate-600" />
           <p className="mt-4 text-lg font-medium text-slate-900 dark:text-slate-100">User not found</p>
           <Link
-            href="/clubguide/users"
+            href="/escal/users"
             className="mt-4 text-sm font-medium text-indigo-600 hover:text-indigo-700 dark:text-indigo-400"
           >
             Back to users
@@ -236,7 +236,7 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
     <div className="mx-auto max-w-7xl space-y-6">
       {/* Back link */}
       <Link
-        href="/clubguide/users"
+        href="/escal/users"
         className="inline-flex items-center gap-2 text-sm font-medium text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
       >
         <ArrowLeft className="h-4 w-4" />
@@ -244,7 +244,7 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
       </Link>
 
       {/* Sub Navigation */}
-      <SubNav current="/clubguide/users" />
+      <SubNav current="/escal/users" />
 
       {/* User Header */}
       <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">

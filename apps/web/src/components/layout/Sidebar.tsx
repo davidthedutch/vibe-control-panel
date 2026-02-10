@@ -26,7 +26,7 @@ const navItems = [
   { label: 'Analytics', href: '/analytics', icon: BarChart3 },
   { label: 'Health', href: '/health', icon: HeartPulse },
   { label: 'Terminal', href: '/terminal', icon: Terminal },
-  { label: 'Clubguide', href: '/clubguide', icon: Music },
+  { label: 'Escal', href: '/escal', icon: Music },
   { label: 'Settings', href: '/settings', icon: Settings },
 ];
 
@@ -60,7 +60,7 @@ export default function Sidebar({ collapsed, onToggle, mobile = false }: Sidebar
       {/* Navigation */}
       <nav className="flex-1 space-y-1 overflow-y-auto px-2 py-3">
         {navItems.map((item) => {
-          // Support sub-routes for sections like Clubguide
+          // Support sub-routes for sections like Escal
           const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
           const Icon = item.icon;
 

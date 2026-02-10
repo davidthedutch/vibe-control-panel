@@ -22,19 +22,19 @@ import {
   MessageSquare,
   Image as ImageIcon,
 } from 'lucide-react';
-import { useClubguideEvent } from '@/lib/hooks/use-clubguide-data';
+import { useEscalEvent } from '@/lib/hooks/use-escal-data';
 
 // ---------------------------------------------------------------------------
 // Sub Navigation
 // ---------------------------------------------------------------------------
 
 const subNavItems = [
-  { label: 'Dashboard', href: '/clubguide', icon: Activity },
-  { label: 'Events', href: '/clubguide/events', icon: Calendar },
-  { label: 'Users', href: '/clubguide/users', icon: Users },
-  { label: 'Live', href: '/clubguide/live', icon: Radio },
-  { label: 'Scrapers', href: '/clubguide/scrapers', icon: Bot },
-  { label: 'Analytics', href: '/clubguide/analytics', icon: TrendingUp },
+  { label: 'Dashboard', href: '/escal', icon: Activity },
+  { label: 'Events', href: '/escal/events', icon: Calendar },
+  { label: 'Users', href: '/escal/users', icon: Users },
+  { label: 'Live', href: '/escal/live', icon: Radio },
+  { label: 'Scrapers', href: '/escal/scrapers', icon: Bot },
+  { label: 'Analytics', href: '/escal/analytics', icon: TrendingUp },
 ];
 
 function SubNav({ current }: { current: string }) {
@@ -134,7 +134,7 @@ function StatCard({
 
 export default function EventDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
-  const { event, loading, error } = useClubguideEvent(id);
+  const { event, loading, error } = useEscalEvent(id);
 
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);
@@ -154,7 +154,7 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
   if (loading) {
     return (
       <div className="mx-auto max-w-7xl">
-        <SubNav current="/clubguide/events" />
+        <SubNav current="/escal/events" />
         <div className="flex items-center justify-center py-24">
           <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
         </div>
@@ -165,12 +165,12 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
   if (!event) {
     return (
       <div className="mx-auto max-w-7xl">
-        <SubNav current="/clubguide/events" />
+        <SubNav current="/escal/events" />
         <div className="flex flex-col items-center justify-center py-24">
           <Calendar className="h-12 w-12 text-slate-300 dark:text-slate-600" />
           <p className="mt-4 text-lg font-medium text-slate-900 dark:text-slate-100">Event not found</p>
           <Link
-            href="/clubguide/events"
+            href="/escal/events"
             className="mt-4 text-sm font-medium text-indigo-600 hover:text-indigo-700 dark:text-indigo-400"
           >
             Back to events
@@ -198,7 +198,7 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
     <div className="mx-auto max-w-7xl space-y-6">
       {/* Back link */}
       <Link
-        href="/clubguide/events"
+        href="/escal/events"
         className="inline-flex items-center gap-2 text-sm font-medium text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
       >
         <ArrowLeft className="h-4 w-4" />
@@ -206,7 +206,7 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
       </Link>
 
       {/* Sub Navigation */}
-      <SubNav current="/clubguide/events" />
+      <SubNav current="/escal/events" />
 
       {/* Event Header */}
       <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">

@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "Vibe Club Guide",
-    "slug": "vibe-club-guide",
+    "name": "Vibe Escal",
+    "slug": "vibe-escal",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -16,7 +16,7 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.vibe.clubguide",
+      "bundleIdentifier": "com.vibe.escal",
       "config": {
         "usesNonExemptEncryption": false
       },
@@ -29,7 +29,7 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#000000"
       },
-      "package": "com.vibe.clubguide",
+      "package": "com.vibe.escal",
       "permissions": [
         "USE_BIOMETRIC",
         "USE_FINGERPRINT",
@@ -57,7 +57,7 @@
         }
       ]
     ],
-    "scheme": "vibe-club-guide",
+    "scheme": "vibe-escal",
     "experiments": {
       "typedRoutes": true
     },

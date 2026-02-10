@@ -22,19 +22,19 @@ import {
   Plus,
   X,
 } from 'lucide-react';
-import { useClubguideSettings, type ClubguideSettings } from '@/lib/hooks/use-clubguide-data';
+import { useEscalSettings, type EscalSettings } from '@/lib/hooks/use-escal-data';
 
 // ---------------------------------------------------------------------------
 // Sub Navigation
 // ---------------------------------------------------------------------------
 
 const subNavItems = [
-  { label: 'Dashboard', href: '/clubguide', icon: Activity },
-  { label: 'Events', href: '/clubguide/events', icon: Calendar },
-  { label: 'Users', href: '/clubguide/users', icon: Users },
-  { label: 'Live', href: '/clubguide/live', icon: Radio },
-  { label: 'Scrapers', href: '/clubguide/scrapers', icon: Bot },
-  { label: 'Analytics', href: '/clubguide/analytics', icon: TrendingUp },
+  { label: 'Dashboard', href: '/escal', icon: Activity },
+  { label: 'Events', href: '/escal/events', icon: Calendar },
+  { label: 'Users', href: '/escal/users', icon: Users },
+  { label: 'Live', href: '/escal/live', icon: Radio },
+  { label: 'Scrapers', href: '/escal/scrapers', icon: Bot },
+  { label: 'Analytics', href: '/escal/analytics', icon: TrendingUp },
 ];
 
 function SubNav({ current }: { current: string }) {
@@ -59,7 +59,7 @@ function SubNav({ current }: { current: string }) {
         );
       })}
       <Link
-        href="/clubguide/settings"
+        href="/escal/settings"
         className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition-colors"
       >
         <Settings className="h-4 w-4" />
@@ -271,8 +271,8 @@ function BuddyIntervalsEditor({
 // ---------------------------------------------------------------------------
 
 export default function SettingsPage() {
-  const { settings, loading, saving, saveSettings } = useClubguideSettings();
-  const [localSettings, setLocalSettings] = useState<ClubguideSettings | null>(null);
+  const { settings, loading, saving, saveSettings } = useEscalSettings();
+  const [localSettings, setLocalSettings] = useState<EscalSettings | null>(null);
   const [hasChanges, setHasChanges] = useState(false);
 
   // Initialize local settings when loaded
@@ -280,9 +280,9 @@ export default function SettingsPage() {
     setLocalSettings(settings);
   }
 
-  const updateSetting = <K extends keyof ClubguideSettings>(
+  const updateSetting = <K extends keyof EscalSettings>(
     key: K,
-    value: ClubguideSettings[K]
+    value: EscalSettings[K]
   ) => {
     if (!localSettings) return;
     setLocalSettings({ ...localSettings, [key]: value });
@@ -298,7 +298,7 @@ export default function SettingsPage() {
     setHasChanges(true);
   };
 
-  const updateFeatureFlag = (flag: keyof ClubguideSettings['featureFlags'], value: boolean) => {
+  const updateFeatureFlag = (flag: keyof EscalSettings['featureFlags'], value: boolean) => {
     if (!localSettings) return;
     setLocalSettings({
       ...localSettings,
@@ -318,7 +318,7 @@ export default function SettingsPage() {
   if (loading || !localSettings) {
     return (
       <div className="mx-auto max-w-7xl">
-        <SubNav current="/clubguide/settings" />
+        <SubNav current="/escal/settings" />
         <div className="flex items-center justify-center py-24">
           <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
         </div>
@@ -362,7 +362,7 @@ export default function SettingsPage() {
       </div>
 
       {/* Sub Navigation */}
-      <SubNav current="/clubguide/settings" />
+      <SubNav current="/escal/settings" />
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         {/* Scraper Settings */}
