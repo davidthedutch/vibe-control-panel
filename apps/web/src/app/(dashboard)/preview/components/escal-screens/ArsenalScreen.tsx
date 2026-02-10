@@ -152,31 +152,32 @@ function SoundPage({ onBack }: { onBack: () => void }) {
         {micActive ? 'Microfoon actief — luisteren...' : 'Start microfoon (auto BPM + dB)'}
       </button>
 
-      {/* BPM display */}
-      <div className="rounded-[20px] bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] shadow-lg shadow-black/20 p-5 text-center">
-        <Activity className={`mx-auto mb-2 h-8 w-8 ${displayBpm ? 'text-orange-400' : 'text-slate-400'} ${micActive ? 'animate-pulse' : ''}`} />
-        <p className="text-4xl font-bold tabular-nums text-white">{displayBpm ?? '—'}</p>
-        <p className="text-xs text-slate-400 mt-1">BPM</p>
-        {micActive && autoBpm && (
-          <p className="mt-1 text-[10px] text-orange-400">Auto-detect via microfoon</p>
-        )}
-        {!micActive && (
-          <p className="mt-2 text-[10px] text-slate-500">Tik hieronder om handmatig te meten</p>
-        )}
-      </div>
-
-      {/* Tap button */}
+      {/* BPM + TAP combined block */}
       <button
         onClick={handleBpmTap}
-        className="rounded-[20px] bg-orange-500/10 border border-orange-500/20 py-4 text-center active:scale-95 transition-transform"
+        className="rounded-[20px] bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] shadow-lg shadow-black/20 p-4 active:scale-[0.98] transition-transform"
       >
-        <p className="text-sm font-semibold text-orange-400">TAP</p>
-        {bpmTaps.length > 0 && bpmTaps.length < 3 && (
-          <p className="text-[10px] text-orange-300 mt-0.5">Blijf tikken... ({bpmTaps.length}/3)</p>
-        )}
-        {bpmValue && (
-          <p className="text-[10px] text-slate-400 mt-0.5">Handmatig: {bpmValue} BPM</p>
-        )}
+        <div className="flex items-center justify-between">
+          <div className="flex flex-col items-start gap-1">
+            <div className="flex items-center gap-2">
+              <Activity className={`h-5 w-5 ${displayBpm ? 'text-orange-400' : 'text-slate-400'} ${micActive ? 'animate-pulse' : ''}`} />
+              <span className="text-sm font-semibold text-orange-400">TAP</span>
+            </div>
+            {bpmTaps.length > 0 && bpmTaps.length < 3 && (
+              <p className="text-[10px] text-orange-300">Blijf tikken... ({bpmTaps.length}/3)</p>
+            )}
+            {micActive && autoBpm && (
+              <p className="text-[10px] text-orange-400">Auto-detect via mic</p>
+            )}
+            {!micActive && !bpmTaps.length && (
+              <p className="text-[10px] text-slate-500">Tik om BPM te meten</p>
+            )}
+          </div>
+          <div className="text-right">
+            <p className="text-3xl font-bold tabular-nums text-white">{displayBpm ?? '—'}</p>
+            <p className="text-[10px] text-slate-400">BPM</p>
+          </div>
+        </div>
       </button>
       {bpmValue && (
         <button onClick={handleBpmReset} className="text-[10px] text-slate-500 underline text-center -mt-3">
