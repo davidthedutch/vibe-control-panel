@@ -430,7 +430,7 @@ export default function SettingsPage() {
         {/* Buddy System Settings */}
         <div className="rounded-xl border border-slate-200 bg-white p-6 dark:border-slate-700 dark:bg-slate-900">
           <h2 className="flex items-center gap-2 text-lg font-semibold text-slate-900 dark:text-slate-50">
-            <Clock className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+            <Clock className="h-5 w-5 text-orange-600 dark:text-orange-400" />
             Buddy System
           </h2>
           <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">

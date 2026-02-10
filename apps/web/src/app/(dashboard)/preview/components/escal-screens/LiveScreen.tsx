@@ -52,7 +52,7 @@ export default function LiveScreen() {
         <button
           onClick={() => setCheckedIn(!checkedIn)}
           className={`flex flex-1 items-center justify-center gap-1.5 rounded-xl py-2.5 text-xs font-semibold ${
-            checkedIn ? 'bg-green-500 text-white' : 'bg-purple-500 text-white'
+            checkedIn ? 'bg-green-500 text-white' : 'bg-orange-500 text-white'
           }`}
         >
           <CheckCircle className="h-3.5 w-3.5" />
@@ -74,7 +74,7 @@ export default function LiveScreen() {
               onClick={() => setStagePosition(pos)}
               className={`rounded-full px-2.5 py-1 text-[10px] font-medium ${
                 stagePosition === pos
-                  ? 'bg-purple-500 text-white'
+                  ? 'bg-orange-500 text-white'
                   : 'bg-slate-700 text-slate-400'
               }`}
             >
@@ -93,7 +93,7 @@ export default function LiveScreen() {
           value={statusText}
           onChange={(e) => setStatusText(e.target.value)}
         />
-        <Send className="h-4 w-4 text-purple-400" />
+        <Send className="h-4 w-4 text-orange-400" />
       </div>
 
       {/* Stappenteller */}
@@ -137,7 +137,7 @@ export default function LiveScreen() {
           { icon: Coffee, label: 'Bar', color: 'text-yellow-400', bg: 'bg-yellow-500/10' },
           { icon: Droplets, label: 'Water', color: 'text-blue-400', bg: 'bg-blue-500/10' },
           { icon: MapPin, label: 'EHBO', color: 'text-red-400', bg: 'bg-red-500/10' },
-          { icon: Volume2, label: 'dB Meter', color: 'text-purple-400', bg: 'bg-purple-500/10' },
+          { icon: Volume2, label: 'dB Meter', color: 'text-orange-400', bg: 'bg-orange-500/10' },
         ].map((item) => (
           <button key={item.label} className={`flex flex-col items-center gap-1 rounded-xl ${item.bg} py-2.5`}>
             <item.icon className={`h-4 w-4 ${item.color}`} />
@@ -165,7 +165,7 @@ export default function LiveScreen() {
             messages.slice(0, 4).map((msg) => (
               <div key={msg.id} className="rounded-lg bg-slate-800/60 px-3 py-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-medium text-purple-300">{msg.username}</span>
+                  <span className="text-xs font-medium text-orange-300">{msg.username}</span>
                   <span className="text-[10px] text-slate-500">
                     {new Date(msg.created_at).toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' })}
                   </span>
@@ -182,7 +182,7 @@ export default function LiveScreen() {
             placeholder="Bericht versturen..."
             className="flex-1 bg-transparent text-xs text-white placeholder-slate-500 outline-none"
           />
-          <Send className="h-4 w-4 text-purple-400" />
+          <Send className="h-4 w-4 text-orange-400" />
         </div>
       </div>
 

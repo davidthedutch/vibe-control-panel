@@ -91,7 +91,7 @@ function LocationCard({ location }: { location: LiveLocation }) {
   const privacyColors = {
     all: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400',
     friends: 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-400',
-    buddies: 'bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-400',
+    buddies: 'bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-400',
   };
 
   return (
@@ -157,8 +157,8 @@ function BuddyCard({ pair }: { pair: BuddyPair }) {
             <div className="h-8 w-8 rounded-full bg-indigo-100 dark:bg-indigo-900/40 flex items-center justify-center border-2 border-white dark:border-slate-800">
               <Users className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
             </div>
-            <div className="h-8 w-8 rounded-full bg-purple-100 dark:bg-purple-900/40 flex items-center justify-center border-2 border-white dark:border-slate-800">
-              <Users className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+            <div className="h-8 w-8 rounded-full bg-orange-100 dark:bg-orange-900/40 flex items-center justify-center border-2 border-white dark:border-slate-800">
+              <Users className="h-4 w-4 text-orange-600 dark:text-orange-400" />
             </div>
           </div>
           <div>
@@ -391,7 +391,7 @@ export default function LiveMonitoringPage() {
         {/* Buddy System */}
         <div className="rounded-xl border border-slate-200 bg-white p-6 dark:border-slate-700 dark:bg-slate-900">
           <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold text-slate-900 dark:text-slate-50">
-            <UserCheck className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+            <UserCheck className="h-5 w-5 text-orange-600 dark:text-orange-400" />
             Active Buddy Pairs
             <span className="ml-auto text-sm font-normal text-slate-500 dark:text-slate-400">
               {activeBuddies.length} active

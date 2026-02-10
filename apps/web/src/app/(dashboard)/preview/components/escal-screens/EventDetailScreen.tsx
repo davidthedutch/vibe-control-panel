@@ -50,7 +50,7 @@ export default function EventDetailScreen({ eventId, onBack }: EventDetailScreen
   if (loading) {
     return (
       <div className="flex flex-col p-4">
-        <button onClick={onBack} className="mb-4 flex items-center text-sm text-purple-400">
+        <button onClick={onBack} className="mb-4 flex items-center text-sm text-orange-400">
           <ArrowLeft className="mr-1 h-4 w-4" /> Terug
         </button>
         <div className="h-40 animate-pulse rounded-xl bg-slate-800/80" />
@@ -61,7 +61,7 @@ export default function EventDetailScreen({ eventId, onBack }: EventDetailScreen
   if (!event) {
     return (
       <div className="flex flex-col items-center justify-center p-8">
-        <button onClick={onBack} className="mb-4 self-start flex items-center text-sm text-purple-400">
+        <button onClick={onBack} className="mb-4 self-start flex items-center text-sm text-orange-400">
           <ArrowLeft className="mr-1 h-4 w-4" /> Terug
         </button>
         <p className="text-sm text-slate-400">Event niet gevonden</p>
@@ -72,7 +72,7 @@ export default function EventDetailScreen({ eventId, onBack }: EventDetailScreen
   return (
     <div className="flex flex-col">
       {/* Header image area */}
-      <div className="relative h-44 bg-gradient-to-br from-purple-600 via-purple-500 to-blue-600">
+      <div className="relative h-44 bg-gradient-to-br from-orange-600 via-orange-500 to-amber-600">
         <button
           onClick={onBack}
           className="absolute left-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-black/40 backdrop-blur-sm"
@@ -100,19 +100,19 @@ export default function EventDetailScreen({ eventId, onBack }: EventDetailScreen
         {/* Quick info */}
         <div className="flex flex-col gap-2.5">
           <div className="flex items-center gap-3 text-sm text-slate-300">
-            <Calendar className="h-4 w-4 text-purple-400" />
+            <Calendar className="h-4 w-4 text-orange-400" />
             <span>{formatDate(event.start_date)}</span>
           </div>
           <div className="flex items-center gap-3 text-sm text-slate-300">
-            <Clock className="h-4 w-4 text-purple-400" />
+            <Clock className="h-4 w-4 text-orange-400" />
             <span>{formatTime(event.start_date)}{event.end_date ? ` - ${formatTime(event.end_date)}` : ''}</span>
           </div>
           <div className="flex items-center gap-3 text-sm text-slate-300">
-            <MapPin className="h-4 w-4 text-purple-400" />
+            <MapPin className="h-4 w-4 text-orange-400" />
             <span>{event.venue_name}{event.venue_city ? `, ${event.venue_city}` : ''}</span>
           </div>
           <div className="flex items-center gap-3 text-sm text-slate-300">
-            <Ticket className="h-4 w-4 text-purple-400" />
+            <Ticket className="h-4 w-4 text-orange-400" />
             <span className="text-green-400">Tickets beschikbaar</span>
             <span className="text-[11px] text-slate-500">vanaf €25</span>
           </div>
@@ -125,7 +125,7 @@ export default function EventDetailScreen({ eventId, onBack }: EventDetailScreen
             className={`flex-1 rounded-xl py-2.5 text-sm font-semibold ${
               isGoing
                 ? 'bg-green-500 text-white'
-                : 'bg-purple-500 text-white'
+                : 'bg-orange-500 text-white'
             }`}
           >
             {isGoing ? '✓ Ik ga!' : `Ik ga! (${event.going_count})`}
@@ -153,12 +153,12 @@ export default function EventDetailScreen({ eventId, onBack }: EventDetailScreen
           <div className="flex items-center gap-2">
             <div className="flex -space-x-2">
               {DEMO_FRIENDS_GOING.map((f, i) => (
-                <div key={i} className="flex h-7 w-7 items-center justify-center rounded-full border-2 border-slate-800 bg-purple-500/60 text-[9px] font-bold text-white">
+                <div key={i} className="flex h-7 w-7 items-center justify-center rounded-full border-2 border-slate-800 bg-orange-500/60 text-[9px] font-bold text-white">
                   {f.initials}
                 </div>
               ))}
             </div>
-            <span className="text-xs text-purple-300">{DEMO_FRIENDS_GOING.length} vrienden gaan</span>
+            <span className="text-xs text-orange-300">{DEMO_FRIENDS_GOING.length} vrienden gaan</span>
           </div>
         </div>
 
@@ -168,13 +168,13 @@ export default function EventDetailScreen({ eventId, onBack }: EventDetailScreen
             <h3 className="flex items-center gap-1.5 text-xs font-semibold uppercase text-slate-500">
               <Music className="h-3.5 w-3.5" /> Line-up
             </h3>
-            <span className="text-[10px] text-purple-400">Volledig schema</span>
+            <span className="text-[10px] text-orange-400">Volledig schema</span>
           </div>
           <div className="flex flex-col gap-1.5">
             {DEMO_LINEUP.map((dj, i) => (
               <div key={i} className="flex items-center justify-between rounded-lg bg-slate-800/60 px-3 py-2">
                 <div className="flex items-center gap-2">
-                  <div className="flex h-7 w-7 items-center justify-center rounded-full bg-purple-500/20 text-[9px] font-bold text-purple-300">
+                  <div className="flex h-7 w-7 items-center justify-center rounded-full bg-orange-500/20 text-[9px] font-bold text-orange-300">
                     {dj.name.split(' ').map(n => n[0]).join('')}
                   </div>
                   <div>
@@ -194,7 +194,7 @@ export default function EventDetailScreen({ eventId, onBack }: EventDetailScreen
             <h3 className="mb-2 text-xs font-semibold uppercase text-slate-500">Genres</h3>
             <div className="flex flex-wrap gap-2">
               {event.genres.map((genre) => (
-                <span key={genre} className="rounded-full bg-purple-500/20 px-3 py-1 text-xs font-medium text-purple-300">
+                <span key={genre} className="rounded-full bg-orange-500/20 px-3 py-1 text-xs font-medium text-orange-300">
                   {genre}
                 </span>
               ))}
@@ -228,7 +228,7 @@ export default function EventDetailScreen({ eventId, onBack }: EventDetailScreen
               <div key={i} className="rounded-lg bg-slate-800/60 px-3 py-2">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-1.5">
-                    <span className="text-xs font-medium text-purple-300">{review.user}</span>
+                    <span className="text-xs font-medium text-orange-300">{review.user}</span>
                     <div className="flex">
                       {[1, 2, 3, 4, 5].map((s) => (
                         <Star key={s} className={`h-2.5 w-2.5 ${s <= review.rating ? 'text-yellow-400' : 'text-slate-600'}`} fill={s <= review.rating ? 'currentColor' : 'none'} />
@@ -241,7 +241,7 @@ export default function EventDetailScreen({ eventId, onBack }: EventDetailScreen
               </div>
             ))}
           </div>
-          <button className="mt-2 w-full rounded-lg bg-slate-800/40 py-2 text-xs text-purple-400">
+          <button className="mt-2 w-full rounded-lg bg-slate-800/40 py-2 text-xs text-orange-400">
             Schrijf een review
           </button>
         </div>

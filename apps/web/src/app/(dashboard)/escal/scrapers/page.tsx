@@ -124,7 +124,7 @@ function ScraperCard({
   };
 
   const sourceColors: Record<string, string> = {
-    ra: 'bg-purple-100 border-purple-200 dark:bg-purple-900/20 dark:border-purple-800',
+    ra: 'bg-orange-100 border-orange-200 dark:bg-orange-900/20 dark:border-orange-800',
     partyflock: 'bg-blue-100 border-blue-200 dark:bg-blue-900/20 dark:border-blue-800',
     djguide: 'bg-orange-100 border-orange-200 dark:bg-orange-900/20 dark:border-orange-800',
   };

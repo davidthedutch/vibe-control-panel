@@ -79,7 +79,7 @@ function SimpleBarChart({
     indigo: 'bg-indigo-500',
     emerald: 'bg-emerald-500',
     amber: 'bg-amber-500',
-    purple: 'bg-purple-500',
+    orange: 'bg-orange-500',
     blue: 'bg-blue-500',
   };
 
@@ -418,8 +418,8 @@ export default function AnalyticsPage() {
 
         <div className="rounded-xl border border-slate-200 bg-white p-5 dark:border-slate-700 dark:bg-slate-900">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-purple-100 dark:bg-purple-900/40">
-              <Calendar className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-orange-100 dark:bg-orange-900/40">
+              <Calendar className="h-5 w-5 text-orange-600 dark:text-orange-400" />
             </div>
             <div>
               <p className="text-sm text-slate-500 dark:text-slate-400">Total Events</p>
@@ -466,10 +466,10 @@ export default function AnalyticsPage() {
         {/* Events Per Month */}
         <div className="rounded-xl border border-slate-200 bg-white p-6 dark:border-slate-700 dark:bg-slate-900">
           <div className="mb-4 flex items-center gap-2">
-            <BarChart3 className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+            <BarChart3 className="h-5 w-5 text-orange-600 dark:text-orange-400" />
             <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50">Events Per Month</h2>
           </div>
-          <SimpleBarChart data={eventsBarData} dataKey="events" color="purple" height={220} />
+          <SimpleBarChart data={eventsBarData} dataKey="events" color="orange" height={220} />
         </div>
       </div>
 

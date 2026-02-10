@@ -112,11 +112,11 @@ export default function EscalAppPreview({ device }: EscalAppPreviewProps) {
                   className="flex flex-col items-center gap-0.5 px-3 py-1"
                 >
                   <tab.icon
-                    className={`h-5 w-5 ${isActive ? 'text-purple-400' : 'text-slate-500'}`}
+                    className={`h-5 w-5 ${isActive ? 'text-orange-400' : 'text-slate-500'}`}
                   />
                   <span
                     className={`text-[10px] font-medium ${
-                      isActive ? 'text-purple-400' : 'text-slate-500'
+                      isActive ? 'text-orange-400' : 'text-slate-500'
                     }`}
                   >
                     {tab.label}

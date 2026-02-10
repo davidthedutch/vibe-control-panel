@@ -22,14 +22,14 @@ export default function HomeScreen() {
             <Bell className="h-4 w-4 text-slate-300" />
             <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[8px] font-bold text-white">3</span>
           </button>
-          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-purple-500/20">
-            <Zap className="h-4 w-4 text-purple-400" />
+          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-orange-500/20">
+            <Zap className="h-4 w-4 text-orange-400" />
           </div>
         </div>
       </div>
 
       {/* Weather Widget */}
-      <div className="rounded-xl bg-gradient-to-r from-blue-600/30 to-purple-600/30 p-3">
+      <div className="rounded-xl bg-gradient-to-r from-blue-600/30 to-slate-600/30 p-3">
         <div className="flex items-center justify-between">
           <div>
             <p className="text-xs font-medium text-blue-300">Weer in Amsterdam</p>
@@ -57,7 +57,7 @@ export default function HomeScreen() {
           { label: 'Events', value: metricsLoading ? '...' : metrics.totalEvents.toLocaleString(), icon: Calendar, color: 'text-blue-400', bg: 'bg-blue-500/10', trend: metrics.trends.totalEvents },
           { label: 'Gebruikers', value: metricsLoading ? '...' : metrics.activeUsers.toLocaleString(), icon: Users, color: 'text-green-400', bg: 'bg-green-500/10', trend: metrics.trends.activeUsers },
           { label: 'Live Nu', value: metricsLoading ? '...' : metrics.liveNow.toString(), icon: MapPin, color: 'text-orange-400', bg: 'bg-orange-500/10', trend: metrics.trends.liveNow },
-          { label: 'Scrapers OK', value: metricsLoading ? '...' : `${metrics.scrapersOk}/3`, icon: Activity, color: 'text-purple-400', bg: 'bg-purple-500/10', trend: null },
+          { label: 'Scrapers OK', value: metricsLoading ? '...' : `${metrics.scrapersOk}/3`, icon: Activity, color: 'text-orange-400', bg: 'bg-orange-500/10', trend: null },
         ].map((item) => (
           <div key={item.label} className="rounded-xl bg-slate-800/80 p-3">
             <div className="mb-2 flex items-center justify-between">
@@ -81,18 +81,18 @@ export default function HomeScreen() {
       <div>
         <div className="mb-2 flex items-center justify-between">
           <h2 className="text-sm font-semibold text-white">Mijn Agenda</h2>
-          <span className="text-[10px] text-purple-400">Alles bekijken</span>
+          <span className="text-[10px] text-orange-400">Alles bekijken</span>
         </div>
         <div className="flex gap-2.5 overflow-x-auto pb-1">
           {upcomingLoading ? (
             <div className="h-20 w-40 shrink-0 animate-pulse rounded-xl bg-slate-800/80" />
           ) : (
             upcomingEvents.slice(0, 3).map((event) => (
-              <div key={event.id} className="w-40 shrink-0 rounded-xl bg-gradient-to-br from-purple-600/30 to-blue-600/20 p-3">
+              <div key={event.id} className="w-40 shrink-0 rounded-xl bg-gradient-to-br from-orange-600/30 to-amber-600/20 p-3">
                 <p className="truncate text-xs font-semibold text-white">{event.title}</p>
                 <p className="mt-0.5 truncate text-[10px] text-slate-300">{event.venue_name || 'TBA'}</p>
                 <div className="mt-2 flex items-center justify-between">
-                  <span className="text-[10px] text-purple-300">
+                  <span className="text-[10px] text-orange-300">
                     {new Date(event.start_date).toLocaleDateString('nl-NL', { day: 'numeric', month: 'short' })}
                   </span>
                   <Heart className="h-3 w-3 text-red-400" fill="currentColor" />
@@ -129,7 +129,7 @@ export default function HomeScreen() {
           ) : (
             topEvents.slice(0, 3).map((event, i) => (
               <div key={event.id} className="flex items-center gap-3 rounded-xl bg-slate-800/80 p-3">
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-500/20 text-sm font-bold text-purple-400">
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-orange-500/20 text-sm font-bold text-orange-400">
                   {i + 1}
                 </div>
                 <div className="min-w-0 flex-1">
@@ -170,7 +170,7 @@ export default function HomeScreen() {
                 <div className={`h-2 w-2 rounded-full ${
                   act.type === 'event_created' ? 'bg-blue-400' :
                   act.type === 'user_registered' ? 'bg-green-400' :
-                  act.type === 'checkin' ? 'bg-orange-400' : 'bg-purple-400'
+                  act.type === 'checkin' ? 'bg-orange-400' : 'bg-orange-400'
                 }`} />
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-xs font-medium text-slate-200">{act.title}</p>

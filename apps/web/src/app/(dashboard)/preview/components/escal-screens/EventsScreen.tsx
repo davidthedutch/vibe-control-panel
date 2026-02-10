@@ -110,7 +110,7 @@ export default function EventsScreen({ onSelectEvent }: EventsScreenProps) {
             onClick={() => setActiveGenre(genre.id)}
             className={`shrink-0 rounded-full px-3 py-1 text-xs font-medium ${
               activeGenre === genre.id
-                ? 'bg-purple-500 text-white'
+                ? 'bg-orange-500 text-white'
                 : 'bg-slate-800 text-slate-400'
             }`}
           >
@@ -130,11 +130,11 @@ export default function EventsScreen({ onSelectEvent }: EventsScreenProps) {
               className="flex items-start gap-3 rounded-xl bg-slate-800/80 p-3 text-left transition-colors active:bg-slate-700/80"
             >
               {/* Date badge */}
-              <div className="flex h-12 w-12 shrink-0 flex-col items-center justify-center rounded-lg bg-purple-500/20">
-                <span className="text-[10px] font-medium uppercase text-purple-300">
+              <div className="flex h-12 w-12 shrink-0 flex-col items-center justify-center rounded-lg bg-orange-500/20">
+                <span className="text-[10px] font-medium uppercase text-orange-300">
                   {new Date(event.start_date).toLocaleDateString('nl-NL', { month: 'short' })}
                 </span>
-                <span className="text-lg font-bold leading-tight text-purple-400">
+                <span className="text-lg font-bold leading-tight text-orange-400">
                   {new Date(event.start_date).getDate()}
                 </span>
               </div>
@@ -166,12 +166,12 @@ export default function EventsScreen({ onSelectEvent }: EventsScreenProps) {
                   <div className="mt-1.5 flex items-center gap-1">
                     <div className="flex -space-x-1.5">
                       {FRIEND_AVATARS.slice(0, friendsGoing).map((name, i) => (
-                        <div key={i} className="flex h-4 w-4 items-center justify-center rounded-full border border-slate-800 bg-purple-500/50 text-[7px] font-bold text-white">
+                        <div key={i} className="flex h-4 w-4 items-center justify-center rounded-full border border-slate-800 bg-orange-500/50 text-[7px] font-bold text-white">
                           {name}
                         </div>
                       ))}
                     </div>
-                    <span className="text-[10px] text-purple-300">{friendsGoing} vriend{friendsGoing > 1 ? 'en' : ''} gaan</span>
+                    <span className="text-[10px] text-orange-300">{friendsGoing} vriend{friendsGoing > 1 ? 'en' : ''} gaan</span>
                   </div>
                 )}
               </div>

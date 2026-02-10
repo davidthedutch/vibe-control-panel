@@ -88,7 +88,7 @@ function StatusBadge({ status }: { status: EscalEvent['status'] }) {
 
 function SourceBadge({ source }: { source: EscalEvent['source'] }) {
   const styles = {
-    ra: 'bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-400',
+    ra: 'bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-400',
     partyflock: 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-400',
     djguide: 'bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-400',
     manual: 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400',

@@ -94,7 +94,7 @@ function StatCard({
   icon: React.ReactNode;
   label: string;
   value: string | number;
-  color: 'emerald' | 'amber' | 'purple' | 'blue';
+  color: 'emerald' | 'amber' | 'orange' | 'blue';
 }) {
   const colorStyles = {
     emerald: {
@@ -105,9 +105,9 @@ function StatCard({
       bg: 'bg-amber-100 dark:bg-amber-900/40',
       text: 'text-amber-600 dark:text-amber-400',
     },
-    purple: {
-      bg: 'bg-purple-100 dark:bg-purple-900/40',
-      text: 'text-purple-600 dark:text-purple-400',
+    orange: {
+      bg: 'bg-orange-100 dark:bg-orange-900/40',
+      text: 'text-orange-600 dark:text-orange-400',
     },
     blue: {
       bg: 'bg-blue-100 dark:bg-blue-900/40',
@@ -278,7 +278,7 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
           icon={<Eye className="h-5 w-5" />}
           label="Views"
           value={Math.floor(Math.random() * 5000) + 1000}
-          color="purple"
+          color="orange"
         />
         <StatCard
           icon={<Star className="h-5 w-5" />}

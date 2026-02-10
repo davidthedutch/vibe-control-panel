@@ -215,7 +215,7 @@ export default function EditPanel({
       <div className="border-t border-slate-200 p-4 dark:border-slate-700">
         <button
           onClick={onAISuggestion}
-          className="mb-2 flex w-full items-center justify-center gap-2 rounded-md bg-gradient-to-r from-purple-500 to-blue-500 px-4 py-2 text-sm font-medium text-white hover:from-purple-600 hover:to-blue-600"
+          className="mb-2 flex w-full items-center justify-center gap-2 rounded-md bg-gradient-to-r from-orange-500 to-amber-500 px-4 py-2 text-sm font-medium text-white hover:from-orange-600 hover:to-amber-600"
         >
           <Sparkles className="h-4 w-4" />
           AI Suggestion

@@ -96,7 +96,7 @@ function StatCard({
   icon: React.ReactNode;
   label: string;
   value: string | number;
-  color: 'emerald' | 'amber' | 'purple' | 'blue' | 'indigo';
+  color: 'emerald' | 'amber' | 'orange' | 'blue' | 'indigo';
 }) {
   const colorStyles = {
     emerald: {
@@ -107,9 +107,9 @@ function StatCard({
       bg: 'bg-amber-100 dark:bg-amber-900/40',
       text: 'text-amber-600 dark:text-amber-400',
     },
-    purple: {
-      bg: 'bg-purple-100 dark:bg-purple-900/40',
-      text: 'text-purple-600 dark:text-purple-400',
+    orange: {
+      bg: 'bg-orange-100 dark:bg-orange-900/40',
+      text: 'text-orange-600 dark:text-orange-400',
     },
     blue: {
       bg: 'bg-blue-100 dark:bg-blue-900/40',
@@ -324,7 +324,7 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
           icon={<Heart className="h-5 w-5" />}
           label="XP"
           value={user.xp.toLocaleString()}
-          color="purple"
+          color="orange"
         />
       </div>
 

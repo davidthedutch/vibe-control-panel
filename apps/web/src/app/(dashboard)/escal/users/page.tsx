@@ -88,7 +88,7 @@ function StatusBadge({ status }: { status: EscalUser['status'] }) {
 
 function LevelBadge({ level, xp }: { level: number; xp: number }) {
   const getColor = (lvl: number) => {
-    if (lvl >= 15) return 'bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-400';
+    if (lvl >= 15) return 'bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-400';
     if (lvl >= 10) return 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-400';
     if (lvl >= 5) return 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-400';
     return 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400';

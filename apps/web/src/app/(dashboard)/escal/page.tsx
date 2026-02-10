@@ -39,11 +39,11 @@ const accentStyles = {
     border: 'border-emerald-100 dark:border-emerald-900/40',
     bg: 'bg-emerald-50/50 dark:bg-emerald-950/20',
   },
-  purple: {
-    iconBg: 'bg-purple-100 dark:bg-purple-900/40',
-    iconColor: 'text-purple-600 dark:text-purple-400',
-    border: 'border-purple-100 dark:border-purple-900/40',
-    bg: 'bg-purple-50/50 dark:bg-purple-950/20',
+  orange: {
+    iconBg: 'bg-orange-100 dark:bg-orange-900/40',
+    iconColor: 'text-orange-600 dark:text-orange-400',
+    border: 'border-orange-100 dark:border-orange-900/40',
+    bg: 'bg-orange-50/50 dark:bg-orange-950/20',
   },
   amber: {
     iconBg: 'bg-amber-100 dark:bg-amber-900/40',
@@ -117,7 +117,7 @@ function ActivityFeedItem({
   const colorMap = {
     event_created: 'bg-indigo-100 text-indigo-600 dark:bg-indigo-900/40 dark:text-indigo-400',
     user_registered: 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/40 dark:text-emerald-400',
-    checkin: 'bg-purple-100 text-purple-600 dark:bg-purple-900/40 dark:text-purple-400',
+    checkin: 'bg-orange-100 text-orange-600 dark:bg-orange-900/40 dark:text-orange-400',
     scraper_run: 'bg-amber-100 text-amber-600 dark:bg-amber-900/40 dark:text-amber-400',
   };
 
@@ -190,7 +190,7 @@ export default function EscalDashboard() {
       icon: <MapPin className="h-5 w-5" />,
       label: 'Live Now',
       value: metricsLoading ? '-' : metrics.liveNow,
-      accent: 'purple',
+      accent: 'orange',
       trend: metrics.trends.liveNow,
       href: '/escal/live',
     },
