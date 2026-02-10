@@ -19,6 +19,8 @@ export default function TerminalView({ wsUrl = 'ws://localhost:3001', ref }: Ter
   const xtermRef = useRef<XTermTerminal | null>(null);
   const wsRef = useRef<WebSocket | null>(null);
   const fitAddonRef = useRef<any>(null);
+  const retryCountRef = useRef(0);
+  const MAX_RETRIES = 2;
   const [connectionStatus, setConnectionStatus] = useState<'connecting' | 'connected' | 'disconnected'>('disconnected');
   const [error, setError] = useState<string | null>(null);
 
@@ -93,12 +95,30 @@ export default function TerminalView({ wsUrl = 'ws://localhost:3001', ref }: Ter
         // Display welcome message
         term.writeln('\x1b[1;36m╭───────────────────────────────────────────────────────────╮\x1b[0m');
         term.writeln('\x1b[1;36m│\x1b[0m  \x1b[1;33mVibe Control Panel Terminal\x1b[0m                           \x1b[1;36m│\x1b[0m');
-        term.writeln('\x1b[1;36m│\x1b[0m  Connecting to terminal server...                      \x1b[1;36m│\x1b[0m');
         term.writeln('\x1b[1;36m╰───────────────────────────────────────────────────────────╯\x1b[0m');
         term.writeln('');
 
-        // Connect to WebSocket server
-        connectWebSocket(term);
+        // Only connect on localhost — on production there is no terminal server
+        const isLocal = typeof window !== 'undefined' && (
+          window.location.hostname === 'localhost' ||
+          window.location.hostname === '127.0.0.1'
+        );
+
+        if (isLocal) {
+          term.writeln('  Connecting to terminal server...');
+          term.writeln('');
+          connectWebSocket(term);
+        } else {
+          term.writeln('\x1b[1;33m  Terminal server is alleen beschikbaar in lokale ontwikkeling.\x1b[0m');
+          term.writeln('');
+          term.writeln('  Start lokaal:');
+          term.writeln('  \x1b[1;36m1.\x1b[0m cd apps/web');
+          term.writeln('  \x1b[1;36m2.\x1b[0m node terminal-server.js');
+          term.writeln('  \x1b[1;36m3.\x1b[0m Open http://localhost:3000/terminal');
+          term.writeln('');
+          setError(null);
+          setConnectionStatus('disconnected');
+        }
 
         // Handle resize
         const handleResize = () => {
@@ -141,6 +161,7 @@ export default function TerminalView({ wsUrl = 'ws://localhost:3001', ref }: Ter
         ws.onopen = () => {
           if (!mounted) return;
           console.log('[Terminal] WebSocket connected');
+          retryCountRef.current = 0; // Reset retries on successful connection
           setConnectionStatus('connected');
           setError(null);
 
@@ -203,15 +224,20 @@ export default function TerminalView({ wsUrl = 'ws://localhost:3001', ref }: Ter
           term.writeln('\x1b[1;31m│\x1b[0m  \x1b[1;36mnode terminal-server.js\x1b[0m                              \x1b[1;31m│\x1b[0m');
           term.writeln('\x1b[1;31m╰───────────────────────────────────────────────────────────╯\x1b[0m');
 
-          // Attempt to reconnect after 5 seconds
-          if (mounted) {
+          // Attempt to reconnect (max 2 retries)
+          if (mounted && retryCountRef.current < MAX_RETRIES) {
+            retryCountRef.current++;
             setTimeout(() => {
               if (mounted && wsRef.current?.readyState !== WebSocket.OPEN) {
                 term.writeln('');
-                term.writeln('\x1b[1;33mAttempting to reconnect...\x1b[0m');
+                term.writeln(`\x1b[1;33mPoging ${retryCountRef.current}/${MAX_RETRIES}...\x1b[0m`);
                 connectWebSocket(term);
               }
-            }, 5000);
+            }, 3000);
+          } else if (mounted && retryCountRef.current >= MAX_RETRIES) {
+            term.writeln('');
+            term.writeln('\x1b[1;31mKon geen verbinding maken na meerdere pogingen.\x1b[0m');
+            term.writeln('\x1b[0;33mZorg dat de terminal server draait: \x1b[1;36mnode terminal-server.js\x1b[0m');
           }
         };
       } catch (err) {
