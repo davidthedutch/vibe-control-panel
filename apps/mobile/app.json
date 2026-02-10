@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "Vibe Control Panel",
-    "slug": "vibe-control-panel",
+    "name": "Vibe Club Guide",
+    "slug": "vibe-club-guide",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -16,7 +16,10 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.vibe.controlpanel",
+      "bundleIdentifier": "com.vibe.clubguide",
+      "config": {
+        "usesNonExemptEncryption": false
+      },
       "infoPlist": {
         "NSFaceIDUsageDescription": "Use biometric authentication to secure your access to the Vibe Control Panel."
       }
@@ -26,7 +29,7 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#000000"
       },
-      "package": "com.vibe.controlpanel",
+      "package": "com.vibe.clubguide",
       "permissions": [
         "USE_BIOMETRIC",
         "USE_FINGERPRINT",
@@ -54,9 +57,18 @@
         }
       ]
     ],
-    "scheme": "vibe-control-panel",
+    "scheme": "vibe-club-guide",
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "27f0ce0d-cbf4-430f-b46b-88157dff7d13"
+      }
+    },
+    "owner": "lekkerbouwen"
   }
 }

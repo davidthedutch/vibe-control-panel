@@ -17,9 +17,6 @@
       "env": {
         "EXPO_PUBLIC_SUPABASE_URL": "https://oprkkdajaywinvohnhoc.supabase.co",
         "EXPO_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9wcmtrZGFqYXl3aW52b2huaG9jIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzg4NTI0MTcsImV4cCI6MjA1NDQyODQxN30.sb_publishable_MqW7_xoktdwKbzP0XWeGxg_8AOWpGFm"
-      },
-      "ios": {
-        "bundleIdentifier": "com.vibe.clubguide"
       }
     }
   },

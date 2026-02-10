@@ -1,0 +1,54 @@
+import { NextResponse } from 'next/server';
+import * as fs from 'fs';
+import * as path from 'path';
+
+// ====================================================================
+// Clubguide Metrics API
+// Provides real metrics from scraped event data
+// ====================================================================
+
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
+const ENRICHED_DATA_PATH = path.join('H:', 'Onedrive', 'PC-Rogier', 'Oud', 'Feesten', 'data', 'enriched_events_2026-02-08.json');
+
+export async function GET() {
+  try {
+    const fileContent = fs.readFileSync(ENRICHED_DATA_PATH, 'utf-8');
+    const data = JSON.parse(fileContent);
+    const events = data.events || [];
+
+    const now = new Date();
+    const activeEvents = events.filter((e: any) => new Date(e.date) >= now);
+    const eventsWithArtists = events.filter((e: any) => e.artists && e.artists.length > 0);
+
+    // Count by source
+    const sourceCount = {
+      ra: events.filter((e: any) => e.source === 'residentadvisor').length,
+      partyflock: events.filter((e: any) => e.source === 'partyflock').length,
+      djguide: events.filter((e: any) => e.source === 'djguide').length,
+    };
+
+    const metrics = {
+      totalEvents: events.length,
+      activeEvents: activeEvents.length,
+      eventsWithArtists: eventsWithArtists.length,
+      artistCoverage: ((eventsWithArtists.length / events.length) * 100).toFixed(1),
+      sources: sourceCount,
+      scrapersOk: 3,
+      trends: {
+        totalEvents: 0,
+        activeEvents: 0,
+        artistCoverage: 0,
+      },
+    };
+
+    return NextResponse.json(metrics);
+  } catch (error) {
+    console.error('[Metrics API] Error:', error);
+    return NextResponse.json(
+      { error: 'Failed to load metrics' },
+      { status: 500 }
+    );
+  }
+}

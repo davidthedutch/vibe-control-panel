@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { supabase } from '../supabase';
 import type { RealtimeChannel } from '@supabase/supabase-js';
+import { fetchClubguideEvents, fetchClubguideMetrics } from '../actions/clubguide-actions';
 
 // ============================================================================
 // Types
@@ -417,14 +418,27 @@ export function useClubguideMetrics() {
 
   useEffect(() => {
     const fetchMetrics = async () => {
+      console.log('[useClubguideMetrics] Starting fetchMetrics...');
       try {
-        // In production, fetch from Clubguide API
-        // For now, use demo data
-        await new Promise((resolve) => setTimeout(resolve, 500));
+        console.log('[useClubguideMetrics] Calling fetchClubguideMetrics server action...');
+        // Fetch real metrics using server action
+        const data = await fetchClubguideMetrics();
+        console.log('[useClubguideMetrics] Received data:', data);
 
+        setMetrics({
+          totalEvents: data.totalEvents || 0,
+          activeUsers: 0, // TODO: implement user metrics
+          liveNow: 0, // TODO: implement live user tracking
+          scrapersOk: data.scrapersOk || 0,
+          trends: data.trends || { totalEvents: 0, activeUsers: 0, liveNow: 0 },
+        });
+        console.log('[useClubguideMetrics] Metrics updated, setting loading to false');
+        setLoading(false);
+      } catch (err) {
+        console.error('[useClubguideMetrics] Error fetching Clubguide metrics:', err);
+        // Fallback to demo data
         const scrapers = generateDemoScraperStatus();
         const scrapersOk = scrapers.filter((s) => s.status === 'success' || s.status === 'idle').length;
-
         setMetrics({
           totalEvents: 1247,
           activeUsers: 3891,
@@ -436,9 +450,6 @@ export function useClubguideMetrics() {
             liveNow: 23.1,
           },
         });
-        setLoading(false);
-      } catch (err) {
-        console.error('Error fetching Clubguide metrics:', err);
         setError(err as Error);
         setLoading(false);
       }
@@ -467,11 +478,22 @@ export function useClubguideEvents(filters?: {
   const fetchEvents = useCallback(async () => {
     setLoading(true);
     try {
-      // Demo data
-      await new Promise((resolve) => setTimeout(resolve, 300));
-      let demoEvents = generateDemoEvents(50);
+      // Fetch real data using server action
+      const data = await fetchClubguideEvents({
+        status: filters?.status as any,
+        source: filters?.source,
+        search: filters?.search,
+        page: filters?.page,
+        limit: filters?.limit,
+      });
 
-      // Apply filters
+      setEvents(data.events || []);
+      setTotal(data.total || 0);
+      setLoading(false);
+    } catch (err) {
+      console.error('Error fetching events:', err);
+      // Fallback to demo data on error
+      let demoEvents = generateDemoEvents(50);
       if (filters?.status && filters.status !== 'all') {
         demoEvents = demoEvents.filter((e) => e.status === filters.status);
       }
@@ -487,17 +509,11 @@ export function useClubguideEvents(filters?: {
             e.venue_city?.toLowerCase().includes(search)
         );
       }
-
       setTotal(demoEvents.length);
-
-      // Pagination
       const page = filters?.page || 1;
       const limit = filters?.limit || 10;
       const start = (page - 1) * limit;
       setEvents(demoEvents.slice(start, start + limit));
-      setLoading(false);
-    } catch (err) {
-      console.error('Error fetching events:', err);
       setError(err as Error);
       setLoading(false);
     }
