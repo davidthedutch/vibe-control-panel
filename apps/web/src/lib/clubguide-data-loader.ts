@@ -1,12 +1,9 @@
-import * as fs from 'fs';
-import * as path from 'path';
+import eventsData from '@/data/events.json';
 
 // ====================================================================
 // Clubguide Data Loader
-// Direct data loading for clubguide (bypasses API routes)
+// Direct data loading for clubguide (uses bundled event data)
 // ====================================================================
-
-const ENRICHED_DATA_PATH = path.join('H:', 'Onedrive', 'PC-Rogier', 'Oud', 'Feesten', 'data', 'enriched_events_2026-02-08.json');
 
 interface EnrichedEvent {
   source: string;
@@ -25,74 +22,15 @@ interface EnrichedEvent {
   enrichedMatchScore?: number;
 }
 
-// Parse dates in format "8 feb" or "Sun, 8 Feb" to ISO date
-function parseEventDate(dateStr: string | Date | undefined): Date {
-  if (!dateStr) {
-    return new Date(); // Return current date as fallback
-  }
-
-  if (dateStr instanceof Date) {
-    return dateStr;
-  }
-
-  const year = 2026; // Events are from 2026
-
-  // Remove day name if present (e.g., "Sun, 8 Feb" -> "8 Feb")
-  const cleanDate = dateStr.replace(/^[A-Za-z]+,\s*/, '');
-
-  // Parse "8 feb" or "8 Feb" format
-  const monthNames = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
-  const parts = cleanDate.toLowerCase().split(/\s+/);
-
-  if (parts.length >= 2) {
-    const day = parseInt(parts[0]);
-    const monthIndex = monthNames.indexOf(parts[1].substring(0, 3));
-
-    if (monthIndex >= 0 && !isNaN(day)) {
-      return new Date(year, monthIndex, day);
-    }
-  }
-
-  // Fallback: try to parse as regular date
-  return new Date(dateStr);
-}
-
-interface EventData {
-  events: EnrichedEvent[];
-  metadata?: any;
-}
-
-let eventsCache: EnrichedEvent[] | null = null;
-let cacheTimestamp = 0;
-const CACHE_TTL = 60000; // 1 minute
-
 export function loadEnrichedEvents(): EnrichedEvent[] {
-  const now = Date.now();
-
-  // Return cached data if still valid
-  if (eventsCache && (now - cacheTimestamp) < CACHE_TTL) {
-    return eventsCache;
-  }
-
-  try {
-    const fileContent = fs.readFileSync(ENRICHED_DATA_PATH, 'utf-8');
-    const data: EventData = JSON.parse(fileContent);
-    eventsCache = data.events || [];
-    cacheTimestamp = now;
-
-    console.log(`[Clubguide] Loaded ${eventsCache.length} events from enriched data`);
-    return eventsCache;
-  } catch (error) {
-    console.error('[Clubguide] Error loading enriched events:', error);
-    return [];
-  }
+  return (eventsData.events || []) as EnrichedEvent[];
 }
 
 export function getClubguideMetrics() {
   const events = loadEnrichedEvents();
   const now = new Date();
 
-  const activeEvents = events.filter((e: EnrichedEvent) => parseEventDate(e.date as string) >= now);
+  const activeEvents = events.filter((e: EnrichedEvent) => new Date(e.date) >= now);
   const eventsWithArtists = events.filter((e: EnrichedEvent) => e.artists && e.artists.length > 0);
 
   const sourceCount = {
@@ -105,7 +43,7 @@ export function getClubguideMetrics() {
     totalEvents: events.length,
     activeEvents: activeEvents.length,
     eventsWithArtists: eventsWithArtists.length,
-    artistCoverage: ((eventsWithArtists.length / events.length) * 100).toFixed(1),
+    artistCoverage: events.length > 0 ? ((eventsWithArtists.length / events.length) * 100).toFixed(1) : '0',
     sources: sourceCount,
     scrapersOk: 3,
     trends: {
@@ -139,15 +77,17 @@ export function getClubguideEvents(filters: ClubguideFilters = {}) {
   if (status !== 'all') {
     const now = new Date();
     if (status === 'active') {
-      filteredEvents = filteredEvents.filter(e => parseEventDate(e.date as string) >= now);
+      filteredEvents = filteredEvents.filter(e => new Date(e.date) >= now);
     } else if (status === 'past') {
-      filteredEvents = filteredEvents.filter(e => parseEventDate(e.date as string) < now);
+      filteredEvents = filteredEvents.filter(e => new Date(e.date) < now);
     }
   }
 
-  // Source filter
+  // Source filter (map 'ra' to 'residentadvisor' for matching)
   if (source !== 'all') {
-    filteredEvents = filteredEvents.filter(e => e.source === source);
+    const sourceMap: Record<string, string> = { ra: 'residentadvisor' };
+    const mappedSource = sourceMap[source] || source;
+    filteredEvents = filteredEvents.filter(e => e.source === mappedSource || e.source === source);
   }
 
   // Search filter
@@ -161,9 +101,9 @@ export function getClubguideEvents(filters: ClubguideFilters = {}) {
     );
   }
 
-  // Sort by date (upcoming first for active, most recent first for past)
+  // Sort by date (upcoming first)
   filteredEvents = filteredEvents.sort((a, b) => {
-    return parseEventDate(b.date as string).getTime() - parseEventDate(a.date as string).getTime();
+    return new Date(b.date).getTime() - new Date(a.date).getTime();
   });
 
   const total = filteredEvents.length;
@@ -172,7 +112,7 @@ export function getClubguideEvents(filters: ClubguideFilters = {}) {
 
   // Convert to clubguide format
   const events = paginatedEvents.map((event, index) => {
-    const date = parseEventDate(event.date as string);
+    const date = new Date(event.date);
     const isActive = date >= new Date();
 
     return {
@@ -188,7 +128,7 @@ export function getClubguideEvents(filters: ClubguideFilters = {}) {
       genres: event.genres || [],
       going_count: event.artists?.length ? event.artists.length * 50 : 0,
       interested_count: event.artists?.length ? event.artists.length * 30 : 0,
-      source: event.source as 'ra' | 'partyflock' | 'djguide' | 'manual',
+      source: (event.source === 'residentadvisor' ? 'ra' : event.source) as 'ra' | 'partyflock' | 'djguide' | 'manual',
       status: isActive ? 'active' as const : 'past' as const,
       created_at: new Date().toISOString(),
       artists: event.artists || [],
