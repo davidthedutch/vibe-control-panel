@@ -1,14 +1,223 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Shield, Phone, Volume2, Coffee, Droplets, MapPin, Timer, Activity, AlertTriangle, Cigarette, Check, X } from 'lucide-react';
+import { Shield, Phone, Volume2, Coffee, Droplets, MapPin, Timer, Activity, AlertTriangle, Cigarette, Check, X, ArrowLeft, Mic, MicOff } from 'lucide-react';
 import { useBuddyPairs } from '@/lib/hooks/use-escal-data';
 import { usePersistedState } from './use-persisted-state';
 
-export default function ArsenalScreen() {
-  const { pairs, loading: pairsLoading } = useBuddyPairs();
+function SoundPage({ onBack }: { onBack: () => void }) {
+  // BPM tap
   const [bpmTaps, setBpmTaps] = useState<number[]>([]);
   const [bpmValue, setBpmValue] = useState<number | null>(null);
+
+  // BPM auto-detect via microphone
+  const [micActive, setMicActive] = useState(false);
+  const [autoBpm, setAutoBpm] = useState<number | null>(null);
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const analyserRef = useRef<AnalyserNode | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+  const rafRef = useRef<number | null>(null);
+  const peaksRef = useRef<number[]>([]);
+  const lastPeakRef = useRef(0);
+
+  // dB meter
+  const [dbLevel, setDbLevel] = usePersistedState('escal-arsenal-db', 92);
+  const [dbMeasuring, setDbMeasuring] = useState(false);
+
+  const handleBpmTap = () => {
+    const now = Date.now();
+    const newTaps = [...bpmTaps, now].filter((t) => now - t < 5000);
+    setBpmTaps(newTaps);
+    if (newTaps.length >= 3) {
+      const intervals = newTaps.slice(1).map((t, i) => t - newTaps[i]);
+      const avgInterval = intervals.reduce((a, b) => a + b, 0) / intervals.length;
+      setBpmValue(Math.round(60000 / avgInterval));
+    }
+  };
+
+  const handleBpmReset = () => {
+    setBpmTaps([]);
+    setBpmValue(null);
+  };
+
+  const startMic = useCallback(async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      streamRef.current = stream;
+      const audioContext = new AudioContext();
+      audioContextRef.current = audioContext;
+      const source = audioContext.createMediaStreamSource(stream);
+      const analyser = audioContext.createAnalyser();
+      analyser.fftSize = 2048;
+      source.connect(analyser);
+      analyserRef.current = analyser;
+      setMicActive(true);
+      peaksRef.current = [];
+      lastPeakRef.current = 0;
+
+      const dataArray = new Uint8Array(analyser.fftSize);
+      let prevEnergy = 0;
+
+      const detect = () => {
+        analyser.getByteTimeDomainData(dataArray);
+        // Calculate energy (RMS)
+        let sum = 0;
+        for (let i = 0; i < dataArray.length; i++) {
+          const v = (dataArray[i] - 128) / 128;
+          sum += v * v;
+        }
+        const energy = Math.sqrt(sum / dataArray.length);
+
+        // Peak detection with threshold
+        const now = Date.now();
+        if (energy > 0.15 && energy > prevEnergy * 1.3 && now - lastPeakRef.current > 200) {
+          lastPeakRef.current = now;
+          peaksRef.current = [...peaksRef.current.filter((t) => now - t < 8000), now];
+
+          if (peaksRef.current.length >= 4) {
+            const peaks = peaksRef.current;
+            const intervals = peaks.slice(1).map((t, i) => t - peaks[i]);
+            const avg = intervals.reduce((a, b) => a + b, 0) / intervals.length;
+            const detected = Math.round(60000 / avg);
+            if (detected >= 60 && detected <= 200) {
+              setAutoBpm(detected);
+            }
+          }
+        }
+        prevEnergy = energy;
+
+        // Also update dB from mic
+        const rms = Math.sqrt(sum / dataArray.length);
+        const dbFromMic = Math.round(20 * Math.log10(Math.max(rms, 0.0001)) + 90);
+        setDbLevel(Math.max(50, Math.min(120, dbFromMic)));
+
+        rafRef.current = requestAnimationFrame(detect);
+      };
+      detect();
+    } catch {
+      setMicActive(false);
+    }
+  }, [setDbLevel]);
+
+  const stopMic = useCallback(() => {
+    if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    if (streamRef.current) streamRef.current.getTracks().forEach((t) => t.stop());
+    if (audioContextRef.current) audioContextRef.current.close();
+    streamRef.current = null;
+    audioContextRef.current = null;
+    analyserRef.current = null;
+    setMicActive(false);
+  }, []);
+
+  useEffect(() => {
+    return () => { stopMic(); };
+  }, [stopMic]);
+
+  const handleMeasureDb = () => {
+    if (micActive) return; // mic already measuring live
+    setDbMeasuring(true);
+    const interval = setInterval(() => {
+      setDbLevel(Math.floor(75 + Math.random() * 30));
+    }, 200);
+    setTimeout(() => {
+      clearInterval(interval);
+      setDbMeasuring(false);
+      setDbLevel(Math.floor(80 + Math.random() * 25));
+    }, 2000);
+  };
+
+  const dbPercent = Math.min(100, Math.max(0, ((dbLevel - 50) / 70) * 100));
+  const dbColor = dbLevel >= 100 ? 'text-red-400' : dbLevel >= 85 ? 'text-orange-400' : 'text-green-400';
+  const displayBpm = autoBpm ?? bpmValue;
+
+  return (
+    <div className="flex flex-col gap-5 p-5">
+      <div className="flex items-center gap-3">
+        <button onClick={onBack} className="flex h-8 w-8 items-center justify-center rounded-full bg-white/[0.06] border border-white/[0.08]">
+          <ArrowLeft className="h-4 w-4 text-white" />
+        </button>
+        <h1 className="text-lg font-bold text-white">BPM &amp; Geluid</h1>
+      </div>
+
+      {/* Mic toggle */}
+      <button
+        onClick={micActive ? stopMic : startMic}
+        className={`flex items-center justify-center gap-2 rounded-[20px] py-3 text-sm font-semibold transition-colors ${
+          micActive
+            ? 'bg-orange-500 text-white'
+            : 'bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] text-slate-300'
+        }`}
+      >
+        {micActive ? <Mic className="h-4 w-4 animate-pulse" /> : <MicOff className="h-4 w-4" />}
+        {micActive ? 'Microfoon actief — luisteren...' : 'Start microfoon (auto BPM + dB)'}
+      </button>
+
+      {/* BPM display */}
+      <div className="rounded-[20px] bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] shadow-lg shadow-black/20 p-5 text-center">
+        <Activity className={`mx-auto mb-2 h-8 w-8 ${displayBpm ? 'text-orange-400' : 'text-slate-400'} ${micActive ? 'animate-pulse' : ''}`} />
+        <p className="text-4xl font-bold tabular-nums text-white">{displayBpm ?? '—'}</p>
+        <p className="text-xs text-slate-400 mt-1">BPM</p>
+        {micActive && autoBpm && (
+          <p className="mt-1 text-[10px] text-orange-400">Auto-detect via microfoon</p>
+        )}
+        {!micActive && (
+          <p className="mt-2 text-[10px] text-slate-500">Tik hieronder om handmatig te meten</p>
+        )}
+      </div>
+
+      {/* Tap button */}
+      <button
+        onClick={handleBpmTap}
+        className="rounded-[20px] bg-orange-500/10 border border-orange-500/20 py-4 text-center active:scale-95 transition-transform"
+      >
+        <p className="text-sm font-semibold text-orange-400">TAP</p>
+        {bpmTaps.length > 0 && bpmTaps.length < 3 && (
+          <p className="text-[10px] text-orange-300 mt-0.5">Blijf tikken... ({bpmTaps.length}/3)</p>
+        )}
+        {bpmValue && (
+          <p className="text-[10px] text-slate-400 mt-0.5">Handmatig: {bpmValue} BPM</p>
+        )}
+      </button>
+      {bpmValue && (
+        <button onClick={handleBpmReset} className="text-[10px] text-slate-500 underline text-center -mt-3">
+          Reset tap
+        </button>
+      )}
+
+      {/* dB Meter */}
+      <button
+        onClick={handleMeasureDb}
+        className="rounded-[20px] bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] shadow-lg shadow-black/20 p-4 text-left active:bg-white/[0.08]"
+      >
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center gap-2">
+            <Volume2 className={`h-5 w-5 ${dbColor} ${dbMeasuring || micActive ? 'animate-pulse' : ''}`} />
+            <span className="text-sm font-semibold text-white">Geluidsniveau</span>
+          </div>
+          <span className={`text-xl font-bold tabular-nums ${dbColor}`}>{dbLevel} dB</span>
+        </div>
+        <div className="h-3 overflow-hidden rounded-full bg-white/[0.06]">
+          <div
+            className="h-full rounded-full bg-gradient-to-r from-green-400 via-yellow-400 to-orange-500 transition-all duration-200"
+            style={{ width: `${dbPercent}%` }}
+          />
+        </div>
+        <div className="mt-2 flex items-center justify-between">
+          <span className="text-[10px] text-slate-500">
+            {micActive ? 'Live meting via microfoon' : dbMeasuring ? 'Meten...' : 'Tik om te meten'}
+          </span>
+          <span className={`text-[10px] font-medium ${dbLevel >= 85 ? 'text-orange-400' : 'text-green-400'}`}>
+            {dbLevel >= 100 ? 'Gevaarlijk — oordopjes!' : dbLevel >= 85 ? 'Luid — oordopjes aangeraden' : 'Veilig niveau'}
+          </span>
+        </div>
+      </button>
+    </div>
+  );
+}
+
+export default function ArsenalScreen() {
+  const { pairs, loading: pairsLoading } = useBuddyPairs();
+  const [showSoundPage, setShowSoundPage] = useState(false);
   const [timerSeconds, setTimerSeconds] = useState(0);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const timerActive = timerSeconds > 0;
@@ -17,8 +226,6 @@ export default function ArsenalScreen() {
   const [sosPressed, setSosPressed] = useState(false);
   const [safeHome, setSafeHome] = usePersistedState('escal-arsenal-safehome', false);
   const [activeQuickAction, setActiveQuickAction] = useState<string | null>(null);
-  const [dbLevel, setDbLevel] = usePersistedState('escal-arsenal-db', 92);
-  const [dbMeasuring, setDbMeasuring] = useState(false);
 
   const startTimer = useCallback((minutes: number) => {
     timerStartMinRef.current = minutes;
@@ -39,7 +246,6 @@ export default function ArsenalScreen() {
         clearInterval(timerRef.current);
         timerRef.current = null;
       }
-      // Timer completed — add to history if it was started (not just init)
       if (timerStartMinRef.current > 0) {
         const now = new Date();
         const time = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
@@ -71,72 +277,20 @@ export default function ArsenalScreen() {
 
   const timerProgress = timerSeconds > 0 ? ((timerSeconds % 60) / 60) * 100 : 0;
 
-  const activePairs = pairs.filter((p) => p.status === 'active');
   const alertPairs = pairs.filter((p) => p.status === 'alert');
-
-  const handleBpmTap = () => {
-    const now = Date.now();
-    const newTaps = [...bpmTaps, now].filter((t) => now - t < 5000);
-    setBpmTaps(newTaps);
-    if (newTaps.length >= 3) {
-      const intervals = newTaps.slice(1).map((t, i) => t - newTaps[i]);
-      const avgInterval = intervals.reduce((a, b) => a + b, 0) / intervals.length;
-      setBpmValue(Math.round(60000 / avgInterval));
-    }
-  };
-
-  const handleBpmReset = () => {
-    setBpmTaps([]);
-    setBpmValue(null);
-  };
-
-  const handleMeasureDb = () => {
-    setDbMeasuring(true);
-    // Simulate measuring with random fluctuation
-    const interval = setInterval(() => {
-      setDbLevel(Math.floor(75 + Math.random() * 30));
-    }, 200);
-    setTimeout(() => {
-      clearInterval(interval);
-      setDbMeasuring(false);
-      setDbLevel(Math.floor(80 + Math.random() * 25));
-    }, 2000);
-  };
 
   const handleQuickAction = (label: string) => {
     setActiveQuickAction(label);
     setTimeout(() => setActiveQuickAction(null), 2000);
   };
 
-  const dbPercent = Math.min(100, Math.max(0, ((dbLevel - 50) / 70) * 100));
-  const dbColor = dbLevel >= 100 ? 'text-red-400' : dbLevel >= 85 ? 'text-orange-400' : 'text-green-400';
+  if (showSoundPage) {
+    return <SoundPage onBack={() => setShowSoundPage(false)} />;
+  }
 
   return (
     <div className="flex flex-col gap-5 p-5">
       <h1 className="text-lg font-bold text-white">Arsenal</h1>
-
-      {/* BPM Meter */}
-      <div className="rounded-[20px] bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] shadow-lg shadow-black/20 p-4 text-center">
-        <button
-          onClick={handleBpmTap}
-          className="w-full active:scale-95 transition-transform"
-        >
-          <Activity className={`mx-auto mb-2 h-6 w-6 ${bpmValue ? 'text-orange-400' : 'text-slate-400'}`} />
-          <p className="text-2xl font-bold text-white">{bpmValue ?? '—'}</p>
-          <p className="text-[10px] text-slate-400">BPM — Tik om te meten</p>
-          {bpmTaps.length > 0 && bpmTaps.length < 3 && (
-            <p className="mt-1 text-[10px] text-orange-400">Blijf tikken... ({bpmTaps.length}/3)</p>
-          )}
-        </button>
-        {bpmValue && (
-          <button
-            onClick={handleBpmReset}
-            className="mt-2 text-[10px] text-slate-500 underline"
-          >
-            Reset
-          </button>
-        )}
-      </div>
 
       {/* Timer */}
       <div className="rounded-[20px] bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] shadow-lg shadow-black/20 p-3">
@@ -177,7 +331,6 @@ export default function ArsenalScreen() {
             Stop timer
           </button>
         )}
-        {/* Timer historie */}
         {timerHistory.length > 0 && (
           <div className="mt-2 border-t border-white/[0.06] pt-2">
             <div className="flex items-center justify-between mb-1">
@@ -283,29 +436,6 @@ export default function ArsenalScreen() {
         </div>
       </div>
 
-      {/* dB Meter */}
-      <button
-        onClick={handleMeasureDb}
-        className="rounded-[20px] bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] shadow-lg shadow-black/20 p-3 text-left active:bg-white/[0.08]"
-      >
-        <div className="flex items-center justify-between mb-2">
-          <div className="flex items-center gap-2">
-            <Volume2 className={`h-4 w-4 ${dbColor} ${dbMeasuring ? 'animate-pulse' : ''}`} />
-            <span className="text-xs font-semibold text-white">dB Meter</span>
-          </div>
-          <span className={`text-sm font-bold ${dbColor}`}>{dbLevel} dB</span>
-        </div>
-        <div className="h-2 overflow-hidden rounded-full bg-white/[0.06]">
-          <div
-            className="h-full rounded-full bg-gradient-to-r from-green-400 via-yellow-400 to-orange-500 transition-all duration-200"
-            style={{ width: `${dbPercent}%` }}
-          />
-        </div>
-        <p className="mt-1 text-[10px] text-slate-500">
-          {dbMeasuring ? 'Meten...' : 'Tik om opnieuw te meten — oordopjes boven 85 dB'}
-        </p>
-      </button>
-
       {/* Quick Actions Grid */}
       <div className="grid grid-cols-4 gap-2">
         {[
@@ -347,6 +477,16 @@ export default function ArsenalScreen() {
       >
         {safeHome ? <Check className="h-4 w-4" /> : <Shield className="h-4 w-4" />}
         {safeHome ? 'Veilig thuis gemeld!' : 'Ik ben veilig thuis'}
+      </button>
+
+      {/* BPM & dB knop — navigeert naar sound page */}
+      <button
+        onClick={() => setShowSoundPage(true)}
+        className="flex items-center justify-center gap-3 rounded-[20px] bg-gradient-to-r from-orange-500/20 to-purple-500/20 backdrop-blur-xl border border-orange-500/20 py-3.5 active:from-orange-500/30 active:to-purple-500/30"
+      >
+        <Activity className="h-5 w-5 text-orange-400" />
+        <span className="text-sm font-semibold text-white">BPM &amp; Geluid Meten</span>
+        <Volume2 className="h-5 w-5 text-purple-400" />
       </button>
     </div>
   );
