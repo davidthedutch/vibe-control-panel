@@ -159,7 +159,7 @@ export default function PreviewPage() {
 
       {/* Preview area */}
       <div className="flex flex-1 items-center justify-center overflow-auto bg-slate-100 p-8 dark:bg-slate-900/50">
-        <EscalAppPreview device={device} user={activeUser} />
+        <EscalAppPreview device={device} user={activeUser} onLogin={setActiveUser} />
       </div>
     </div>
   );
