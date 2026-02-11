@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Zap, Calendar, Shield, MessageCircle, Lock } from 'lucide-react';
+import { Zap, Calendar, Shield, MessageCircle, Lock, Hash, UserPlus, LogIn } from 'lucide-react';
 import HomeScreen from './escal-screens/HomeScreen';
 import EventDetailScreen from './escal-screens/EventDetailScreen';
 import ArenaScreen from './escal-screens/ArenaScreen';
@@ -15,7 +15,7 @@ type DeviceMode = 'iphone' | 'ipad';
 
 interface EscalAppPreviewProps {
   device: DeviceMode;
-  user: PreviewUser;
+  user: PreviewUser | null;
 }
 
 const DEVICE_DIMENSIONS = {
@@ -51,6 +51,8 @@ export default function EscalAppPreview({ device, user }: EscalAppPreviewProps) 
   ];
 
   const renderScreen = () => {
+    if (!user) return null;
+
     if (activeTab === 'events' && selectedEventId) {
       return <EventDetailScreen eventId={selectedEventId} onBack={handleBackFromEvent} user={user} />;
     }
@@ -98,44 +100,114 @@ export default function EscalAppPreview({ device, user }: EscalAppPreviewProps) 
           </div>
         </div>
 
-        {/* App content - scrollable */}
-        <div
-          className="scrollbar-hide overflow-y-auto overflow-x-hidden bg-[#1A1D23]"
-          style={{ height: dims.height - 44 - 56 }}
-        >
-          {renderScreen()}
-        </div>
+        {user === null ? (
+          <>
+            {/* Login screen */}
+            <div
+              className="flex flex-col items-center justify-between bg-[#1A1D23] px-8 py-10"
+              style={{ height: dims.height - 44 }}
+            >
+              {/* Top: branding */}
+              <div className="flex flex-col items-center gap-3 pt-8">
+                <div className="flex h-20 w-20 items-center justify-center rounded-[22px] bg-gradient-to-br from-orange-500 to-orange-600 shadow-lg shadow-orange-500/30">
+                  <Shield className="h-10 w-10 text-white" />
+                </div>
+                <div className="text-center">
+                  <h1 className="text-xl font-bold text-white">Escalatie Guide</h1>
+                  <p className="mt-1 text-xs text-slate-400">Veilig samen uit, veilig samen thuis</p>
+                </div>
+              </div>
 
-        {/* Bottom tab bar */}
-        <div className="absolute bottom-0 left-0 right-0 z-10 border-t border-white/[0.08] bg-[#1A1D23]/95 backdrop-blur-lg">
-          <div className="flex items-center justify-around px-2 pb-4 pt-1.5">
-            {tabs.map((tab) => {
-              const isActive = activeTab === tab.id;
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => handleTabChange(tab.id)}
-                  className="flex flex-col items-center gap-0.5 px-3 py-1"
-                >
-                  <tab.icon
-                    className={`h-4 w-4 ${isActive ? 'text-orange-400' : 'text-slate-500'}`}
+              {/* Middle: login form */}
+              <div className="flex w-full flex-col gap-3">
+                <div className="rounded-[16px] bg-white/[0.06] border border-white/[0.08] px-4 py-3">
+                  <label className="text-[10px] font-medium text-slate-400">Gebruikersnaam</label>
+                  <input
+                    type="text"
+                    placeholder="bijv. DJFan"
+                    className="mt-1 w-full bg-transparent text-sm text-white placeholder-slate-600 outline-none"
+                    readOnly
                   />
-                  <span
-                    className={`text-[9px] font-medium ${
-                      isActive ? 'text-orange-400' : 'text-slate-500'
-                    }`}
-                  >
-                    {tab.label}
-                  </span>
+                </div>
+                <div className="rounded-[16px] bg-white/[0.06] border border-white/[0.08] px-4 py-3">
+                  <label className="text-[10px] font-medium text-slate-400">Wachtwoord</label>
+                  <input
+                    type="password"
+                    placeholder="••••••••"
+                    className="mt-1 w-full bg-transparent text-sm text-white placeholder-slate-600 outline-none"
+                    readOnly
+                  />
+                </div>
+                <button className="mt-1 flex w-full items-center justify-center gap-2 rounded-[16px] bg-orange-500 py-3.5 text-sm font-semibold text-white shadow-lg shadow-orange-500/20">
+                  <LogIn className="h-4 w-4" />
+                  Inloggen
                 </button>
-              );
-            })}
-          </div>
-          {/* Home indicator */}
-          <div className="flex justify-center pb-1">
-            <div className="h-1 w-32 rounded-full bg-slate-600" />
-          </div>
-        </div>
+                <div className="flex items-center gap-3 my-1">
+                  <div className="h-px flex-1 bg-white/[0.08]" />
+                  <span className="text-[10px] text-slate-500">of</span>
+                  <div className="h-px flex-1 bg-white/[0.08]" />
+                </div>
+                <button className="flex w-full items-center justify-center gap-2 rounded-[16px] bg-white/[0.06] border border-white/[0.08] py-3 text-sm font-semibold text-slate-300">
+                  <Hash className="h-4 w-4 text-orange-400" />
+                  Inloggen met code
+                </button>
+              </div>
+
+              {/* Bottom: register */}
+              <div className="flex flex-col items-center gap-3 pb-4">
+                <button className="flex items-center gap-2 rounded-[16px] border border-orange-500/20 bg-orange-500/10 px-6 py-2.5 text-xs font-semibold text-orange-300">
+                  <UserPlus className="h-3.5 w-3.5" />
+                  Account aanmaken
+                </button>
+                <p className="text-center text-[10px] text-slate-600 leading-relaxed">
+                  Door in te loggen ga je akkoord met onze<br />
+                  <span className="text-slate-400">Voorwaarden</span> en <span className="text-slate-400">Privacybeleid</span>
+                </p>
+              </div>
+            </div>
+          </>
+        ) : (
+          <>
+            {/* App content - scrollable */}
+            <div
+              className="scrollbar-hide overflow-y-auto overflow-x-hidden bg-[#1A1D23]"
+              style={{ height: dims.height - 44 - 56 }}
+            >
+              {renderScreen()}
+            </div>
+
+            {/* Bottom tab bar */}
+            <div className="absolute bottom-0 left-0 right-0 z-10 border-t border-white/[0.08] bg-[#1A1D23]/95 backdrop-blur-lg">
+              <div className="flex items-center justify-around px-2 pb-4 pt-1.5">
+                {tabs.map((tab) => {
+                  const isActive = activeTab === tab.id;
+                  return (
+                    <button
+                      key={tab.id}
+                      onClick={() => handleTabChange(tab.id)}
+                      className="flex flex-col items-center gap-0.5 px-3 py-1"
+                    >
+                      <tab.icon
+                        className={`h-4 w-4 ${isActive ? 'text-orange-400' : 'text-slate-500'}`}
+                      />
+                      <span
+                        className={`text-[9px] font-medium ${
+                          isActive ? 'text-orange-400' : 'text-slate-500'
+                        }`}
+                      >
+                        {tab.label}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+              {/* Home indicator */}
+              <div className="flex justify-center pb-1">
+                <div className="h-1 w-32 rounded-full bg-slate-600" />
+              </div>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
