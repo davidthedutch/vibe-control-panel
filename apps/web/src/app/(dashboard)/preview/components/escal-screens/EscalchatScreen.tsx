@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Search, Send, Hash, Users, ChevronDown, ChevronUp, UserCheck, UserPlus, UserMinus, ArrowLeft, Circle, X, MessageSquare, Lock, Plus } from 'lucide-react';
+import { Search, Send, Hash, Users, ChevronDown, ChevronUp, UserCheck, UserPlus, UserMinus, ArrowLeft, Circle, X, MessageSquare, Lock, Plus, Timer, Droplets, Wine } from 'lucide-react';
 import { usePersistedState } from './use-persisted-state';
 import type { PreviewUser } from '../../page';
 
@@ -79,6 +79,57 @@ const INITIAL_ROOM_MESSAGES: Record<string, { id: string; user: string; text: st
   ],
 };
 
+// Demo consumptie-timers per persoon (minutesAgo = hoe lang geleden)
+const DEMO_MEMBER_TIMERS: Record<string, { type: 'drank' | 'water'; minutesAgo: number }[]> = {
+  DJFan: [
+    { type: 'water', minutesAgo: 10 },
+    { type: 'drank', minutesAgo: 25 },
+    { type: 'drank', minutesAgo: 85 },
+  ],
+  Rave: [
+    { type: 'drank', minutesAgo: 12 },
+    { type: 'drank', minutesAgo: 55 },
+  ],
+  Bass: [
+    { type: 'drank', minutesAgo: 120 },
+    { type: 'water', minutesAgo: 45 },
+  ],
+  Techno: [
+    { type: 'drank', minutesAgo: 40 },
+    { type: 'water', minutesAgo: 15 },
+    { type: 'drank', minutesAgo: 95 },
+  ],
+  Night: [
+    { type: 'water', minutesAgo: 5 },
+    { type: 'drank', minutesAgo: 70 },
+  ],
+  Flux: [
+    { type: 'drank', minutesAgo: 8 },
+    { type: 'drank', minutesAgo: 30 },
+    { type: 'drank', minutesAgo: 52 },
+  ],
+  Echo: [],
+  Venom: [
+    { type: 'drank', minutesAgo: 18 },
+    { type: 'water', minutesAgo: 35 },
+  ],
+  Pulse: [
+    { type: 'water', minutesAgo: 8 },
+  ],
+  Storm: [
+    { type: 'drank', minutesAgo: 60 },
+    { type: 'water', minutesAgo: 20 },
+  ],
+};
+
+const formatTimeAgo = (minutesAgo: number) => {
+  if (minutesAgo < 1) return 'Zojuist';
+  if (minutesAgo < 60) return `${minutesAgo}m`;
+  const hours = Math.floor(minutesAgo / 60);
+  const mins = minutesAgo % 60;
+  return mins > 0 ? `${hours}u${mins}m` : `${hours}u`;
+};
+
 type FriendsChat = { type: 'group'; id: string } | { type: 'dm'; name: string };
 
 interface EscalchatScreenProps {
@@ -101,6 +152,7 @@ export default function EscalchatScreen({ user }: EscalchatScreenProps) {
   const [createMode, setCreateMode] = useState<'menu' | 'group' | 'dm' | 'search'>('menu');
   const [newGroupName, setNewGroupName] = useState('');
   const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
+  const [membersExpanded, setMembersExpanded] = useState(true);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -573,6 +625,121 @@ export default function EscalchatScreen({ user }: EscalchatScreenProps) {
             </button>
           </div>
         </div>
+
+        {/* Groepsleden & Timers — alleen in groepschat */}
+        {!isDM && (() => {
+          const group = friendGroups.find((g) => g.id === activeFriendsChat.id);
+          if (!group) return null;
+          const drinkCount = (name: string) => (DEMO_MEMBER_TIMERS[name] || []).filter(t => t.type === 'drank').length;
+          const lastDrinkAgo = (name: string) => {
+            const timers = (DEMO_MEMBER_TIMERS[name] || []).filter(t => t.type === 'drank');
+            return timers.length > 0 ? timers[0].minutesAgo : null;
+          };
+          const drinkWarning = (minutesAgo: number | null) => {
+            if (minutesAgo === null) return 'none';
+            if (minutesAgo < 20) return 'red';
+            if (minutesAgo < 45) return 'orange';
+            return 'green';
+          };
+          return (
+            <div className="rounded-[20px] bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] shadow-lg shadow-black/20 overflow-hidden">
+              <button
+                onClick={() => setMembersExpanded(!membersExpanded)}
+                className="w-full flex items-center justify-between px-3 py-2.5"
+              >
+                <h3 className="flex items-center gap-1.5 text-[11px] font-semibold text-slate-400">
+                  <Users className="h-3 w-3" />
+                  Leden & Timers ({group.members.length})
+                </h3>
+                {membersExpanded ? (
+                  <ChevronUp className="h-3.5 w-3.5 text-slate-500" />
+                ) : (
+                  <ChevronDown className="h-3.5 w-3.5 text-slate-500" />
+                )}
+              </button>
+              {membersExpanded && (
+                <div className="px-3 pb-3 flex flex-col gap-2">
+                  {group.members.map((memberName) => {
+                    const person = DEMO_PEOPLE.find((p) => p.name === memberName);
+                    const timers = DEMO_MEMBER_TIMERS[memberName] || [];
+                    const warning = drinkWarning(lastDrinkAgo(memberName));
+                    const drinks = drinkCount(memberName);
+                    return (
+                      <div
+                        key={memberName}
+                        className="rounded-[14px] bg-white/[0.04] border border-white/[0.06] px-3 py-2"
+                      >
+                        <div className="flex items-center gap-2 mb-1.5">
+                          <div className="relative">
+                            <div className="flex h-7 w-7 items-center justify-center rounded-full bg-orange-500/20 text-[9px] font-bold text-orange-300">
+                              {person?.initials || memberName.slice(0, 2)}
+                            </div>
+                            {person?.online && (
+                              <div className="absolute -bottom-px -right-px h-1.5 w-1.5 rounded-full bg-green-400" />
+                            )}
+                          </div>
+                          <div className="flex-1">
+                            <button
+                              onClick={() => setSelectedProfile(memberName)}
+                              className="text-[11px] font-semibold text-white active:underline"
+                            >
+                              {memberName}
+                            </button>
+                          </div>
+                          {drinks > 0 && (
+                            <div className={`flex items-center gap-1 rounded-full px-1.5 py-0.5 ${
+                              warning === 'red' ? 'bg-red-500/15 border border-red-500/20' :
+                              warning === 'orange' ? 'bg-orange-500/15 border border-orange-500/20' :
+                              'bg-green-500/10 border border-green-500/15'
+                            }`}>
+                              <Wine className={`h-2.5 w-2.5 ${
+                                warning === 'red' ? 'text-red-400' :
+                                warning === 'orange' ? 'text-orange-400' :
+                                'text-green-400'
+                              }`} />
+                              <span className={`text-[9px] font-bold ${
+                                warning === 'red' ? 'text-red-400' :
+                                warning === 'orange' ? 'text-orange-400' :
+                                'text-green-400'
+                              }`}>{drinks}x</span>
+                            </div>
+                          )}
+                        </div>
+                        {timers.length > 0 ? (
+                          <div className="flex flex-wrap gap-1">
+                            {timers.map((timer, i) => (
+                              <div
+                                key={i}
+                                className={`flex items-center gap-1 rounded-full px-1.5 py-0.5 text-[9px] ${
+                                  timer.type === 'drank'
+                                    ? timer.minutesAgo < 20
+                                      ? 'bg-red-500/10 text-red-300'
+                                      : timer.minutesAgo < 45
+                                        ? 'bg-orange-500/10 text-orange-300'
+                                        : 'bg-white/[0.04] text-slate-400'
+                                    : 'bg-blue-500/10 text-blue-300'
+                                }`}
+                              >
+                                {timer.type === 'drank' ? (
+                                  <Wine className="h-2.5 w-2.5" />
+                                ) : (
+                                  <Droplets className="h-2.5 w-2.5" />
+                                )}
+                                <span>{formatTimeAgo(timer.minutesAgo)}</span>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <p className="text-[9px] text-slate-600">Geen timers</p>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          );
+        })()}
       </div>
     );
   }
