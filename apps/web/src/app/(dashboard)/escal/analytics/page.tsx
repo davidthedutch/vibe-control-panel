@@ -18,6 +18,7 @@ import {
   UserPlus,
   Heart,
   CheckCircle,
+  ShieldCheck,
 } from 'lucide-react';
 import { useEscalAnalytics } from '@/lib/hooks/use-escal-data';
 
@@ -31,6 +32,7 @@ const subNavItems = [
   { label: 'Users', href: '/escal/users', icon: Users },
   { label: 'Live', href: '/escal/live', icon: Radio },
   { label: 'Scrapers', href: '/escal/scrapers', icon: Bot },
+  { label: 'Verificatie', href: '/escal/scrapers/verificatie', icon: ShieldCheck },
   { label: 'Analytics', href: '/escal/analytics', icon: TrendingUp },
 ];
 

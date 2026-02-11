@@ -140,6 +140,31 @@ export interface AnalyticsData {
   checkinsHeatmap: { day: number; hour: number; count: number }[];
 }
 
+export interface SourceData {
+  name: string;
+  date: string;
+  venue: string;
+  lineup: string[];
+  stages: string[];
+  extraInfo: string;
+  website: string;
+  instagram: string;
+  facebook: string;
+}
+
+export interface ScrapedEventComparison {
+  id: string;
+  sources: {
+    ra?: SourceData;
+    djguide?: SourceData;
+    partyflock?: SourceData;
+  };
+  eigen: Partial<SourceData>;
+  conclusie: SourceData;
+  matchScore: number;
+  status: 'nieuw' | 'conflict' | 'geverifieerd';
+}
+
 export interface EscalSettings {
   scraperIntervals: {
     ra: string;
@@ -935,4 +960,486 @@ export function useTopEvents() {
   }, []);
 
   return { events, loading };
+}
+
+// ============================================================================
+// Scraped Event Verification
+// ============================================================================
+
+function generateDemoVerificationData(): ScrapedEventComparison[] {
+  const events: ScrapedEventComparison[] = [
+    {
+      id: 'verify-1',
+      sources: {
+        ra: {
+          name: 'Awakenings New Year Special',
+          date: '2026-02-14',
+          venue: 'Gashouder',
+          lineup: ['Adam Beyer', 'Amelie Lens', 'Enrico Sangiuliano'],
+          stages: ['Main', 'Tent'],
+          extraInfo: '18+, Techno',
+          website: 'https://ra.co/events/awakenings-nye',
+          instagram: '@awaborig',
+          facebook: 'fb.com/awakenings',
+        },
+        djguide: {
+          name: 'Awakenings NYE Special',
+          date: '2026-02-14',
+          venue: 'Gashouder Amsterdam',
+          lineup: ['Adam Beyer', 'Amelie Lens'],
+          stages: [],
+          extraInfo: 'Techno',
+          website: 'https://djguide.nl/awakenings',
+          instagram: '',
+          facebook: '',
+        },
+        partyflock: {
+          name: 'Awakenings - New Year Special 2026',
+          date: '14-02-2026',
+          venue: 'Gashouder',
+          lineup: ['Adam Beyer', 'Amelie Lens', 'Enrico Sangiuliano', 'Charlotte de Witte'],
+          stages: ['Main'],
+          extraInfo: '',
+          website: 'https://partyflock.nl/party/awakenings-nye',
+          instagram: '@awaborig',
+          facebook: '',
+        },
+      },
+      eigen: {},
+      conclusie: {
+        name: 'Awakenings New Year Special',
+        date: '2026-02-14',
+        venue: 'Gashouder',
+        lineup: ['Adam Beyer', 'Amelie Lens', 'Enrico Sangiuliano', 'Charlotte de Witte'],
+        stages: ['Main', 'Tent'],
+        extraInfo: '18+, Techno',
+        website: 'https://ra.co/events/awakenings-nye',
+        instagram: '@awaborig',
+        facebook: 'fb.com/awakenings',
+      },
+      matchScore: 92,
+      status: 'conflict',
+    },
+    {
+      id: 'verify-2',
+      sources: {
+        ra: {
+          name: 'Verknipt Indoor',
+          date: '2026-02-21',
+          venue: 'Jaarbeurs Utrecht',
+          lineup: ['Reinier Zonneveld', 'I Hate Models', 'FJAAK'],
+          stages: ['Hall 1', 'Hall 2'],
+          extraInfo: '18+, Techno, Hard Techno',
+          website: 'https://ra.co/events/verknipt-indoor',
+          instagram: '@verknipt',
+          facebook: 'fb.com/verknipt',
+        },
+        partyflock: {
+          name: 'Verknipt Indoor',
+          date: '21-02-2026',
+          venue: 'Jaarbeurs',
+          lineup: ['Reinier Zonneveld', 'I Hate Models', 'FJAAK'],
+          stages: ['Hall 1', 'Hall 2'],
+          extraInfo: 'Hard Techno',
+          website: 'https://partyflock.nl/party/verknipt',
+          instagram: '@verknipt',
+          facebook: '',
+        },
+      },
+      eigen: {},
+      conclusie: {
+        name: 'Verknipt Indoor',
+        date: '2026-02-21',
+        venue: 'Jaarbeurs Utrecht',
+        lineup: ['Reinier Zonneveld', 'I Hate Models', 'FJAAK'],
+        stages: ['Hall 1', 'Hall 2'],
+        extraInfo: '18+, Techno, Hard Techno',
+        website: 'https://ra.co/events/verknipt-indoor',
+        instagram: '@verknipt',
+        facebook: 'fb.com/verknipt',
+      },
+      matchScore: 97,
+      status: 'geverifieerd',
+    },
+    {
+      id: 'verify-3',
+      sources: {
+        ra: {
+          name: 'DGTL Amsterdam 2026',
+          date: '2026-03-28',
+          venue: 'NDSM Werf',
+          lineup: ['Dixon', 'Nina Kraviz', 'Ben Klock', 'Tale Of Us'],
+          stages: ['Main', 'Frequency', 'Gain'],
+          extraInfo: '18+, Techno, House',
+          website: 'https://ra.co/events/dgtl-2026',
+          instagram: '@dgtl',
+          facebook: 'fb.com/dgtlfestival',
+        },
+        djguide: {
+          name: 'DGTL Festival 2026',
+          date: '2026-03-28',
+          venue: 'NDSM',
+          lineup: ['Dixon', 'Nina Kraviz'],
+          stages: ['Main'],
+          extraInfo: 'Techno',
+          website: 'https://djguide.nl/dgtl',
+          instagram: '',
+          facebook: '',
+        },
+        partyflock: {
+          name: 'DGTL 2026',
+          date: '28-03-2026',
+          venue: 'NDSM-werf Amsterdam',
+          lineup: ['Dixon', 'Nina Kraviz', 'Ben Klock', 'Tale Of Us', 'Maceo Plex'],
+          stages: ['Main', 'Frequency', 'Gain'],
+          extraInfo: '',
+          website: 'https://partyflock.nl/party/dgtl-2026',
+          instagram: '@dgtl',
+          facebook: 'fb.com/dgtlfestival',
+        },
+      },
+      eigen: {},
+      conclusie: {
+        name: 'DGTL Amsterdam 2026',
+        date: '2026-03-28',
+        venue: 'NDSM Werf',
+        lineup: ['Dixon', 'Nina Kraviz', 'Ben Klock', 'Tale Of Us', 'Maceo Plex'],
+        stages: ['Main', 'Frequency', 'Gain'],
+        extraInfo: '18+, Techno, House',
+        website: 'https://ra.co/events/dgtl-2026',
+        instagram: '@dgtl',
+        facebook: 'fb.com/dgtlfestival',
+      },
+      matchScore: 88,
+      status: 'conflict',
+    },
+    {
+      id: 'verify-4',
+      sources: {
+        ra: {
+          name: 'Loveland Festival',
+          date: '2026-04-11',
+          venue: 'Sloterpark Amsterdam',
+          lineup: ['Solomun', 'Jamie Jones', 'The Martinez Brothers'],
+          stages: ['Stage 1', 'Stage 2', 'Stage 3'],
+          extraInfo: '18+, House, Tech House',
+          website: 'https://ra.co/events/loveland',
+          instagram: '@lovelandfestival',
+          facebook: 'fb.com/loveland',
+        },
+      },
+      eigen: {},
+      conclusie: {
+        name: 'Loveland Festival',
+        date: '2026-04-11',
+        venue: 'Sloterpark Amsterdam',
+        lineup: ['Solomun', 'Jamie Jones', 'The Martinez Brothers'],
+        stages: ['Stage 1', 'Stage 2', 'Stage 3'],
+        extraInfo: '18+, House, Tech House',
+        website: 'https://ra.co/events/loveland',
+        instagram: '@lovelandfestival',
+        facebook: 'fb.com/loveland',
+      },
+      matchScore: 100,
+      status: 'nieuw',
+    },
+    {
+      id: 'verify-5',
+      sources: {
+        djguide: {
+          name: 'Straf_werk',
+          date: '2026-03-07',
+          venue: 'Warehouse Elementenstraat',
+          lineup: ['Kobosil', 'SPFDJ', 'Blawan'],
+          stages: ['Main', 'Dark Room'],
+          extraInfo: 'Techno',
+          website: 'https://djguide.nl/strafwerk',
+          instagram: '@straf_werk',
+          facebook: '',
+        },
+        partyflock: {
+          name: 'STRAF_WERK',
+          date: '07-03-2026',
+          venue: 'Warehouse Elementenstraat',
+          lineup: ['Kobosil', 'SPFDJ', 'Blawan', 'Rebekah'],
+          stages: ['Main', 'Dark Room'],
+          extraInfo: 'Industrial Techno',
+          website: 'https://partyflock.nl/party/strafwerk',
+          instagram: '@straf_werk',
+          facebook: 'fb.com/strafwerk',
+        },
+      },
+      eigen: {},
+      conclusie: {
+        name: 'STRAF_WERK',
+        date: '2026-03-07',
+        venue: 'Warehouse Elementenstraat',
+        lineup: ['Kobosil', 'SPFDJ', 'Blawan', 'Rebekah'],
+        stages: ['Main', 'Dark Room'],
+        extraInfo: 'Industrial Techno',
+        website: 'https://partyflock.nl/party/strafwerk',
+        instagram: '@straf_werk',
+        facebook: 'fb.com/strafwerk',
+      },
+      matchScore: 94,
+      status: 'nieuw',
+    },
+    {
+      id: 'verify-6',
+      sources: {
+        ra: {
+          name: 'Katharsis at Shelter',
+          date: '2026-02-28',
+          venue: 'Shelter Amsterdam',
+          lineup: ['DVS1', 'Surgeon', 'Ancient Methods'],
+          stages: ['Main'],
+          extraInfo: '18+, Industrial Techno',
+          website: 'https://ra.co/events/katharsis',
+          instagram: '@shelter.ams',
+          facebook: '',
+        },
+        partyflock: {
+          name: 'Katharsis',
+          date: '28-02-2026',
+          venue: 'Shelter',
+          lineup: ['DVS1', 'Surgeon'],
+          stages: [],
+          extraInfo: '',
+          website: 'https://partyflock.nl/party/katharsis',
+          instagram: '',
+          facebook: '',
+        },
+      },
+      eigen: {},
+      conclusie: {
+        name: 'Katharsis at Shelter',
+        date: '2026-02-28',
+        venue: 'Shelter Amsterdam',
+        lineup: ['DVS1', 'Surgeon', 'Ancient Methods'],
+        stages: ['Main'],
+        extraInfo: '18+, Industrial Techno',
+        website: 'https://ra.co/events/katharsis',
+        instagram: '@shelter.ams',
+        facebook: '',
+      },
+      matchScore: 85,
+      status: 'conflict',
+    },
+    {
+      id: 'verify-7',
+      sources: {
+        ra: {
+          name: 'Thuishaven Season Opening',
+          date: '2026-04-04',
+          venue: 'Thuishaven Amsterdam',
+          lineup: ['Job Jobse', 'Carista', 'Dekmantel Soundsystem'],
+          stages: ['Outdoor', 'Indoor', 'Greenhouse'],
+          extraInfo: 'House, Disco, Leftfield',
+          website: 'https://ra.co/events/thuishaven-opening',
+          instagram: '@thuishaven',
+          facebook: 'fb.com/thuishaven',
+        },
+        djguide: {
+          name: 'Thuishaven Opening 2026',
+          date: '2026-04-04',
+          venue: 'Thuishaven',
+          lineup: ['Job Jobse', 'Carista'],
+          stages: ['Outdoor'],
+          extraInfo: 'House',
+          website: 'https://djguide.nl/thuishaven',
+          instagram: '',
+          facebook: '',
+        },
+      },
+      eigen: {},
+      conclusie: {
+        name: 'Thuishaven Season Opening',
+        date: '2026-04-04',
+        venue: 'Thuishaven Amsterdam',
+        lineup: ['Job Jobse', 'Carista', 'Dekmantel Soundsystem'],
+        stages: ['Outdoor', 'Indoor', 'Greenhouse'],
+        extraInfo: 'House, Disco, Leftfield',
+        website: 'https://ra.co/events/thuishaven-opening',
+        instagram: '@thuishaven',
+        facebook: 'fb.com/thuishaven',
+      },
+      matchScore: 90,
+      status: 'geverifieerd',
+    },
+    {
+      id: 'verify-8',
+      sources: {
+        ra: {
+          name: 'Dekmantel Festival 2026',
+          date: '2026-07-30',
+          venue: 'Amsterdamse Bos',
+          lineup: ['DJ Stingray', 'Shackleton', 'Midland', 'Joy Orbison'],
+          stages: ['Main', 'Greenhouse', 'Selectors', 'UFO'],
+          extraInfo: '18+, Eclectic, Techno, House',
+          website: 'https://ra.co/events/dekmantel-2026',
+          instagram: '@dekmantelfestival',
+          facebook: 'fb.com/dekmantel',
+        },
+        djguide: {
+          name: 'Dekmantel 2026',
+          date: '2026-07-30',
+          venue: 'Amsterdamse Bos',
+          lineup: ['DJ Stingray', 'Shackleton'],
+          stages: ['Main'],
+          extraInfo: 'Techno',
+          website: 'https://djguide.nl/dekmantel',
+          instagram: '',
+          facebook: '',
+        },
+        partyflock: {
+          name: 'Dekmantel Festival',
+          date: '30-07-2026',
+          venue: 'Amsterdamse Bos',
+          lineup: ['DJ Stingray', 'Shackleton', 'Midland', 'Joy Orbison', 'Antal'],
+          stages: ['Main', 'Greenhouse', 'Selectors', 'UFO'],
+          extraInfo: 'Eclectic',
+          website: 'https://partyflock.nl/party/dekmantel',
+          instagram: '@dekmantelfestival',
+          facebook: 'fb.com/dekmantel',
+        },
+      },
+      eigen: {},
+      conclusie: {
+        name: 'Dekmantel Festival 2026',
+        date: '2026-07-30',
+        venue: 'Amsterdamse Bos',
+        lineup: ['DJ Stingray', 'Shackleton', 'Midland', 'Joy Orbison', 'Antal'],
+        stages: ['Main', 'Greenhouse', 'Selectors', 'UFO'],
+        extraInfo: '18+, Eclectic, Techno, House',
+        website: 'https://ra.co/events/dekmantel-2026',
+        instagram: '@dekmantelfestival',
+        facebook: 'fb.com/dekmantel',
+      },
+      matchScore: 91,
+      status: 'geverifieerd',
+    },
+    {
+      id: 'verify-9',
+      sources: {
+        partyflock: {
+          name: 'Voltt Outdoor',
+          date: '15-05-2026',
+          venue: 'NDSM-werf Amsterdam',
+          lineup: ['Marcel Fengler', 'Etapp Kyle'],
+          stages: ['Main', 'Hangar'],
+          extraInfo: 'Techno',
+          website: 'https://partyflock.nl/party/voltt',
+          instagram: '@volttevents',
+          facebook: '',
+        },
+      },
+      eigen: {},
+      conclusie: {
+        name: 'Voltt Outdoor',
+        date: '2026-05-15',
+        venue: 'NDSM-werf Amsterdam',
+        lineup: ['Marcel Fengler', 'Etapp Kyle'],
+        stages: ['Main', 'Hangar'],
+        extraInfo: 'Techno',
+        website: 'https://partyflock.nl/party/voltt',
+        instagram: '@volttevents',
+        facebook: '',
+      },
+      matchScore: 100,
+      status: 'nieuw',
+    },
+    {
+      id: 'verify-10',
+      sources: {
+        ra: {
+          name: 'Paradigm Festival',
+          date: '2026-08-15',
+          venue: 'Paradigm Groningen',
+          lineup: ['Ben UFO', 'Hunee', 'Marcel Dettmann'],
+          stages: ['Main', 'Second'],
+          extraInfo: '18+, Techno, House',
+          website: 'https://ra.co/events/paradigm',
+          instagram: '@paradigmfestival',
+          facebook: 'fb.com/paradigm',
+        },
+        djguide: {
+          name: 'Paradigm',
+          date: '2026-08-15',
+          venue: 'Paradigm',
+          lineup: ['Ben UFO', 'Hunee'],
+          stages: [],
+          extraInfo: '',
+          website: 'https://djguide.nl/paradigm',
+          instagram: '',
+          facebook: '',
+        },
+        partyflock: {
+          name: 'Paradigm Festival 2026',
+          date: '15-08-2026',
+          venue: 'Paradigm Groningen',
+          lineup: ['Ben UFO', 'Hunee', 'Marcel Dettmann', 'Job Jobse'],
+          stages: ['Main', 'Second'],
+          extraInfo: 'Techno, House',
+          website: 'https://partyflock.nl/party/paradigm',
+          instagram: '@paradigmfestival',
+          facebook: 'fb.com/paradigm',
+        },
+      },
+      eigen: {},
+      conclusie: {
+        name: 'Paradigm Festival 2026',
+        date: '2026-08-15',
+        venue: 'Paradigm Groningen',
+        lineup: ['Ben UFO', 'Hunee', 'Marcel Dettmann', 'Job Jobse'],
+        stages: ['Main', 'Second'],
+        extraInfo: '18+, Techno, House',
+        website: 'https://ra.co/events/paradigm',
+        instagram: '@paradigmfestival',
+        facebook: 'fb.com/paradigm',
+      },
+      matchScore: 89,
+      status: 'conflict',
+    },
+  ];
+
+  return events;
+}
+
+export function useScrapedEventVerification() {
+  const [events, setEvents] = useState<ScrapedEventComparison[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      await new Promise((resolve) => setTimeout(resolve, 400));
+      setEvents(generateDemoVerificationData());
+      setLoading(false);
+    };
+
+    fetchData();
+  }, []);
+
+  const updateEvent = useCallback((id: string, updates: Partial<ScrapedEventComparison>) => {
+    setEvents((prev) =>
+      prev.map((e) => (e.id === id ? { ...e, ...updates } : e))
+    );
+  }, []);
+
+  const deleteEvent = useCallback((id: string) => {
+    setEvents((prev) => prev.filter((e) => e.id !== id));
+  }, []);
+
+  const bulkApprove = useCallback((ids: string[]) => {
+    setEvents((prev) =>
+      prev.map((e) =>
+        ids.includes(e.id) ? { ...e, status: 'geverifieerd' as const } : e
+      )
+    );
+  }, []);
+
+  const bulkDelete = useCallback((ids: string[]) => {
+    setEvents((prev) => prev.filter((e) => !ids.includes(e.id)));
+  }, []);
+
+  return { events, loading, updateEvent, deleteEvent, bulkApprove, bulkDelete };
 }
