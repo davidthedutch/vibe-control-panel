@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Search, Send, Hash, Users, ChevronDown, ChevronUp, UserCheck, UserPlus, UserMinus, ArrowLeft, Circle, X, MessageSquare, Lock } from 'lucide-react';
+import { Search, Send, Hash, Users, ChevronDown, ChevronUp, UserCheck, UserPlus, UserMinus, ArrowLeft, Circle, X, MessageSquare, Lock, Plus } from 'lucide-react';
 import { usePersistedState } from './use-persisted-state';
 import type { PreviewUser } from '../../page';
 
@@ -92,12 +92,15 @@ export default function EscalchatScreen({ user }: EscalchatScreenProps) {
   const [messageText, setMessageText] = useState('');
   const [allMessages, setAllMessages] = usePersistedState('escal-chat-all-messages', INITIAL_ROOM_MESSAGES);
   const [friendsList, setFriendsList] = usePersistedState<string[]>('escal-friends-list', DEFAULT_FRIENDS);
-  const [friendGroups] = usePersistedState('escal-friend-groups', DEFAULT_FRIEND_GROUPS);
-  const [showSearch, setShowSearch] = useState(false);
+  const [friendGroups, setFriendGroups] = usePersistedState('escal-friend-groups', DEFAULT_FRIEND_GROUPS);
   const [searchCode, setSearchCode] = useState('');
   const [searchResult, setSearchResult] = useState<typeof DEMO_PEOPLE[0] | null | 'not_found'>(null);
   const [selectedProfile, setSelectedProfile] = useState<string | null>(null);
   const [usersExpanded, setUsersExpanded] = useState(false);
+  const [showCreateMenu, setShowCreateMenu] = useState(false);
+  const [createMode, setCreateMode] = useState<'menu' | 'group' | 'dm' | 'search'>('menu');
+  const [newGroupName, setNewGroupName] = useState('');
+  const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -149,6 +152,35 @@ export default function EscalchatScreen({ user }: EscalchatScreenProps) {
   };
 
   const truncName = (name: string) => name.slice(0, 7);
+
+  const handleCreateGroup = () => {
+    if (!newGroupName.trim() || selectedMembers.length === 0) return;
+    const groupId = 'custom_' + Date.now();
+    const newGroup = {
+      id: groupId,
+      name: newGroupName.trim(),
+      members: selectedMembers,
+    };
+    setFriendGroups((prev) => [...prev, newGroup]);
+    setAllMessages((prev) => ({ ...prev, [groupId]: [] }));
+    setNewGroupName('');
+    setSelectedMembers([]);
+    setShowCreateMenu(false);
+  };
+
+  const toggleMember = (name: string) => {
+    setSelectedMembers((prev) =>
+      prev.includes(name) ? prev.filter((n) => n !== name) : [...prev, name]
+    );
+  };
+
+  // Combineer statische rooms + custom groepen
+  const allRooms = [
+    ...DEMO_ROOMS,
+    ...friendGroups
+      .filter((g) => g.id.startsWith('custom_'))
+      .map((g) => ({ id: g.id, label: g.name })),
+  ];
 
   const filteredPublicMessages = allMessages[activeRoom] || [];
 
@@ -216,6 +248,232 @@ export default function EscalchatScreen({ user }: EscalchatScreenProps) {
             </button>
           )}
         </div>
+      </div>
+    </div>
+  ) : null;
+
+  // Create Menu overlay
+  const CreateMenu = showCreateMenu ? (
+    <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-6">
+      <div className="w-full max-w-[300px] rounded-[24px] bg-[#1E2128] border border-white/[0.1] shadow-2xl shadow-black/50 p-5 flex flex-col gap-3 relative">
+        {createMode === 'menu' && (
+          <>
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-bold text-white">Nieuw</h3>
+              <button
+                onClick={() => setShowCreateMenu(false)}
+                className="flex h-7 w-7 items-center justify-center rounded-full bg-white/[0.06] border border-white/[0.08]"
+              >
+                <X className="h-3.5 w-3.5 text-slate-400" />
+              </button>
+            </div>
+            <button
+              onClick={() => setCreateMode('group')}
+              className="flex items-center gap-3 rounded-[16px] bg-white/[0.06] border border-white/[0.08] px-3 py-3 text-left active:bg-white/[0.1] transition-colors"
+            >
+              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-purple-500/15">
+                <Users className="h-4 w-4 text-purple-400" />
+              </div>
+              <div>
+                <p className="text-xs font-semibold text-white">Nieuwe groep</p>
+                <p className="text-[10px] text-slate-400">Maak een groepschat</p>
+              </div>
+            </button>
+            <button
+              onClick={() => setCreateMode('dm')}
+              className="flex items-center gap-3 rounded-[16px] bg-white/[0.06] border border-white/[0.08] px-3 py-3 text-left active:bg-white/[0.1] transition-colors"
+            >
+              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-blue-500/15">
+                <MessageSquare className="h-4 w-4 text-blue-400" />
+              </div>
+              <div>
+                <p className="text-xs font-semibold text-white">Nieuw bericht</p>
+                <p className="text-[10px] text-slate-400">Start een gesprek</p>
+              </div>
+            </button>
+            <button
+              onClick={() => setCreateMode('search')}
+              className="flex items-center gap-3 rounded-[16px] bg-white/[0.06] border border-white/[0.08] px-3 py-3 text-left active:bg-white/[0.1] transition-colors"
+            >
+              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-orange-500/15">
+                <Search className="h-4 w-4 text-orange-400" />
+              </div>
+              <div>
+                <p className="text-xs font-semibold text-white">Zoek persoon</p>
+                <p className="text-[10px] text-slate-400">Vind op 6-cijferige code</p>
+              </div>
+            </button>
+          </>
+        )}
+
+        {createMode === 'group' && (
+          <>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setCreateMode('menu')}
+                className="flex h-7 w-7 items-center justify-center rounded-full bg-white/[0.06] border border-white/[0.08]"
+              >
+                <ArrowLeft className="h-3.5 w-3.5 text-slate-400" />
+              </button>
+              <h3 className="text-sm font-bold text-white">Nieuwe groep</h3>
+            </div>
+            <div>
+              <p className="mb-1 text-[10px] font-medium text-slate-400">Groepsnaam</p>
+              <input
+                type="text"
+                placeholder="Bijv. Rave Crew"
+                className="w-full rounded-[12px] bg-white/[0.06] border border-white/[0.08] px-3 py-2 text-xs text-white placeholder-slate-500 outline-none focus:border-orange-500/30"
+                value={newGroupName}
+                onChange={(e) => setNewGroupName(e.target.value)}
+              />
+            </div>
+            <div>
+              <p className="mb-1.5 text-[10px] font-medium text-slate-400">Selecteer leden</p>
+              <div className="flex flex-wrap gap-1.5 max-h-[180px] overflow-y-auto scrollbar-hide">
+                {[...DEMO_PEOPLE]
+                  .sort((a, b) => {
+                    const aFriend = friendsList.includes(a.name) ? 0 : 1;
+                    const bFriend = friendsList.includes(b.name) ? 0 : 1;
+                    return aFriend - bFriend;
+                  })
+                  .map((person) => {
+                    const selected = selectedMembers.includes(person.name);
+                    return (
+                      <button
+                        key={person.name}
+                        onClick={() => toggleMember(person.name)}
+                        className={`flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-medium transition-colors ${
+                          selected
+                            ? 'bg-orange-500/20 border border-orange-500/30 text-orange-300'
+                            : 'bg-white/[0.04] border border-white/[0.06] text-slate-400'
+                        }`}
+                      >
+                        {selected && <UserCheck className="h-3 w-3" />}
+                        {person.name}
+                        {friendsList.includes(person.name) && !selected && (
+                          <span className="text-green-400 text-[8px]">●</span>
+                        )}
+                      </button>
+                    );
+                  })}
+              </div>
+            </div>
+            <button
+              onClick={handleCreateGroup}
+              disabled={!newGroupName.trim() || selectedMembers.length === 0}
+              className="w-full rounded-[16px] bg-orange-500 py-2.5 text-xs font-semibold text-white active:bg-orange-600 disabled:opacity-30 disabled:active:bg-orange-500 transition-colors"
+            >
+              Maak groep{selectedMembers.length > 0 ? ` (${selectedMembers.length})` : ''}
+            </button>
+          </>
+        )}
+
+        {createMode === 'dm' && (
+          <>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setCreateMode('menu')}
+                className="flex h-7 w-7 items-center justify-center rounded-full bg-white/[0.06] border border-white/[0.08]"
+              >
+                <ArrowLeft className="h-3.5 w-3.5 text-slate-400" />
+              </button>
+              <h3 className="text-sm font-bold text-white">Nieuw bericht</h3>
+            </div>
+            <p className="text-[10px] text-slate-400">Kies een vriend</p>
+            <div className="flex flex-col gap-1 max-h-[250px] overflow-y-auto scrollbar-hide">
+              {friendsList.length === 0 ? (
+                <p className="text-center text-[11px] text-slate-500 py-4">Nog geen vrienden</p>
+              ) : (
+                friendsList.map((name) => {
+                  const person = DEMO_PEOPLE.find((p) => p.name === name);
+                  return (
+                    <button
+                      key={name}
+                      onClick={() => {
+                        setShowCreateMenu(false);
+                        openDM(name);
+                      }}
+                      className="flex items-center gap-3 rounded-[12px] bg-white/[0.04] border border-white/[0.06] px-3 py-2 text-left active:bg-white/[0.1] transition-colors"
+                    >
+                      <div className="relative">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-orange-500/25 text-[10px] font-bold text-orange-300">
+                          {person?.initials || name.slice(0, 2)}
+                        </div>
+                        {person?.online && (
+                          <div className="absolute bottom-0 right-0 h-2 w-2 rounded-full bg-green-400 border-[2px] border-[#1E2128]" />
+                        )}
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-xs font-medium text-white">{name}</p>
+                        <p className={`text-[10px] ${person?.online ? 'text-green-400' : 'text-slate-500'}`}>
+                          {person?.online ? 'Online' : 'Offline'}
+                        </p>
+                      </div>
+                      <ArrowLeft className="h-3.5 w-3.5 text-slate-500 rotate-180" />
+                    </button>
+                  );
+                })
+              )}
+            </div>
+          </>
+        )}
+
+        {createMode === 'search' && (
+          <>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setCreateMode('menu')}
+                className="flex h-7 w-7 items-center justify-center rounded-full bg-white/[0.06] border border-white/[0.08]"
+              >
+                <ArrowLeft className="h-3.5 w-3.5 text-slate-400" />
+              </button>
+              <h3 className="text-sm font-bold text-white">Zoek persoon</h3>
+            </div>
+            <p className="text-[10px] text-slate-400">Zoek op 6-cijferige code</p>
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1 rounded-[12px] bg-white/[0.06] border border-white/[0.08] px-3 py-1.5 flex-1">
+                <Hash className="h-3 w-3 text-orange-400" />
+                <input
+                  type="text"
+                  placeholder="6-cijferige code"
+                  maxLength={6}
+                  className="flex-1 bg-transparent text-xs text-white placeholder-slate-500 outline-none"
+                  value={searchCode}
+                  onChange={(e) => { setSearchCode(e.target.value.replace(/\D/g, '')); setSearchResult(null); }}
+                  onKeyDown={(e) => e.key === 'Enter' && handleSearchCode()}
+                />
+              </div>
+              <button
+                onClick={handleSearchCode}
+                className="rounded-[12px] bg-orange-500 px-3 py-1.5 text-xs font-semibold text-white active:bg-orange-600"
+              >
+                Zoek
+              </button>
+            </div>
+            {searchResult === 'not_found' && (
+              <p className="text-[11px] text-red-400">Geen persoon gevonden met code #{searchCode}</p>
+            )}
+            {searchResult && searchResult !== 'not_found' && (
+              <button
+                onClick={() => { setShowCreateMenu(false); setSelectedProfile(searchResult.name); }}
+                className="w-full flex items-center gap-3 rounded-[16px] bg-white/[0.06] border border-white/[0.08] px-3 py-2 text-left active:bg-white/[0.1]"
+              >
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-orange-500/30 text-[10px] font-bold text-orange-300">
+                  {searchResult.initials}
+                </div>
+                <div className="flex-1">
+                  <p className="text-xs font-medium text-slate-200">{searchResult.name}</p>
+                  <p className="text-[10px] text-slate-500">#{searchResult.code} &bull; {searchResult.online ? 'Online' : 'Offline'}</p>
+                </div>
+                {isFriend(searchResult.name) ? (
+                  <UserCheck className="h-4 w-4 text-green-400" />
+                ) : (
+                  <UserPlus className="h-4 w-4 text-slate-400" />
+                )}
+              </button>
+            )}
+          </>
+        )}
       </div>
     </div>
   ) : null;
@@ -323,92 +581,44 @@ export default function EscalchatScreen({ user }: EscalchatScreenProps) {
   return (
     <div className="relative flex flex-col gap-3 p-5">
       {MiniProfile}
+      {CreateMenu}
 
       {/* Header */}
       <div className="flex items-center justify-between">
         <h1 className="text-lg font-bold text-white">Escalatiekamer</h1>
+      </div>
+
+      {/* Mode toggle — Public / Friends + Plus */}
+      <div className="flex items-center gap-2">
+        <div className="flex flex-1 rounded-full bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] p-0.5">
+          {(['public', 'friends'] as const).map((m) => (
+            <button
+              key={m}
+              onClick={() => setMode(m)}
+              className={`flex-1 rounded-full py-1.5 text-xs font-semibold transition-colors ${
+                mode === m
+                  ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/20'
+                  : 'text-slate-400'
+              }`}
+            >
+              {m === 'public' ? 'Public' : 'Friends'}
+            </button>
+          ))}
+        </div>
         <button
-          onClick={() => { setShowSearch(!showSearch); setSearchResult(null); setSearchCode(''); }}
-          className={`flex h-8 w-8 items-center justify-center rounded-full backdrop-blur-xl border border-white/[0.08] ${
-            showSearch ? 'bg-orange-500/20' : 'bg-white/[0.06]'
-          }`}
+          onClick={() => { setShowCreateMenu(true); setCreateMode('menu'); setSearchCode(''); setSearchResult(null); }}
+          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-orange-500 text-white shadow-lg shadow-orange-500/20 active:bg-orange-600 transition-colors"
         >
-          <Search className="h-4 w-4 text-slate-300" />
+          <Plus className="h-4 w-4" />
         </button>
       </div>
-
-      {/* Mode toggle — Public / Friends */}
-      <div className="flex rounded-full bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] p-0.5">
-        {(['public', 'friends'] as const).map((m) => (
-          <button
-            key={m}
-            onClick={() => setMode(m)}
-            className={`flex-1 rounded-full py-1.5 text-xs font-semibold transition-colors ${
-              mode === m
-                ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/20'
-                : 'text-slate-400'
-            }`}
-          >
-            {m === 'public' ? 'Public' : 'Friends'}
-          </button>
-        ))}
-      </div>
-
-      {/* Search by code */}
-      {showSearch && (
-        <div className="rounded-[20px] bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] shadow-lg shadow-black/20 p-3">
-          <p className="mb-2 text-[11px] font-medium text-slate-400">Zoek persoon op code</p>
-          <div className="flex items-center gap-2">
-            <div className="flex items-center gap-1 rounded-[12px] bg-white/[0.06] border border-white/[0.08] px-3 py-1.5 flex-1">
-              <Hash className="h-3 w-3 text-orange-400" />
-              <input
-                type="text"
-                placeholder="6-cijferige code"
-                maxLength={6}
-                className="flex-1 bg-transparent text-xs text-white placeholder-slate-500 outline-none"
-                value={searchCode}
-                onChange={(e) => { setSearchCode(e.target.value.replace(/\D/g, '')); setSearchResult(null); }}
-                onKeyDown={(e) => e.key === 'Enter' && handleSearchCode()}
-              />
-            </div>
-            <button
-              onClick={handleSearchCode}
-              className="rounded-[12px] bg-orange-500 px-3 py-1.5 text-xs font-semibold text-white active:bg-orange-600"
-            >
-              Zoek
-            </button>
-          </div>
-          {searchResult === 'not_found' && (
-            <p className="mt-2 text-[11px] text-red-400">Geen persoon gevonden met code #{searchCode}</p>
-          )}
-          {searchResult && searchResult !== 'not_found' && (
-            <button
-              onClick={() => setSelectedProfile(searchResult.name)}
-              className="mt-2 w-full flex items-center gap-3 rounded-[16px] bg-white/[0.06] border border-white/[0.08] px-3 py-2 text-left active:bg-white/[0.1]"
-            >
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-orange-500/30 text-[10px] font-bold text-orange-300">
-                {searchResult.initials}
-              </div>
-              <div className="flex-1">
-                <p className="text-xs font-medium text-slate-200">{searchResult.name}</p>
-                <p className="text-[10px] text-slate-500">#{searchResult.code} &bull; {searchResult.online ? 'Online' : 'Offline'}</p>
-              </div>
-              {isFriend(searchResult.name) ? (
-                <UserCheck className="h-4 w-4 text-green-400" />
-              ) : (
-                <UserPlus className="h-4 w-4 text-slate-400" />
-              )}
-            </button>
-          )}
-        </div>
-      )}
 
       {/* ====== PUBLIC MODE ====== */}
       {mode === 'public' && (
         <>
           {/* Room filter chips */}
           <div className="scrollbar-hide flex gap-2 overflow-x-auto pb-0.5">
-            {DEMO_ROOMS.map((room) => (
+            {allRooms.map((room) => (
               <button
                 key={room.id}
                 onClick={() => setActiveRoom(room.id)}
