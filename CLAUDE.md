@@ -16,15 +16,16 @@
 
 ## Escal Dashboard Routes
 ```
-/escal              # Dashboard overzicht
-/escal/events       # Event management
-/escal/events/[id]  # Event detail
-/escal/users        # User management
-/escal/users/[id]   # User detail
-/escal/live         # Real-time monitoring
-/escal/scrapers     # Scraper status
-/escal/analytics    # Analytics
-/escal/settings     # Configuratie
+/escal                        # Dashboard overzicht
+/escal/events                 # Event management
+/escal/events/[id]            # Event detail
+/escal/users                  # User management
+/escal/users/[id]             # User detail
+/escal/live                   # Real-time monitoring
+/escal/scrapers               # Scraper status
+/escal/scrapers/verificatie   # Scraper data verificatie
+/escal/analytics              # Analytics
+/escal/settings               # Configuratie
 ```
 
 ## VERPLICHT: Cross-Platform Consistentie
@@ -77,11 +78,22 @@ Kleur mapping voor Escal components (ALLE platforms):
 - **Backgrounds**: `slate-*` (surfaces, borders, secondary text)
 - **VERBODEN**: `purple-*` en `indigo-*` mogen NIET worden gebruikt als Escal primary/accent kleur
 
+## Regels
+- **NOOIT zelf data genereren of verzinnen** — alleen echte data uit Supabase of handmatig door de gebruiker ingevoerde data
+- **Na wijzigingen ALTIJD committen + pushen** zodat Vercel in sync blijft
+- **Build commando**: `npx turbo build --force` vanuit monorepo root (NIET `pnpm build --filter=web`)
+
+## Huidige Data Status (11 feb 2026)
+- Alle demo/fake data is verwijderd uit `use-escal-data.ts`
+- Alle hooks retourneren lege arrays/null totdat ze aan Supabase worden gekoppeld
+- Alleen `useEscalMetrics()` en `useEscalEvents()` halen echte data op via server actions
+- Verificatie pagina UI is klaar, wacht op echte scraper data (1.134 events uit 3 bronnen)
+
 ## Key Files
 - `src/lib/escal-api-client.ts` - Escal API client
 - `src/lib/escal-data-loader.ts` - Bundled JSON data loader (fallback)
 - `src/lib/actions/escal-actions.ts` - Server actions
-- `src/lib/hooks/use-escal-data.ts` - React hooks voor Escal data
+- `src/lib/hooks/use-escal-data.ts` - React hooks voor Escal data (SCHOON - geen demo data)
 
 ## Naming Convention
 - Routes: `/escal/*`
