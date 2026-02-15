@@ -508,6 +508,14 @@ export default function SettingsPage() {
                 description="Enable XP, levels, badges, and achievements"
               />
             </div>
+            <div className="rounded-lg border border-slate-100 p-4 dark:border-slate-800">
+              <Toggle
+                enabled={localSettings.featureFlags.arena}
+                onChange={(v) => updateFeatureFlag('arena', v)}
+                label="Arena"
+                description="Live event dashboard met timers, stappen, shazam, status en plattegrond"
+              />
+            </div>
           </div>
         </div>
       </div>

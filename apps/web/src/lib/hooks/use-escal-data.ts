@@ -180,6 +180,7 @@ export interface EscalSettings {
     radiusChat: boolean;
     buddySystem: boolean;
     gamification: boolean;
+    arena: boolean;
   };
 }
 
@@ -466,6 +467,7 @@ export function useEscalSettings() {
       radiusChat: false,
       buddySystem: false,
       gamification: false,
+      arena: false,
     },
   });
   const [loading, setLoading] = useState(true);
