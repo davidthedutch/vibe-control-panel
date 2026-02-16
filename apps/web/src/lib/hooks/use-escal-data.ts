@@ -165,6 +165,14 @@ export interface ScrapedEventComparison {
   status: 'nieuw' | 'conflict' | 'geverifieerd';
 }
 
+export interface ArenaMetrics {
+  activeSessions: number;
+  activeTimers: number;
+  totalStepsToday: number;
+  shazamsToday: number;
+  activeStatuses: number;
+}
+
 export interface EscalSettings {
   scraperIntervals: {
     ra: string;
@@ -222,6 +230,25 @@ export function useEscalMetrics() {
     fetchMetrics();
     const interval = setInterval(fetchMetrics, 30000);
     return () => clearInterval(interval);
+  }, []);
+
+  return { metrics, loading, error };
+}
+
+export function useArenaMetrics() {
+  const [metrics, setMetrics] = useState<ArenaMetrics>({
+    activeSessions: 0,
+    activeTimers: 0,
+    totalStepsToday: 0,
+    shazamsToday: 0,
+    activeStatuses: 0,
+  });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+
+  useEffect(() => {
+    // TODO: Koppel aan Supabase
+    setLoading(false);
   }, []);
 
   return { metrics, loading, error };
