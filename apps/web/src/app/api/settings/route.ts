@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
+import { supabaseAdmin } from '@/lib/supabase-admin';
 
 export const dynamic = 'force-dynamic';
 
@@ -32,7 +32,7 @@ export async function GET(request: NextRequest) {
   try {
     const projectId = request.nextUrl.searchParams.get('projectId') || 'default';
 
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from('project_settings')
       .select('*')
       .eq('project_id', projectId)
@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { projectId = 'default', settings } = body;
 
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from('project_settings')
       .upsert({
         project_id: projectId,
@@ -86,7 +86,7 @@ export async function PATCH(request: NextRequest) {
     const { projectId = 'default', section, data: sectionData } = body;
 
     // First, get existing settings
-    const { data: existing, error: fetchError } = await supabase
+    const { data: existing, error: fetchError } = await supabaseAdmin
       .from('project_settings')
       .select('settings')
       .eq('project_id', projectId)
@@ -103,7 +103,7 @@ export async function PATCH(request: NextRequest) {
     };
 
     // Save back
-    const { data: updated, error: updateError } = await supabase
+    const { data: updated, error: updateError } = await supabaseAdmin
       .from('project_settings')
       .upsert({
         project_id: projectId,

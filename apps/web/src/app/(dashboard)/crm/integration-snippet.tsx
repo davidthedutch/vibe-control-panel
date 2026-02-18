@@ -10,34 +10,22 @@ export default function IntegrationSnippet({ projectId }: IntegrationSnippetProp
   const [copied, setCopied] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
 
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'YOUR_SUPABASE_URL';
-  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'YOUR_SUPABASE_ANON_KEY';
+  const apiBase = process.env.NEXT_PUBLIC_SUPABASE_URL
+    ? 'https://vibe-control-panel-web.vercel.app'
+    : 'http://localhost:3000';
 
   const snippet = `<!-- Vibe CRM Tracking Script -->
 <script>
 (function() {
   const VIBE_CONFIG = {
     projectId: '${projectId}',
-    supabaseUrl: '${supabaseUrl}',
-    supabaseKey: '${supabaseKey}'
+    apiUrl: '${apiBase}/api/crm/track'
   };
 
   let sessionId = null;
   let userId = null;
-  let sessionStartTime = Date.now();
 
-  // Initialize Supabase client
-  const supabase = window.supabase?.createClient(
-    VIBE_CONFIG.supabaseUrl,
-    VIBE_CONFIG.supabaseKey
-  );
-
-  if (!supabase) {
-    console.error('Supabase client not loaded. Please include Supabase JS SDK.');
-    return;
-  }
-
-  // Get or create user ID
+  // Get or create anonymous user ID
   function getUserId() {
     let uid = localStorage.getItem('vibe_user_id');
     if (!uid) {
@@ -47,156 +35,99 @@ export default function IntegrationSnippet({ projectId }: IntegrationSnippetProp
     return uid;
   }
 
+  // Send tracking request to API
+  async function track(action, data) {
+    try {
+      const res = await fetch(VIBE_CONFIG.apiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: action,
+          projectId: VIBE_CONFIG.projectId,
+          ...data
+        })
+      });
+      return await res.json();
+    } catch (err) {
+      console.error('Vibe tracking error:', err);
+      return null;
+    }
+  }
+
   // Track page view
   async function trackPageView() {
-    try {
-      const { data } = await supabase
-        .from('user_events')
-        .insert({
-          session_id: sessionId,
-          user_id: userId,
-          project_id: VIBE_CONFIG.projectId,
-          event_type: 'page_view',
-          page_url: window.location.pathname,
-          event_data: {
-            referrer: document.referrer,
-            title: document.title
-          }
-        })
-        .select()
-        .single();
-    } catch (err) {
-      console.error('Error tracking page view:', err);
-    }
+    if (!sessionId || !userId) return;
+    await track('page_view', {
+      sessionId: sessionId,
+      userId: userId,
+      pageUrl: window.location.pathname,
+      eventData: {
+        referrer: document.referrer,
+        title: document.title
+      }
+    });
   }
 
   // Start session
   async function startSession() {
-    userId = getUserId();
+    const externalId = getUserId();
 
-    try {
-      // Create or get user
-      const { data: existingUser } = await supabase
-        .from('site_users')
-        .select('id')
-        .eq('external_id', userId)
-        .eq('project_id', VIBE_CONFIG.projectId)
-        .single();
+    const result = await track('session_start', {
+      externalId: externalId,
+      device: /Mobile|Android|iPhone/i.test(navigator.userAgent) ? 'mobile' : 'desktop',
+      browser: navigator.userAgent.split('/')[0],
+      currentPage: window.location.pathname
+    });
 
-      let dbUserId;
-      if (existingUser) {
-        dbUserId = existingUser.id;
-      } else {
-        const { data: newUser } = await supabase
-          .from('site_users')
-          .insert({
-            project_id: VIBE_CONFIG.projectId,
-            external_id: userId,
-            segment: 'visitor'
-          })
-          .select('id')
-          .single();
-        dbUserId = newUser?.id;
-      }
-
-      // Create session
-      const { data: session } = await supabase
-        .from('site_sessions')
-        .insert({
-          user_id: dbUserId,
-          project_id: VIBE_CONFIG.projectId,
-          device: /Mobile|Android|iPhone/i.test(navigator.userAgent) ? 'mobile' : 'desktop',
-          browser: navigator.userAgent.split('/')[0],
-          is_online: true,
-          current_page: window.location.pathname
-        })
-        .select()
-        .single();
-
-      sessionId = session?.id;
-      userId = dbUserId;
-
-      // Track initial page view
+    if (result) {
+      sessionId = result.sessionId;
+      userId = result.userId;
       await trackPageView();
-
-      // Send heartbeat every 30 seconds
       setInterval(sendHeartbeat, 30000);
-    } catch (err) {
-      console.error('Error starting session:', err);
     }
   }
 
-  // Send heartbeat to keep session alive
+  // Send heartbeat
   async function sendHeartbeat() {
     if (!sessionId) return;
-
-    try {
-      await supabase
-        .from('site_sessions')
-        .update({
-          last_activity_at: new Date().toISOString(),
-          current_page: window.location.pathname
-        })
-        .eq('id', sessionId);
-    } catch (err) {
-      console.error('Error sending heartbeat:', err);
-    }
+    await track('heartbeat', {
+      sessionId: sessionId,
+      currentPage: window.location.pathname
+    });
   }
 
   // End session
   async function endSession() {
     if (!sessionId) return;
-
-    try {
-      await supabase
-        .from('site_sessions')
-        .update({
-          ended_at: new Date().toISOString(),
-          is_online: false
-        })
-        .eq('id', sessionId);
-    } catch (err) {
-      console.error('Error ending session:', err);
-    }
+    navigator.sendBeacon(VIBE_CONFIG.apiUrl, JSON.stringify({
+      action: 'session_end',
+      projectId: VIBE_CONFIG.projectId,
+      sessionId: sessionId
+    }));
   }
 
   // Track custom event
-  window.vibeTrack = async function(eventType, eventData = {}) {
+  window.vibeTrack = async function(eventType, eventData) {
     if (!sessionId || !userId) return;
-
-    try {
-      await supabase
-        .from('user_events')
-        .insert({
-          session_id: sessionId,
-          user_id: userId,
-          project_id: VIBE_CONFIG.projectId,
-          event_type: eventType,
-          page_url: window.location.pathname,
-          event_data: eventData
-        });
-    } catch (err) {
-      console.error('Error tracking event:', err);
-    }
+    await track('event', {
+      sessionId: sessionId,
+      userId: userId,
+      eventType: eventType,
+      pageUrl: window.location.pathname,
+      eventData: eventData || {}
+    });
   };
 
   // Identify user
   window.vibeIdentify = async function(userInfo) {
     if (!userId) return;
-
-    try {
-      await supabase
-        .from('site_users')
-        .update({
-          email: userInfo.email,
-          name: userInfo.name,
-          segment: userInfo.segment || 'user',
-          metadata: userInfo.metadata || {}
-        })
-        .eq('id', userId);
-    } catch (err) {
-      console.error('Error identifying user:', err);
-    }
+    await track('identify', {
+      userId: userId,
+      email: userInfo.email,
+      name: userInfo.name,
+      segment: userInfo.segment || 'user',
+      metadata: userInfo.metadata || {}
+    });
   };
 
   // Initialize
@@ -211,17 +142,14 @@ export default function IntegrationSnippet({ projectId }: IntegrationSnippetProp
 
   // Track page changes for SPAs
   let lastPath = window.location.pathname;
-  setInterval(() => {
+  setInterval(function() {
     if (window.location.pathname !== lastPath) {
       lastPath = window.location.pathname;
       trackPageView();
     }
   }, 500);
 })();
-</script>
-
-<!-- Include Supabase JS SDK (required) -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>`;
+</script>`;
 
   const handleCopy = () => {
     navigator.clipboard.writeText(snippet);

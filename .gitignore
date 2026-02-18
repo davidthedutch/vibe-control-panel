@@ -46,6 +46,7 @@ next-env.d.ts
 
 # Supabase
 .supabase/
+SUPABASE_CREDENTIALS.md
 
 # IDE
 .vscode/

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { supabase } from '@vibe/shared/lib/supabase';
+import { supabaseAdmin } from '@/lib/supabase-admin';
 import type { SeoIssue } from '@vibe/shared/types';
 
 export const dynamic = 'force-dynamic';
@@ -10,7 +10,7 @@ export async function POST(request: Request) {
     const projectId = '00000000-0000-0000-0000-000000000001';
 
     // Get project URLs
-    const { data: project } = await supabase
+    const { data: project } = await supabaseAdmin
       .from('projects')
       .select('urls')
       .eq('id', projectId)
@@ -64,7 +64,7 @@ export async function POST(request: Request) {
         const issues = detectIssues(seoData);
 
         // Check if page already exists
-        const { data: existing } = await supabase
+        const { data: existing } = await supabaseAdmin
           .from('seo_pages')
           .select('id')
           .eq('project_id', projectId)
@@ -73,7 +73,7 @@ export async function POST(request: Request) {
 
         if (existing) {
           // Update existing page
-          await supabase
+          await supabaseAdmin
             .from('seo_pages')
             .update({
               title: seoData.title,
@@ -88,7 +88,7 @@ export async function POST(request: Request) {
             .eq('id', existing.id);
         } else {
           // Insert new page
-          await supabase
+          await supabaseAdmin
             .from('seo_pages')
             .insert({
               project_id: projectId,

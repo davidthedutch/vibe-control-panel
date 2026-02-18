@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { supabase } from '@vibe/shared/lib/supabase';
+import { supabaseAdmin } from '@/lib/supabase-admin';
 
 export const dynamic = 'force-dynamic';
 
@@ -8,7 +8,7 @@ export async function GET() {
   try {
     const projectId = 'default';
 
-    const { data: settings } = await supabase
+    const { data: settings } = await supabaseAdmin
       .from('project_settings')
       .select('settings')
       .eq('project_id', projectId)
@@ -45,7 +45,7 @@ export async function POST(request: Request) {
     const projectId = 'default';
 
     // Get current settings
-    const { data: currentSettings } = await supabase
+    const { data: currentSettings } = await supabaseAdmin
       .from('project_settings')
       .select('settings')
       .eq('project_id', projectId)
@@ -64,7 +64,7 @@ export async function POST(request: Request) {
     };
 
     // Update settings
-    await supabase
+    await supabaseAdmin
       .from('project_settings')
       .update({ settings: updatedSettings })
       .eq('project_id', projectId);

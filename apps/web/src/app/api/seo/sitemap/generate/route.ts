@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getSeoPages } from '@vibe/shared/lib/api';
-import { supabase } from '@vibe/shared/lib/supabase';
+import { supabaseAdmin } from '@/lib/supabase-admin';
 
 export const dynamic = 'force-dynamic';
 
@@ -11,7 +11,7 @@ export async function POST() {
     const settingsProjectId = 'default';
 
     // Get project to fetch base URL
-    const { data: project } = await supabase
+    const { data: project } = await supabaseAdmin
       .from('projects')
       .select('urls')
       .eq('id', projectId)
@@ -33,7 +33,7 @@ export async function POST() {
     const sitemap = generateSitemapXml(baseUrl, pages);
 
     // Get current settings
-    const { data: currentSettings } = await supabase
+    const { data: currentSettings } = await supabaseAdmin
       .from('project_settings')
       .select('settings')
       .eq('project_id', settingsProjectId)
@@ -52,7 +52,7 @@ export async function POST() {
     };
 
     // Update settings
-    await supabase
+    await supabaseAdmin
       .from('project_settings')
       .update({ settings: updatedSettings })
       .eq('project_id', settingsProjectId);
